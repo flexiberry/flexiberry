@@ -1,8 +1,7 @@
 {
   "name": "flexiberry",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "Flexiberry is an API testing framework designed to create test suites for various use cases, including functional testing, load testing, security testing, API data comparison, API response validation, API unit testing, and end-to-end testing",
   "workspaces": [
     "packages/*",
     "apps/*"
@@ -10,9 +9,21 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "keywords": [
+    "flexiberry",
+    "API",
+    "API TESTING",
+    "API quality Assurance ",
+    "QA",
+    "load tesing",
+    "functional testing",
+    "end to end tesing",
+    "data comparison",
+    "data validation",
+    "end-to-end testing"
+  ],
+  "author": "rinturajc@gmail.com",
+  "license": "MIT",
   "devDependencies": {
     "@types/node": "^20.14.11",
     "ts-node": "^10.9.2",
