@@ -1,0 +1,66 @@
+{
+    "title": "User Authentication Test Suite",
+    "description": "Test suite for user authentication flows",
+    "scenarios": [
+      {
+        "title": "Login Scenario",
+        "description": "Tests for user login",
+        "testCase": [
+          {
+            "title": "Successful Login Test",
+            "description": "Test for successful user login",
+            "steps": [
+              {
+                "title": "Send Login Request",
+                "id": "step1",
+                "http": {
+                  "endpoint": "/api/login",
+                  "method": "POST",
+                  "headers": {
+                    "Content-Type": "application/json"
+                  },
+                  "body": {
+                    "username": "testuser",
+                    "password": "testpass"
+                  }
+                },
+                "capture": {
+                  "token": "response.body.token"
+                },
+                "validation": {
+                  "status": "200",
+                  "body": {
+                    "success": true
+                  },
+                  "compare": {
+                    "lhs": "response.body.success",
+                    "rhs": "true",
+                    "operator": "EQUALS"
+                  }
+                }
+              }
+            ],
+            "expected": true,
+            "variables": {
+              "username": "testuser",
+              "password": "testpass"
+            }
+          }
+        ]
+      }
+    ],
+    "environment": [
+      {
+        "env": "development",
+        "globalVariables": {
+          "baseUrl": "http://localhost:3000"
+        }
+      }
+    ],
+    "inputData": {
+      "testUser": {
+        "username": "testuser",
+        "password": "testpass"
+      }
+    }
+  }
