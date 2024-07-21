@@ -14,21 +14,33 @@
   import { moveItemInHierarchy } from "../util/util";
   import { flip } from "svelte/animate";
   import { v4 as uuidv4 } from "uuid";
-  import { savedFolders, updateFolder } from "../writable/folder.store";
-  import type { Folder } from "../types/folder.model";
+  import { savedFolders, updateFolder } from "$lib/writable/folder.store";
   import { ScrollArea } from "$lib/components/ui/scroll-area/index.js";
+  import { onMount } from "svelte";
+  import { db } from "../db/db";
 
   export let height: number = 100;
+
+  onMount(async () => {
+    console.log("onMount");
+    let d = await db.folderTable.get("folder");
+    updateFolder(d?.data);
+    console.log(d);
+  });
+
   let folders: any[] = [];
+
   savedFolders.subscribe((data) => {
     folders = data;
   });
 
   function addFolder() {
     folders.push({
-      name: uuidv4().toString(),
+      name: "",
       subfolder: [],
       type: "folder",
+      rename: true,
+      expand: false,
       uid: uuidv4().toString(),
     });
     updateFolder(folders);
@@ -118,10 +130,14 @@
       </div>
     {/if}
 
-    {#each folders as folder (folder.name)}
+    {#each folders as folder, index (index)}
       <div animate:flip={{ delay: 250, duration: 250 }}>
         <FolderItem
           {folder}
+          on:folderUpdate={(f) => {
+            console.log(f.detail.fld);
+            updateFolder(folders);
+          }}
           path={folder}
           onDrop={handleDrop}
           onDragStart={handleDragStart}

@@ -1,6 +1,8 @@
-export type Folder = {
+export type FolderModel = {
   name: string;
   type: string;
+  expand: boolean;
   uid: string;
-  subfolder: Folder[];
+  rename: boolean;
+  subfolders: FolderModel[];
 };

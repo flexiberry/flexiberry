@@ -1,8 +1,8 @@
-<script>
+<script lang="ts">
   import { Button } from "../components/ui/button";
   import FolderItem from "./FolderItem.svelte";
 
-  import { Delete, Folder, Trash } from "lucide-svelte";
+  import { Folder, Trash } from "lucide-svelte";
   import { FolderPlus } from "lucide-svelte";
   import { FilePlus } from "lucide-svelte";
 
@@ -12,28 +12,46 @@
   import { EllipsisVertical } from "lucide-svelte";
 
   import { flip } from "svelte/animate";
+  import { v4 as uuidv4 } from "uuid";
+  import type { FolderModel } from "../types/folder.model";
 
-  export let folder;
+  import { Input } from "$lib/components/ui/input/index.js";
 
-  /**
-   * @type {any[]}
-   */
-  export let path = [];
+  import { createEventDispatcher } from "svelte";
+  export let folder: FolderModel;
+
+  export let path: FolderModel;
   export let onDrop;
   export let onDragStart;
   export let onDragOver;
 
-  let open = false;
   let dragging = false;
-  const toggle = () => (open = !open);
+  const toggle = () => (folder.expand = !folder.expand);
+  const dispatch = createEventDispatcher();
 
-  const handleDrop = (/** @type {DragEvent} */ event) => {
+  function addFolder(type: "folder" | "file") {
+    if (!folder.subfolders) folder.subfolders = [];
+    folder.expand = true;
+    folder.subfolders.push({
+      name: "",
+      subfolders: [],
+      type: type,
+      rename: true,
+      expand: false,
+      uid: uuidv4().toString(),
+    });
+    dispatch("folderUpdate", {
+      fld: folder,
+    });
+  }
+
+  const handleDrop = (event: { preventDefault: () => void }) => {
     onDrop({ event, path });
     dragging = false;
     event.preventDefault();
   };
 
-  const handleDragStart = (/** @type {DragEvent} */ event) => {
+  const handleDragStart = (event: any) => {
     onDragStart({ event, path });
     if (!!event && !!event.dataTransfer) {
       event.dataTransfer.effectAllowed = "move";
@@ -43,7 +61,7 @@
     dragging = true;
   };
 
-  const handleDragOver = (/** @type {DragEvent} */ event) => {
+  const handleDragOver = (event: any) => {
     if (!!event && !!event.dataTransfer) {
       event.dataTransfer.dropEffect = "move";
       console.log(event.dataTransfer);
@@ -56,6 +74,22 @@
   let showStatusBar = true;
   let showActivityBar = false;
   let showPanel = false;
+
+  function handleKey(e: KeyboardEvent): void {
+    console.log(e.key);
+
+    if (e.key === "Enter" || e.key === "Escape") {
+      if (folder.name === "") {
+        alert("Please rename the folder");
+        folder.rename = true;
+      } else {
+        folder.rename = false;
+        dispatch("folderUpdate", {
+          fld: folder,
+        });
+      }
+    }
+  }
 </script>
 
 <div
@@ -74,10 +108,14 @@
      
     justify-between select-none items-center rounded-sm px-2 py-0 text-sm outline-none aria-selected:bg-accent aria-selected:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50"
   >
-    <button on:click={toggle} class="flex flex-auto align-middle">
+    <button
+      on:click={toggle}
+      on:dblclick={() => (folder.rename = true)}
+      class="flex flex-auto items-center ring-0 align-middle"
+    >
       <div class="flex-none">
         {#if folder.type == "folder"}
-          {#if !open}
+          {#if !folder.expand}
             <Folder size={20}></Folder>
           {:else}
             <FolderOpen size={20}></FolderOpen>
@@ -86,20 +124,34 @@
           <FileCode class="text-blue-400" size={20}></FileCode>
         {/if}
       </div>
-      <span class="ml-2 flex-none"> {folder.name} </span>
+
+      {#if folder.rename}
+        <Input
+          type="text"
+          class="m-1 focus-visible:ring-0 h-6 bg-slate-200 dark:bg-slate-800 "
+          bind:value={folder.name}
+          on:keydown={handleKey}
+          on:focusout={() => {
+            if (folder.name !== "") folder.rename = false;
+          }}
+          placeholder="Enter {folder.type} name"
+        />
+      {:else}
+        <span class="ml-2 flex-none"> {folder.name} </span>
+      {/if}
     </button>
     <div
       class="inline-flex group-hover:bg-slate-50 group-hover:dark:bg-slate-900"
     >
       {#if folder.type == "folder"}
         <button
-          on:click={() => console.log("click on create")}
+          on:click={() => addFolder("folder")}
           class=" px-1 group-hover:opacity-100 opacity-0 hover:bg-slate-100 hover:dark:bg-slate-900 rounded-sm"
         >
           <FolderPlus size={16}></FolderPlus>
         </button>
         <button
-          on:click={() => console.log("click on create")}
+          on:click={() => addFolder("file")}
           class=" px-1 group-hover:opacity-100 opacity-0 hover:bg-slate-100 hover:dark:bg-slate-900 rounded-sm"
         >
           <FilePlus size={16}></FilePlus>
@@ -142,13 +194,18 @@
     </div>
   </div>
 
-  {#if open && folder?.subfolders != null && folder?.subfolders?.length > 0}
+  {#if folder.expand && folder?.subfolders != null && folder?.subfolders?.length > 0}
     <div
       style="margin-left: 24px; border-left-width: 1px; border-bottom-left-radius: 12px; "
     >
-      {#each folder?.subfolders as subfolder (subfolder.name)}
+      {#each folder?.subfolders as subfolder, index (index)}
         <div animate:flip>
           <FolderItem
+            on:folderUpdate={(f) => {
+              dispatch("folderUpdate", {
+                fld: f,
+              });
+            }}
             folder={subfolder}
             path={subfolder}
             {onDrop}
@@ -158,25 +215,19 @@
         </div>
       {/each}
     </div>
-  {:else if open}
-    <div style="margin-left: 24px;  ">
+  {:else if folder.expand && folder.type === "folder"}
+    <!-- <div style="margin-left: 24px;  ">
       <div class="flex flex-col flex-1">
         <div class="flex flex-col items-center justify-center p-4">
+          <img src="%sveltekit.assets%/104-dumbbell.svg" alt="" srcset="" />
           <span
             class="max-w-sm mt-2 text-center whitespace-normal font-thin text-xs text-secondaryLight"
-            >Collections are empty</span
-          >
-          <div class="mt-4">
-            <div class="flex flex-col items-center space-y-4">
-              <span class="text-center text-secondaryLight"
-                >Import or create a collection</span
-              >
-              <div class="flex flex-col items-stretch gap-4"></div>
-            </div>
-          </div>
+            >🫙 Empty
+          </span>
+          <span></span>
         </div>
       </div>
-    </div>
+    </div> -->
   {/if}
 </div>
 

@@ -44,6 +44,7 @@
     "bits-ui": "^0.21.12",
     "clsx": "^2.1.1",
     "cmdk-sv": "^0.0.17",
+    "dexie": "^4.0.8",
     "lucide-svelte": "^0.399.0",
     "mode-watcher": "^0.3.1",
     "paneforge": "^0.0.5",

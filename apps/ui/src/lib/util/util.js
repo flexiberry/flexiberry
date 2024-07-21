@@ -78,3 +78,14 @@ function findFolderPath(folders, targetFolder, path = []) {
   // @ts-ignore
   return null; // Folder not found
 }
+
+/**
+ * @param {any[]} folder
+ */
+export function removeIfFileNameisEmpty(folder) {
+  for (let index = 0; index < folder.length; index++) {
+    const element = folder[index];
+    if (element.name === "" && element.rename == false) folder.splice(index, 1);
+    else removeIfFileNameisEmpty(element);
+  }
+}
