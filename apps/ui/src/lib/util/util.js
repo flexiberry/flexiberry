@@ -83,9 +83,15 @@ function findFolderPath(folders, targetFolder, path = []) {
  * @param {any[]} folder
  */
 export function removeIfFileNameisEmpty(folder) {
+  if (folder == null) return null;
   for (let index = 0; index < folder.length; index++) {
     const element = folder[index];
-    if (element.name === "" && element.rename == false) folder.splice(index, 1);
-    else removeIfFileNameisEmpty(element);
+    if (element.name === "" && element.rename == false) {
+      folder.splice(index, 1);
+    } else if (element["remove"] == true) {
+      folder.splice(index, 1);
+    } else {
+      removeIfFileNameisEmpty(element.subfolders);
+    }
   }
 }

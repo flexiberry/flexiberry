@@ -25,7 +25,6 @@
     console.log("onMount");
     let d = await db.folderTable.get("folder");
     updateFolder(d?.data);
-    console.log(d);
   });
 
   let folders: any[] = [];

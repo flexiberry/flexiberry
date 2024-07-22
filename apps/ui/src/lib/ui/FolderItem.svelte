@@ -1,4 +1,8 @@
 <script lang="ts">
+  import FolderName from "./FolderName.svelte";
+
+  import FolderAction from "./FolderAction.svelte";
+
   import { Button } from "../components/ui/button";
   import FolderItem from "./FolderItem.svelte";
 
@@ -29,22 +33,6 @@
   const toggle = () => (folder.expand = !folder.expand);
   const dispatch = createEventDispatcher();
 
-  function addFolder(type: "folder" | "file") {
-    if (!folder.subfolders) folder.subfolders = [];
-    folder.expand = true;
-    folder.subfolders.push({
-      name: "",
-      subfolders: [],
-      type: type,
-      rename: true,
-      expand: false,
-      uid: uuidv4().toString(),
-    });
-    dispatch("folderUpdate", {
-      fld: folder,
-    });
-  }
-
   const handleDrop = (event: { preventDefault: () => void }) => {
     onDrop({ event, path });
     dragging = false;
@@ -70,10 +58,6 @@
     dragging = true;
     event.preventDefault();
   };
-
-  let showStatusBar = true;
-  let showActivityBar = false;
-  let showPanel = false;
 
   function handleKey(e: KeyboardEvent): void {
     console.log(e.key);
@@ -105,93 +89,24 @@
     on:dragleave={() => (dragging = false)}
     on:dragenter={() => (dragging = true)}
     class="relative group flex hover:bg-slate-50 dark:hover:bg-slate-800
-     
-    justify-between select-none items-center rounded-sm px-2 py-0 text-sm outline-none aria-selected:bg-accent aria-selected:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50"
+     justify-between select-none items-center rounded-sm px-2 py-0 text-sm outline-none aria-selected:bg-accent aria-selected:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50"
   >
-    <button
-      on:click={toggle}
-      on:dblclick={() => (folder.rename = true)}
-      class="flex flex-auto items-center ring-0 align-middle"
-    >
-      <div class="flex-none">
-        {#if folder.type == "folder"}
-          {#if !folder.expand}
-            <Folder size={20}></Folder>
-          {:else}
-            <FolderOpen size={20}></FolderOpen>
-          {/if}
-        {:else}
-          <FileCode class="text-blue-400" size={20}></FileCode>
-        {/if}
-      </div>
-
-      {#if folder.rename}
-        <Input
-          type="text"
-          class="m-1 focus-visible:ring-0 h-6 bg-slate-200 dark:bg-slate-800 "
-          bind:value={folder.name}
-          on:keydown={handleKey}
-          on:focusout={() => {
-            if (folder.name !== "") folder.rename = false;
-          }}
-          placeholder="Enter {folder.type} name"
-        />
-      {:else}
-        <span class="ml-2 flex-none"> {folder.name} </span>
-      {/if}
-    </button>
-    <div
-      class="inline-flex group-hover:bg-slate-50 group-hover:dark:bg-slate-900"
-    >
-      {#if folder.type == "folder"}
-        <button
-          on:click={() => addFolder("folder")}
-          class=" px-1 group-hover:opacity-100 opacity-0 hover:bg-slate-100 hover:dark:bg-slate-900 rounded-sm"
-        >
-          <FolderPlus size={16}></FolderPlus>
-        </button>
-        <button
-          on:click={() => addFolder("file")}
-          class=" px-1 group-hover:opacity-100 opacity-0 hover:bg-slate-100 hover:dark:bg-slate-900 rounded-sm"
-        >
-          <FilePlus size={16}></FilePlus>
-        </button>
-      {:else}
-        <button
-          on:click={() => console.log("click on create")}
-          class=" px-1 group-hover:opacity-100 opacity-0 hover:bg-slate-100 hover:dark:bg-slate-900 rounded-sm"
-        >
-          <Trash class="text-red-500" size={16}></Trash>
-        </button>
-      {/if}
-      <div class="group-hover:opacity-100 opacity-20">
-        <DropdownMenu.Root>
-          <DropdownMenu.Trigger asChild let:builder>
-            <Button
-              class="px-1"
-              builders={[builder]}
-              variant="link"
-              style="icon"
-            >
-              <EllipsisVertical size={16}></EllipsisVertical>
-            </Button>
-          </DropdownMenu.Trigger>
-          <DropdownMenu.Content>
-            <DropdownMenu.Label>Appearance</DropdownMenu.Label>
-            <DropdownMenu.Separator />
-            <DropdownMenu.CheckboxItem bind:checked={showStatusBar}>
-              Status Bar
-            </DropdownMenu.CheckboxItem>
-            <DropdownMenu.CheckboxItem bind:checked={showActivityBar} disabled>
-              Activity Bar
-            </DropdownMenu.CheckboxItem>
-            <DropdownMenu.CheckboxItem bind:checked={showPanel}
-              >Panel</DropdownMenu.CheckboxItem
-            >
-          </DropdownMenu.Content>
-        </DropdownMenu.Root>
-      </div>
-    </div>
+    <FolderName
+      {folder}
+      on:folderUpdate={(f) => {
+        dispatch("folderUpdate", {
+          fld: folder,
+        });
+      }}
+    ></FolderName>
+    <FolderAction
+      {folder}
+      on:folderUpdate={(f) => {
+        dispatch("folderUpdate", {
+          fld: f,
+        });
+      }}
+    ></FolderAction>
   </div>
 
   {#if folder.expand && folder?.subfolders != null && folder?.subfolders?.length > 0}
