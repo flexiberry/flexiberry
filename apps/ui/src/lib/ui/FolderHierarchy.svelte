@@ -82,7 +82,7 @@
 </script>
 
 <div style="height:{height - 40}px;" class="pb-4">
-  <div class="flex justify-between rounded-lg m-2">
+  <div class="flex justify-between m-2">
     <div class="flex-auto">
       <Input
         class="w-full focus-visible:ring-0 bg-slate-50 dark:bg-slate-800"
@@ -100,7 +100,7 @@
       </Button>
     </div>
   </div>
-  <ScrollArea class=" h-full  w-full rounded-md border">
+  <ScrollArea class=" h-full  w-full ">
     {#if folders.length <= 0}
       <div class="flex flex-col mt-6 items-center justify-center p-4">
         <Inbox size={56} strokeWidth={1} />

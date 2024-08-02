@@ -47,6 +47,7 @@
     "dexie": "^4.0.8",
     "lucide-svelte": "^0.399.0",
     "mode-watcher": "^0.3.1",
+    "monaco-editor": "^0.44.0",
     "paneforge": "^0.0.5",
     "svelte-dnd-action": "^0.9.22",
     "svelte-sonner": "^0.3.24",
