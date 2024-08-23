@@ -3,24 +3,9 @@
 
   import FolderAction from "./FolderAction.svelte";
 
-  import { Button } from "../components/ui/button";
   import FolderItem from "./FolderItem.svelte";
-
-  import { Folder, Trash } from "lucide-svelte";
-  import { FolderPlus } from "lucide-svelte";
-  import { FilePlus } from "lucide-svelte";
-
-  import { FolderOpen } from "lucide-svelte";
-  import { FileCode } from "lucide-svelte";
-  import * as DropdownMenu from "$lib/components/ui/dropdown-menu";
-  import { EllipsisVertical } from "lucide-svelte";
-
   import { flip } from "svelte/animate";
-  import { v4 as uuidv4 } from "uuid";
   import type { FolderModel } from "../types/folder.model";
-
-  import { Input } from "$lib/components/ui/input/index.js";
-
   import { createEventDispatcher } from "svelte";
   export let folder: FolderModel;
 

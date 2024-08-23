@@ -17,6 +17,7 @@
       fld: folder,
     });
   };
+
   const dispatch = createEventDispatcher();
 
   function handleKey(e: KeyboardEvent): void {
@@ -36,7 +37,6 @@
 
 <button
   on:click={toggle}
-  on:dblclick={() => (folder.rename = true)}
   class="flex flex-auto items-center ring-0 align-middle"
 >
   <div class="flex-none">
@@ -62,7 +62,9 @@
       }}
       placeholder="Enter {folder.type} name"
     />
+  {:else if folder.type === "file"}
+    <a href={folder.uid} class="ml-2 flex-none">{folder.name}</a>
   {:else}
-    <span class="ml-2 flex-none"> {folder.name} </span>
+    <span class="ml-2 flex-none">{folder.name}</span>
   {/if}
 </button>

@@ -6,6 +6,7 @@
   import * as Resizable from "$lib/components/ui/resizable/index";
   import Header from "../lib/ui/Header.svelte";
   import FolderHierarchy from "../lib/ui/FolderHierarchy.svelte";
+  import SplashScreen from "../lib/ui/SplashScreen.svelte";
 
   let heightDifference = 0;
   onMount(() => {
@@ -26,6 +27,10 @@
     };
   });
 </script>
+
+<!-- <SplashScreen duration={3000} /> -->
+
+<!-- Show the splash screen for 3 seconds -->
 
 <Toaster position="bottom-center" />
 <ModeWatcher />

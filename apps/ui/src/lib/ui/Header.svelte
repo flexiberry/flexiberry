@@ -8,7 +8,7 @@
   import { toast } from "svelte-sonner";
   import { toggleMode } from "mode-watcher";
   import Separator from "../components/ui/separator/separator.svelte";
-
+  import berry from "$lib/assets/berry.png";
   let bookmarks = false;
   let fullUrls = true;
 
@@ -18,8 +18,8 @@
 <header
   class="border-b-2 dark:border-b-2 dark:border-slate-800 border-black border-opacity-10"
 >
-  <div class="logo">
-    <Cherry></Cherry>
+  <div class="logo flex align-middle items-center">
+    <img src={berry} height={"40px"} class="h-10" alt="" srcset="" />
     <h1 class="font-extrabold pl-3">FlexiBerry</h1>
   </div>
   <div>
