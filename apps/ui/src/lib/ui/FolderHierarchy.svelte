@@ -30,7 +30,7 @@
   let folders: any[] = [];
 
   savedFolders.subscribe((data) => {
-    folders = data;
+    folders = data || [];
   });
 
   function addFolder() {
@@ -101,7 +101,7 @@
     </div>
   </div>
   <ScrollArea class=" h-full  w-full ">
-    {#if folders.length <= 0}
+    {#if folders == null || folders.length <= 0}
       <div class="flex flex-col mt-6 items-center justify-center p-4">
         <Inbox size={56} strokeWidth={1} />
 
@@ -127,22 +127,22 @@
           </div>
         </div>
       </div>
+    {:else}
+      {#each folders as folder, index (index)}
+        <div animate:flip={{ delay: 250, duration: 250 }}>
+          <FolderItem
+            {folder}
+            on:folderUpdate={(f) => {
+              console.log(f.detail.fld);
+              updateFolder(folders);
+            }}
+            path={folder}
+            onDrop={handleDrop}
+            onDragStart={handleDragStart}
+            onDragOver={handleDragOver}
+          />
+        </div>
+      {/each}
     {/if}
-
-    {#each folders as folder, index (index)}
-      <div animate:flip={{ delay: 250, duration: 250 }}>
-        <FolderItem
-          {folder}
-          on:folderUpdate={(f) => {
-            console.log(f.detail.fld);
-            updateFolder(folders);
-          }}
-          path={folder}
-          onDrop={handleDrop}
-          onDragStart={handleDragStart}
-          onDragOver={handleDragOver}
-        />
-      </div>
-    {/each}
   </ScrollArea>
 </div>

@@ -47,14 +47,14 @@
         <FolderOpen size={20}></FolderOpen>
       {/if}
     {:else}
-      <FileCode class="text-blue-400" size={20}></FileCode>
+      <FileCode class="text-secondary" size={20}></FileCode>
     {/if}
   </div>
 
   {#if folder.rename}
     <Input
       type="text"
-      class="m-1 focus-visible:ring-0 h-6 bg-slate-200 dark:bg-slate-800 "
+      class="m-1 focus-visible:ring-0 h-6 bg-muted bg-opacity-5 "
       bind:value={folder.name}
       on:keydown={handleKey}
       on:focusout={() => {

@@ -61,9 +61,7 @@
   }
 </script>
 
-<div
-  class="folder rounded-lg {dragging ? 'bg-green-100 dark:bg-green-950 ' : ''}"
->
+<div class="folder rounded-lg {dragging ? 'bg-primary bg-blend-multiply' : ''}">
   <div
     role="listitem"
     draggable={true}
@@ -73,7 +71,7 @@
     on:dragexit={() => (dragging = false)}
     on:dragleave={() => (dragging = false)}
     on:dragenter={() => (dragging = true)}
-    class="relative group flex hover:bg-slate-50 dark:hover:bg-slate-800
+    class="relative group flex hover:bg-muted
      justify-between select-none items-center rounded-sm px-2 py-0 text-sm outline-none aria-selected:bg-accent aria-selected:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50"
   >
     <FolderName

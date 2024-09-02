@@ -8,16 +8,14 @@
   import { toast } from "svelte-sonner";
   import { toggleMode } from "mode-watcher";
   import Separator from "../components/ui/separator/separator.svelte";
-  import berry from "$lib/assets/berry.png";
+  import berry from "$lib/assets/berry-fotor-2024090211181.png";
   let bookmarks = false;
   let fullUrls = true;
 
   const profileRadioValue = "benoit";
 </script>
 
-<header
-  class="border-b-2 dark:border-b-2 dark:border-slate-800 border-black border-opacity-10"
->
+<header class="border-b-2">
   <div class="logo flex align-middle items-center">
     <img src={berry} height={"40px"} class="h-10" alt="" srcset="" />
     <h1 class="font-extrabold pl-3">FlexiBerry</h1>
@@ -29,7 +27,7 @@
     >
       <Input
         type="search"
-        class="m-1 focus-visible:ring-0 bg-slate-200 dark:bg-slate-800 "
+        class="m-1 focus-visible:ring-0 bg-opacity-15 "
         placeholder=" Search here..."
       />
     </form>
@@ -51,9 +49,7 @@
         />
         <span class="sr-only">Toggle theme</span>
       </Button>
-      <div
-        class=" border-l-2 border-opacity-15 mr-1 border-l-slate-500 h-100"
-      ></div>
+      <div class=" border-l-2 border-opacity-15 mr-1 h-100"></div>
       <Button
         class="mr-4"
         color="primary"

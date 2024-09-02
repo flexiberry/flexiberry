@@ -47,17 +47,17 @@
   }
 </script>
 
-<div class="inline-flex group-hover:bg-slate-50 group-hover:dark:bg-slate-900">
+<div class="inline-flex group-hover:bg-muted bg-opacity-10">
   {#if folder.type == "folder"}
     <button
       on:click={() => addFolder("folder")}
-      class=" px-1 group-hover:opacity-100 opacity-0 hover:bg-slate-100 hover:dark:bg-slate-900 rounded-sm"
+      class=" px-1 group-hover:opacity-100 opacity-0 hover:bg-muted rounded-sm"
     >
       <FolderPlus size={16}></FolderPlus>
     </button>
     <button
       on:click={() => addFolder("file")}
-      class=" px-1 group-hover:opacity-100 opacity-0 hover:bg-slate-100 hover:dark:bg-slate-900 rounded-sm"
+      class=" px-1 group-hover:opacity-100 opacity-0 hover:bg-muted rounded-sm"
     >
       <FilePlus size={16}></FilePlus>
     </button>
@@ -66,7 +66,7 @@
       on:click={() => {
         onDelete = true;
       }}
-      class=" px-1 group-hover:opacity-100 opacity-0 hover:bg-slate-100 hover:dark:bg-slate-900 rounded-sm"
+      class=" px-1 group-hover:opacity-100 opacity-0 hover:bg-muted rounded-sm"
     >
       <Trash class="text-red-500" size={16}></Trash>
     </button>
