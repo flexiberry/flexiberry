@@ -24,12 +24,14 @@
   onMount(async () => {
     console.log("onMount");
     let d = await db.folderTable.get("folder");
-    updateFolder(d?.data);
+    if (d) updateFolder(d.data);
   });
 
   let folders: any[] = [];
 
   savedFolders.subscribe((data) => {
+    console.log(data);
+
     folders = data || [];
   });
 
@@ -85,7 +87,7 @@
   <div class="flex justify-between m-2">
     <div class="flex-auto">
       <Input
-        class="w-full focus-visible:ring-0 bg-slate-50 dark:bg-slate-800"
+        class="w-full focus-visible:ring-0  bg-primary bg-opacity-25"
         placeholder="search for files or folders"
       ></Input>
     </div>

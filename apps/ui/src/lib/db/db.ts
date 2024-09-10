@@ -1,8 +1,9 @@
 import Dexie, { type EntityTable, type Table } from "dexie";
+import type { FolderModel } from "../types/folder.model";
 
 interface folderTable {
   id: string;
-  data: any;
+  data: FolderModel[];
 }
 
 const db = new Dexie("folderTable") as Dexie & {

@@ -41,11 +41,11 @@
   style="height: {heightDifference}px;"
   class="h-100"
 >
-  <Resizable.Pane class=" bg-opacity-10" defaultSize={25}>
+  <Resizable.Pane class=" bg-opacity-10 px-2" defaultSize={25}>
     <FolderHierarchy height={heightDifference}></FolderHierarchy>
   </Resizable.Pane>
   <Resizable.Handle withHandle />
-  <Resizable.Pane class="bg-muted bg-opacity-15 " defaultSize={50}>
+  <Resizable.Pane class="bg-muted  " defaultSize={50}>
     <slot></slot>
   </Resizable.Pane>
   <Resizable.Handle withHandle />

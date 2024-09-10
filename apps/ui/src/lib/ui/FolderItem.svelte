@@ -61,7 +61,9 @@
   }
 </script>
 
-<div class="folder rounded-lg {dragging ? 'bg-primary bg-blend-multiply' : ''}">
+<div
+  class="folder rounded-lg {dragging ? 'bg-primary bg-blend-multiply ' : ''}"
+>
   <div
     role="listitem"
     draggable={true}

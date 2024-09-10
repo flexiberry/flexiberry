@@ -37,7 +37,7 @@
 
 <button
   on:click={toggle}
-  class="flex flex-auto items-center ring-0 align-middle"
+  class="flex flex-auto items-center ring-0 border-0 align-middle"
 >
   <div class="flex-none">
     {#if folder.type == "folder"}

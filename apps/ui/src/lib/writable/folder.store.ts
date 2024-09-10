@@ -5,19 +5,20 @@ import { removeIfFileNameisEmpty } from "../util/util";
 
 export const savedFolders = writable<FolderModel[]>([]);
 
-export function updateFolder(folder: FolderModel[]) {
+export async function updateFolder(folder: FolderModel[]) {
   removeIfFileNameisEmpty(folder);
   savedFolders.update((f) => folder);
-  db.folderTable.update("folder", {
-    data: folder,
-    id: "folder",
-  });
-}
+  console.log(folder);
 
-export function getFolder() {
-  return derived(savedFolders, async (s) => {
-    let d = await db.folderTable.get("folder");
-    console.log(d);
-    return d?.data || s;
-  });
+  let count = await db.folderTable.count();
+  if (count > 0) {
+    db.folderTable.update("folder", {
+      data: folder,
+      id: "folder",
+    });
+  } else
+    db.folderTable.add({
+      data: folder,
+      id: "folder",
+    });
 }
