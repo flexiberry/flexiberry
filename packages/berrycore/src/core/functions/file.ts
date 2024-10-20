@@ -47,4 +47,9 @@ export class FileUtils {
       throw error;
     }
   }
+
+  public static loadFile(file: string) {
+    const fileContents = fs.readFileSync(file, "utf8");
+    return fileContents;
+  }
 }

@@ -1,0 +1,62 @@
+
+
+Env UAT,SIT,TAS,
+
+
+Var @UAT variables
+    - name: 'rintu'
+    - age: 30
+
+Var @SIT variables
+    - name: 'rintu'
+    - age: 30
+
+Api @api_one Fetch user information
+Url 'https://api.example.com/user'
+Body json | 
+    {
+        "field1": "value1",
+        "field2": "value2",
+        "field3": "value3"
+    }
+    
+Header
+   - "Authorization": "Bearer <token>"
+
+**all these wording are considered to be comments means line which is  stating with '**' then it is a comment.
+
+Api @user_token_api Fetch user information
+Url https://api.example.com/user
+Body JSON | 
+    {
+        "field1": "value1",
+        "field2": "value2",
+        "field3": "value3"
+    }
+Header 
+   - "Authorization": "Bearer {token}"
+
+
+Testcase @ts001 testing the  application user information api
+   
+   Step @step1 get user information 
+
+    Call {user_token_api}  Function to retrieve user information
+
+           Capture   
+                - token: "response.body.token"
+                - status: "response.status"
+           Validation 
+               token == status  // Ensure token matches status
+         
+    Call {user_token_api} Function to retrieve user information  
+
+          Capture 
+               - token: "response.body.token"
+               - status: "response.status"
+          Validation 
+               token == status  // Ensure token matches status
+
+    Validation 
+        capture.token === 2.capture.status
+

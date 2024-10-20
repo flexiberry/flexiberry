@@ -4,6 +4,8 @@ import { showLoadingSpinner, stopLoadingSpinner } from "../util/loader";
 import { BerryCore } from "../berrycore";
 import { BerryRunner } from "../util/runner";
 import { RUNNER_EVENT } from "../../enum/runner.event";
+import { FileUtils } from "../functions/file";
+import { Lexer } from "../../lang/lexer";
 
 const rl = readline.createInterface({
   input: process.stdin,
@@ -14,7 +16,7 @@ const optionsList = [
   "Exit",
   "Parse File and convert to Obj",
   "Run test suite ",
-  "Option 3",
+  "Parse Lexer",
 ];
 
 function terminateProgram() {
@@ -38,6 +40,7 @@ async function handleChoice(choice: number) {
 
     if (choice == 1) await parseFile();
     if (choice == 2) await runRunner();
+    if (choice == 3) await runLexer();
     askQuestion();
   } else {
     console.log(chalk.red("Invalid option, try again."));
@@ -109,4 +112,13 @@ async function parseFile(): Promise<any> {
       }
     );
   });
+}
+
+function runLexer() {
+  let fileContent = FileUtils.loadFile(
+    "/Users/rinturajc/lib_projects/Flexiberry/flexiberry/packages/berrycore/src/_fake_data/sample.fb"
+  );
+
+  let lexer = new Lexer(fileContent);
+  console.log(lexer.tokenize());
 }
