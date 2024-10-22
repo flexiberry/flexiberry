@@ -3,11 +3,15 @@ export enum TokenType {
   Number,
   Scalar,
   Value,
+
   Identifier,
   // Keywords
   Env,
+
   Var,
   Pointer,
+  Pointed,
+
   Api,
   Url,
   Body,
@@ -20,7 +24,7 @@ export enum TokenType {
   Step,
   StepName,
   Call,
-  CallTitle,
+  Title,
 
   //   logic types
   And,
@@ -40,4 +44,7 @@ export enum TokenType {
   Eof,
   EmptyLine,
   Comma,
+  Colon,
+  Backtick,
+  Hyphen,
 }

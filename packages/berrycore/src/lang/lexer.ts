@@ -1,5 +1,7 @@
 import { CommentReader } from "./reader/commentReader";
 import { EnvReader } from "./reader/envReader";
+import { VarReader } from "./reader/varReader";
+import { Token } from "./token";
 import { TokenType } from "./tokenType";
 import { isApi, isComment, isEnv, isVar, isWhitespace } from "./util";
 
@@ -26,20 +28,30 @@ export class Lexer {
         const commentReader = new CommentReader(this.input, this.position);
         const comment = commentReader.read();
         tokens.push(...comment);
-        this.position = commentReader.getPosition(); // Update position from CommentReader
+        this.position = commentReader.getPosition(); // Update position
         continue;
       }
 
       if (isEnv(this.input, this.position)) {
         const envReader = new EnvReader(this.input, this.position);
         const envTokens = envReader.read();
-        tokens.push(...envTokens); // Spread operator to add all tokens
-        this.position = envReader.getPosition(); // Update position from EnvReader
+        tokens.push(...envTokens);
+        this.position = envReader.getPosition(); // Update position
         continue;
       }
 
+      if (isVar(this.input, this.position)) {
+        const varReader = new VarReader(this.input, this.position);
+        const varTokens = varReader.read();
+        tokens.push(...varTokens);
+        this.position = varReader.getPosition(); // Update position
+        continue;
+      }
       this.position++; // Move to the next character if no match
     }
+
+    tokens.push(Token.from("EOF", TokenType.Eof, this.position, this.position));
+
     return tokens;
   }
 }
