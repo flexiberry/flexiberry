@@ -34,6 +34,14 @@ export class VarReader extends CReader implements Reader {
         this.position++; // Move to the next
         continue;
       }
+      value += char;
+
+      if (this.input[this.position + 1] === "\n") {
+        tkns.push(Token.from(value, TokenType.Title, start, this.position));
+        this.position++; // Move to the next
+        this.position++; // Move to the next
+        continue;
+      }
       this.position++; // Move to the next
     }
 

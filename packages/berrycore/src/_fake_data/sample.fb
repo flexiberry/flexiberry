@@ -3,12 +3,14 @@
 Env UAT,SIT,TAS
 
 
+Var  without Pointer
+    - name: 'rintu'
+    - age: 30
+
 Var @UAT variables for uat env
     - name: 'rintu'
     - age: 30
-Var @  without Pointer
-    - name: 'rintu'
-    - age: 30
+
 
 Var @SIT variables
     - name: 'rintu'
