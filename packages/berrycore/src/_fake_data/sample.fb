@@ -21,15 +21,15 @@ Var @SIT variables
     
 
 
-Api #api_one Fetch user information
+Api the api is for the following testing methods
 Url 'https://api.example.com/user'
-Body json | 
+Body json `
     {
         "field1": "value1",
         "field2": "value2",
         "field3": "value3"
     }
-    
+  `
 Header
    - "Authorization": "Bearer <token>"
 

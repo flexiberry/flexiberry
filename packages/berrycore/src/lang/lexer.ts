@@ -1,3 +1,4 @@
+import { ApiReader } from "./reader/apiReader";
 import { CommentReader } from "./reader/commentReader";
 import { EnvReader } from "./reader/envReader";
 import { VarReader } from "./reader/varReader";
@@ -47,6 +48,15 @@ export class Lexer {
         this.position = varReader.getPosition(); // Update position
         continue;
       }
+
+      if (isApi(this.input, this.position)) {
+        const apiReader = new ApiReader(this.input, this.position);
+        const tkns = apiReader.read();
+        tokens.push(...tkns);
+        this.position = apiReader.getPosition(); // Update position
+        continue;
+      }
+
       this.position++; // Move to the next character if no match
     }
 
