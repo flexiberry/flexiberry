@@ -23,13 +23,12 @@ Var @SIT variables
 
 Api the api is for the following testing methods
 Url 'https://api.example.com/user'
-Body json `
+Body JSON | 
     {
         "field1": "value1",
         "field2": "value2",
         "field3": "value3"
-    }
-  `
+    } 
 Header
    - "Authorization": "Bearer <token>"
 
@@ -48,19 +47,14 @@ Header
 
 
 Testcase @ts001 testing the  application user information api
-   
-   Step @step1 get user information 
-
-    Call {user_token_api}  Function to retrieve user information
-
-           Capture   
-                - token: "response.body.token"
-                - status: "response.status"
-           Validation 
-               token == status  // Ensure token matches status
-         
+Step @step1 get user information 
+Call {user_token_api}  Function to retrieve user information
+Capture   
+  - token: "response.body.token"
+  - status: "response.status"
+Validation 
+    token == status  // Ensure token matches status 
     Call {user_token_api} Function to retrieve user information  
-
           Capture 
                - token: "response.body.token"
                - status: "response.status"

@@ -1,5 +1,5 @@
-<script>
+<!-- <script>
   import Monaco from "../../lib/ui/Monaco.svelte";
-</script>
+</script> -->
 
-<Monaco></Monaco>
+<!-- <Monaco></Monaco> -->
