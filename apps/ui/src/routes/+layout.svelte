@@ -6,6 +6,8 @@
   import * as Resizable from "$lib/components/ui/resizable/index";
   import Header from "../lib/ui/Header.svelte";
   import FolderHierarchy from "../lib/ui/FolderHierarchy.svelte";
+  import berry from "$lib/assets/berry-fotor-2024090211181.png";
+  import Separator from "../lib/components/ui/separator/separator.svelte";
 
   let heightDifference = 0;
   onMount(() => {
@@ -41,8 +43,17 @@
   style="height: {heightDifference}px;"
   class="h-100"
 >
-  <Resizable.Pane class=" bg-opacity-10 px-2" defaultSize={25}>
-    <FolderHierarchy height={heightDifference}></FolderHierarchy>
+  <Resizable.Pane class=" bg-opacity-10" defaultSize={25}>
+    <div
+      class="logo flex px-2 align-middle bg-opacity-10 bg-secondary py-2 items-center"
+    >
+      <img src={berry} height={"20px"} class="h-[20px]" alt="" srcset="" />
+      <h1 class="font-extrabold pl-3">FlexiBerry</h1>
+    </div>
+    <Separator></Separator>
+    <div class=" px-2">
+      <FolderHierarchy height={heightDifference}></FolderHierarchy>
+    </div>
   </Resizable.Pane>
   <Resizable.Handle withHandle />
   <Resizable.Pane class="bg-muted  " defaultSize={50}>

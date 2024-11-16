@@ -18,6 +18,7 @@
   import { ScrollArea } from "$lib/components/ui/scroll-area/index.js";
   import { onMount } from "svelte";
   import { db } from "../db/db";
+  import berry from "$lib/assets/berry-fotor-2024090211181.png";
 
   export let height: number = 100;
 
@@ -84,15 +85,8 @@
 </script>
 
 <div style="height:{height - 40}px;" class="pb-4">
-  <div class="flex justify-between m-2">
-    <div class="flex-auto">
-      <Input
-        class="w-full focus-visible:ring-0  bg-primary bg-opacity-25"
-        placeholder="search for files or folders"
-      ></Input>
-    </div>
-
-    <div class="grid grid-cols-2 gap-2 flex-none grow-0">
+  <div class="flex justify-between m-2 bg-primary bg-opacity-10">
+    <!-- <div class="grid grid-cols-2 gap-2 flex-none grow-0">
       <Button variant="ghost" on:click={addFolder} style="icon">
         <Plus size={18}></Plus>
         New
@@ -100,7 +94,7 @@
       <Button variant="ghost" style="icon">
         <Share size={18}></Share>
       </Button>
-    </div>
+    </div> -->
   </div>
   <ScrollArea class=" h-full  w-full ">
     {#if folders == null || folders.length <= 0}

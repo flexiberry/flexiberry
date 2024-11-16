@@ -4,8 +4,8 @@
   let tabs = $page.params.tabs;
 </script>
 
-<Card.Root>
+<!-- <Card.Root>
   <Card.Content>rint</Card.Content>
-</Card.Root>
+</Card.Root> -->
 
 <slot></slot>

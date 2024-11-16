@@ -42,6 +42,9 @@
   },
   "type": "module",
   "dependencies": {
+    "@codemirror/lang-javascript": "^6.2.2",
+    "@codemirror/theme-one-dark": "^6.1.2",
+    "@codemirror/view": "^6.34.3",
     "@lucide/lab": "^0.1.2",
     "bits-ui": "^0.21.12",
     "clsx": "^2.1.1",
@@ -51,6 +54,7 @@
     "mode-watcher": "^0.3.1",
     "monaco-editor": "^0.44.0",
     "paneforge": "^0.0.5",
+    "svelte-codemirror-editor": "^1.4.1",
     "svelte-dnd-action": "^0.9.22",
     "svelte-sonner": "^0.3.24",
     "svelte-splitpanes": "^8.0.5",
