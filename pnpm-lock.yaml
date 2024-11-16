@@ -60,6 +60,9 @@ importers:
       '@codemirror/lang-javascript':
         specifier: ^6.2.2
         version: 6.2.2
+      '@codemirror/state':
+        specifier: ^6.4.1
+        version: 6.4.1
       '@codemirror/theme-one-dark':
         specifier: ^6.1.2
         version: 6.1.2
@@ -87,9 +90,6 @@ importers:
       mode-watcher:
         specifier: ^0.3.1
         version: 0.3.1(svelte@4.2.18)
-      monaco-editor:
-        specifier: ^0.44.0
-        version: 0.44.0
       paneforge:
         specifier: ^0.0.5
         version: 0.0.5(svelte@4.2.18)
@@ -1621,9 +1621,6 @@ packages:
     resolution: {integrity: sha512-inghSVSXpEENV0SHM98+AvjDmTOjh9EJIrJXMScK42GNkDm5QJL7a/nZQ8M8i8RK7loFHqsQKBKdlXfw5e5C4w==}
     peerDependencies:
       svelte: ^4.0.0 || ^5.0.0-next.1
-
-  monaco-editor@0.44.0:
-    resolution: {integrity: sha512-5SmjNStN6bSuSE5WPT2ZV+iYn1/yI9sd4Igtk23ChvqB7kDk9lZbB9F5frsuvpB+2njdIeGGFf2G4gbE6rCC9Q==}
 
   mri@1.2.0:
     resolution: {integrity: sha512-tzzskb3bG8LvYGFF/mDTpq3jpI6Q9wc3LEmBaghu+DdCssd1FakN7Bc0hVNmEyGq1bq3RgfkCb3cmQLpNPOroA==}
@@ -3721,8 +3718,6 @@ snapshots:
   mode-watcher@0.3.1(svelte@4.2.18):
     dependencies:
       svelte: 4.2.18
-
-  monaco-editor@0.44.0: {}
 
   mri@1.2.0: {}
 

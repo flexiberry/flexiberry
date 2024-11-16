@@ -1,75 +1,69 @@
 <script lang="ts">
-  import Monaco from "../../lib/ui/Monaco.svelte";
-  import CodeMirror from "svelte-codemirror-editor";
-  import {
-    EditorView,
-    ViewPlugin,
-    Decoration,
-    WidgetType,
-  } from "@codemirror/view";
-  import { Button } from "$lib/components/ui/button";
-  import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuTrigger,
-  } from "$lib/components/ui/dropdown-menu";
+  import CustomCodeMirror from "../../lib/ui/CustomCodeMirror.svelte";
+  import { page } from "$app/stores";
+  import { goto } from "$app/navigation";
 
-  let value = " eubrjk";
+  // Extract tabs from the URL
+  $: currentTabs = $page.params.tabs?.split("/") || [];
 
-  // Custom theme extension for grid lines
-  const gridTheme = EditorView.theme({
-    "&": {
-      backgroundColor: "hsl(var(--primary) / 0.2)",
-    },
-
-    ".cm-content": {
-      backgroundImage: `
-        linear-gradient(to right, hsl(var(--secondary) / 0.095) 1px, transparent 1px),
-        linear-gradient(to bottom, hsl(var(--secondary) / 0.095) 1px, transparent 1px)
-      `,
-      backgroundSize: "10px 10px",
-    },
-    ".cm-line": {
-      padding: "0 1px",
-      backgroundColor: "hsl(var(--secondary) / 0.2)",
-    },
-    ".cm-gutters": {
-      backgroundColor: "hsl(var(--primary) / 1.0)",
-    },
-  });
-
-  const extensions = [gridTheme];
+  function closeTab(tabToClose: string) {
+    const newTabs = currentTabs.filter((tab) => tab !== tabToClose);
+    goto(newTabs.length ? `/${newTabs.join("/")}` : "/");
+  }
 </script>
 
-<CodeMirror bind:value {extensions} class="editor" />
+<div class="h-full flex flex-col">
+  <div class="tabs-container flex bg-primary/10 border-b border-primary/20">
+    {#each currentTabs as tab}
+      <div
+        class="tab group relative flex items-center px-4 py-2 border-r border-primary/20"
+      >
+        <span class="max-w-[150px] truncate">{tab}</span>
+        <button
+          class="ml-2 opacity-0 group-hover:opacity-100 transition-opacity"
+          on:click|preventDefault={() => closeTab(tab)}
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="14"
+            height="14"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path d="M18 6 6 18" />
+            <path d="m6 6 12 12" />
+          </svg>
+        </button>
+
+        <!-- Active tab indicator -->
+        {#if tab === currentTabs[currentTabs.length - 1]}
+          <div class="absolute bottom-0 left-0 right-0 h-0.5 bg-primary"></div>
+        {/if}
+      </div>
+    {/each}
+  </div>
+
+  <div class="flex-1">
+    <CustomCodeMirror />
+  </div>
+</div>
 
 <style>
-  :global(.editor) {
-    height: 100%;
-    width: 100%;
+  .tab {
+    height: 36px;
+    background-color: hsl(var(--primary) / 0.05);
   }
 
-  :global(.editor .cm-editor) {
-    height: 100%;
+  .tab:hover {
+    background-color: hsl(var(--primary) / 0.1);
   }
 
-  :global(.editor .cm-scroller) {
-    overflow: auto;
-  }
-
-  :global(.add-button-widget) {
-    display: inline-block;
-    margin-left: 4px;
-    vertical-align: middle;
-  }
-
-  :global(.add-button-widget button) {
-    opacity: 0.5;
-    transition: opacity 0.2s;
-  }
-
-  :global(.add-button-widget button:hover) {
-    opacity: 1;
+  /* Style for the active tab */
+  .tab:has(.bg-primary) {
+    background-color: hsl(var(--primary) / 0.15);
   }
 </style>
