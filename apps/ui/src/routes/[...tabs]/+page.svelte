@@ -47,7 +47,7 @@
     {/each}
   </div>
 
-  <div class="flex-1">
+  <div class="flex-1 z-50">
     <CustomCodeMirror />
   </div>
 </div>

@@ -1,80 +1,56 @@
 <script lang="ts">
   import CodeMirror from "svelte-codemirror-editor";
-  import { EditorView, ViewPlugin, WidgetType } from "@codemirror/view";
-  import { StateField, StateEffect } from "@codemirror/state";
   import {
-    Card,
-    CardContent,
-    CardHeader,
-    CardTitle,
-  } from "$lib/components/ui/card";
+    EditorView,
+    ViewPlugin,
+    Decoration,
+    WidgetType,
+    ViewUpdate,
+  } from "@codemirror/view";
+  import SuggestionWidget from "./SuggestionWidget.svelte";
 
   let value = "";
-  let contextMenuPosition = { x: 0, y: 0 };
-  let showContextMenu = false;
-  let showApiCard = true;
-  let apiCardPosition = { x: 0, y: 0 };
 
   class ApiSuggestionWidget extends WidgetType {
-    constructor(readonly position: { x: number; y: number }) {
+    constructor(private view: EditorView) {
       super();
     }
 
     toDOM() {
-      const dom = document.createElement("div");
-      dom.className = "api-suggestion";
-      dom.style.position = "absolute";
-      dom.style.left = `${this.position.x}px`;
-      dom.style.top = `${this.position.y}px`;
-      return dom;
+      const wrapper = document.createElement("div");
+      wrapper.className = "api-suggestion-widget";
+
+      // Mount the Svelte component
+      new SuggestionWidget({
+        target: wrapper,
+        props: {
+          onInsert: (template: string) => {
+            const transaction = this.view.state.update({
+              changes: {
+                from: this.view.state.selection.main.head,
+                insert: template,
+              },
+            });
+            this.view.dispatch(transaction);
+          },
+        },
+      });
+
+      return wrapper;
+    }
+
+    destroy(dom: HTMLElement) {
+      // Clean up the Svelte component if needed
     }
   }
 
-  // Effect to show context menu
-  const showContextMenuEffect = StateEffect.define<{ x: number; y: number }>();
-
-  // State field to track context menu
-  const contextMenuField = StateField.define({
-    create: () => ({ show: false, x: 0, y: 0 }),
-    update(value, tr) {
-      for (let e of tr.effects) {
-        if (e.is(showContextMenuEffect)) {
-          return { show: true, x: e.value.x, y: e.value.y };
-        }
-      }
-      return value;
-    },
-  });
-
-  // Plugin to handle right-click
-  const contextMenuPlugin = ViewPlugin.fromClass(
-    class {
-      constructor(view: EditorView) {
-        view.dom.addEventListener("contextmenu", (event: MouseEvent) => {
-          event.preventDefault();
-          const pos = view.posAtCoords({ x: event.clientX, y: event.clientY });
-          if (pos) {
-            contextMenuPosition = { x: event.clientX, y: event.clientY };
-            showContextMenu = true;
-          }
-        });
-      }
-
-      destroy() {}
-    }
-  );
-
-  // Plugin to detect "api" text and show card
+  // Plugin to detect "api" text
   const apiDetectorPlugin = ViewPlugin.fromClass(
     class {
-      constructor(view: EditorView) {
-        this.checkForApi(view);
-      }
+      decorations: any;
 
-      update(update: any) {
-        if (update.docChanged) {
-          this.checkForApi(update.view);
-        }
+      constructor(view: EditorView) {
+        this.decorations = this.checkForApi(view);
       }
 
       checkForApi(view: EditorView) {
@@ -83,24 +59,27 @@
         const line = doc.lineAt(cursorPos);
         const lineText = line.text;
 
-        // Check if the current line contains "api"
         if (lineText.includes("api")) {
-          const coords = view.coordsAtPos(line.from);
-          if (coords) {
-            showApiCard = true;
-            // Position the card above the line
-            apiCardPosition = {
-              x: coords.left,
-              y: coords.top - 120, // Adjust this value to position the card properly
-            };
-          }
-        } else {
-          showApiCard = false;
+          return Decoration.set([
+            Decoration.widget({
+              widget: new ApiSuggestionWidget(view),
+              side: 1,
+            }).range(line.from + lineText.indexOf("api") + 3),
+          ]);
+        }
+        return Decoration.none;
+      }
+
+      update(update: ViewUpdate) {
+        if (update.docChanged || update.selectionSet) {
+          this.decorations = this.checkForApi(update.view);
         }
       }
+    },
+    {
+      decorations: (v) => v.decorations,
     }
   );
-
   // Custom theme extension for grid lines
   const gridTheme = EditorView.theme({
     "&": {
@@ -120,100 +99,20 @@
       backgroundColor: "hsl(var(--primary) / 1.0)",
     },
   });
-
   const extensions = [
     gridTheme,
-    contextMenuPlugin,
-    contextMenuField,
     apiDetectorPlugin,
+    EditorView.theme({
+      ".api-suggestion-widget": {
+        position: "relative",
+        display: "inline-block",
+      },
+    }),
   ];
-
-  function handleMenuItemClick(action: string) {
-    // Handle different menu actions
-    console.log(`Selected action: ${action}`);
-    showContextMenu = false;
-  }
 </script>
 
 <div class="relative h-full">
   <CodeMirror bind:value {extensions} class="editor" />
-
-  {#if showApiCard}
-    <div
-      class="fixed z-50 transform -translate-y-full"
-      style="left: {apiCardPosition.x}px; top: {apiCardPosition.y}px"
-    >
-      <Card class="w-[350px]">
-        <CardHeader>
-          <CardTitle>API Suggestion</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div class="space-y-2">
-            <div class="flex items-center justify-between">
-              <span class="text-sm font-medium">GET /api/users</span>
-              <button
-                class="text-xs bg-primary/10 hover:bg-primary/20 px-2 py-1 rounded"
-                on:click={() => {
-                  // Insert the API code at cursor position
-                  const template = `fetch('/api/users')
-  .then(response => response.json())
-  .then(data => console.log(data));`;
-                  // Add code to insert the template
-                }}
-              >
-                Insert
-              </button>
-            </div>
-            <div class="flex items-center justify-between">
-              <span class="text-sm font-medium">POST /api/users</span>
-              <button
-                class="text-xs bg-primary/10 hover:bg-primary/20 px-2 py-1 rounded"
-                on:click={() => {
-                  // Insert the API code at cursor position
-                }}
-              >
-                Insert
-              </button>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-    </div>
-  {/if}
-
-  {#if showContextMenu}
-    <!-- svelte-ignore a11y-no-static-element-interactions -->
-    <div
-      class="fixed z-50"
-      style="left: {contextMenuPosition.x}px; top: {contextMenuPosition.y}px"
-      on:mouseleave={() => (showContextMenu = false)}
-    >
-      <div
-        class="rounded-md border bg-popover p-1 text-popover-foreground shadow-md"
-      >
-        <div class="grid gap-1">
-          <button
-            class="flex w-full items-center rounded-sm px-2 py-1.5 text-sm outline-none hover:bg-accent hover:text-accent-foreground"
-            on:click={() => handleMenuItemClick("component")}
-          >
-            Add Component
-          </button>
-          <button
-            class="flex w-full items-center rounded-sm px-2 py-1.5 text-sm outline-none hover:bg-accent hover:text-accent-foreground"
-            on:click={() => handleMenuItemClick("function")}
-          >
-            Add Function
-          </button>
-          <button
-            class="flex w-full items-center rounded-sm px-2 py-1.5 text-sm outline-none hover:bg-accent hover:text-accent-foreground"
-            on:click={() => handleMenuItemClick("variable")}
-          >
-            Add Variable
-          </button>
-        </div>
-      </div>
-    </div>
-  {/if}
 </div>
 
 <style>
@@ -230,9 +129,7 @@
     overflow: auto;
   }
 
-  /* Add smooth transition for the API card */
-  :global(.card) {
-    transition: all 0.2s ease;
+  :global(.api-suggestion-widget) {
     animation: slideIn 0.2s ease;
   }
 
