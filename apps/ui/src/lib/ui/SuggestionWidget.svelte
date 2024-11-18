@@ -1,6 +1,9 @@
 <script lang="ts">
   import * as Card from "$lib/components/ui/card/index.js";
+  import { Cross, X } from "lucide-svelte";
   import { Description } from "../components/ui/alert-dialog";
+  import Button from "../components/ui/button/button.svelte";
+  import Header from "./Header.svelte";
 
   export let onInsert: (template: string) => void;
 
@@ -29,7 +32,16 @@
 <div class="absolute top-2 left-0 z-[100]">
   <Card.Root class="w-[350px]">
     <Card.Header>
-      <Card.Description>API Suggestions</Card.Description>
+      <div class="flex justify-between items-center">
+        <div>Quick Tool</div>
+        <div>
+          <button
+            class="text-xs bg-primary/10 hover:bg-primary/20 px-2 py-1 rounded"
+          >
+            <X size={14}></X>
+          </button>
+        </div>
+      </div>
     </Card.Header>
 
     <Card.Content>
