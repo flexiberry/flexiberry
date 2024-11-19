@@ -6,10 +6,15 @@
     Decoration,
     WidgetType,
     ViewUpdate,
+    keymap,
   } from "@codemirror/view";
+  import { StateEffect } from "@codemirror/state";
   import SuggestionWidget from "./SuggestionWidget.svelte";
 
   let value = "";
+
+  // Define the clear effect
+  const clearSuggestionEffect = StateEffect.define<boolean>();
 
   class ApiSuggestionWidget extends WidgetType {
     constructor(private view: EditorView) {
@@ -20,7 +25,6 @@
       const wrapper = document.createElement("div");
       wrapper.className = "api-suggestion-widget";
 
-      // Mount the Svelte component
       new SuggestionWidget({
         target: wrapper,
         props: {
@@ -33,14 +37,16 @@
             });
             this.view.dispatch(transaction);
           },
+          onClose: () => {
+            const transaction = this.view.state.update({
+              effects: clearSuggestionEffect.of(true),
+            });
+            this.view.dispatch(transaction);
+          },
         },
       });
 
       return wrapper;
-    }
-
-    destroy(dom: HTMLElement) {
-      // Clean up the Svelte component if needed
     }
   }
 
@@ -71,6 +77,16 @@
       }
 
       update(update: ViewUpdate) {
+        // Check for clear effect
+        for (let tr of update.transactions) {
+          for (let effect of tr.effects) {
+            if (effect.is(clearSuggestionEffect)) {
+              this.decorations = Decoration.none;
+              return;
+            }
+          }
+        }
+
         if (update.docChanged || update.selectionSet) {
           this.decorations = this.checkForApi(update.view);
         }
@@ -80,6 +96,24 @@
       decorations: (v) => v.decorations,
     }
   );
+
+  // // Add escape key handling
+  // const escapeKeymap = keymap.of([
+  //   {
+  //     key: "Escape",
+  //     run: (view) => {
+  //       // console.log(view);
+  //       // if (view.state.field(apiDetectorPlugin.decorations)) {
+  //       //   view.dispatch({
+  //       //     effects: clearSuggestionEffect.of(true),
+  //       //   });
+  //       //   return true;
+  //       // }
+  //       return false;
+  //     },
+  //   },
+  // ]);
+
   // Custom theme extension for grid lines
   const gridTheme = EditorView.theme({
     "&": {
@@ -99,9 +133,11 @@
       backgroundColor: "hsl(var(--primary) / 1.0)",
     },
   });
+
   const extensions = [
     gridTheme,
     apiDetectorPlugin,
+    // escapeKeymap,
     EditorView.theme({
       ".api-suggestion-widget": {
         position: "relative",

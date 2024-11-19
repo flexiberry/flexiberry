@@ -6,6 +6,25 @@
   import Header from "./Header.svelte";
 
   export let onInsert: (template: string) => void;
+  export let onClose: () => void;
+
+  // Handle escape key
+  function handleKeydown(event: KeyboardEvent) {
+    if (event.key === "Escape") {
+      onClose();
+    }
+  }
+
+  // Add event listener when component mounts
+  import { onMount, onDestroy } from "svelte";
+
+  onMount(() => {
+    window.addEventListener("keydown", handleKeydown);
+  });
+
+  onDestroy(() => {
+    window.removeEventListener("keydown", handleKeydown);
+  });
 
   const suggestions = [
     {
@@ -29,14 +48,19 @@
   ];
 </script>
 
-<div class="absolute top-2 left-0 z-[100]">
-  <Card.Root class="w-[350px]">
-    <Card.Header>
+<div class="absolute top-1 left-0 z-[100]">
+  <Card.Root
+    class="w-[350px] rounded-lg border bg-card  text-card-foreground shadow-lg relative"
+  >
+    <Card.Header class="p-3 bg-primary bg-opacity-15">
       <div class="flex justify-between items-center">
         <div>Quick Tool</div>
         <div>
           <button
-            class="text-xs bg-primary/10 hover:bg-primary/20 px-2 py-1 rounded"
+            class="text-xs bg-primary/10 hover:bg-primary/20 rounded"
+            on:click={() => {
+              onClose();
+            }}
           >
             <X size={14}></X>
           </button>
@@ -44,7 +68,7 @@
       </div>
     </Card.Header>
 
-    <Card.Content>
+    <Card.Content class="p-2">
       <div class="space-y-2">
         {#each suggestions as suggestion}
           <div class="flex items-center justify-between">
