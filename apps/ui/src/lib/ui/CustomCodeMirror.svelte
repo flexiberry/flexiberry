@@ -123,7 +123,8 @@
       backgroundImage: `
         linear-gradient(to right, hsl(var(--primary) / 0.095) 1px, transparent 1px),
         linear-gradient(to bottom, hsl(var(--primary) / 0.095) 1px, transparent 1px)
-      `,
+      
+        `,
       backgroundSize: "10px 10px",
     },
     ".cm-line": {

@@ -1,69 +1,79 @@
 <script lang="ts">
   import CustomCodeMirror from "../../lib/ui/CustomCodeMirror.svelte";
   import { page } from "$app/stores";
-  import { goto } from "$app/navigation";
+  import { Button } from "$lib/components/ui/button";
+  import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuTrigger,
+  } from "$lib/components/ui/dropdown-menu";
+  import {
+    BugPlay,
+    MoreHorizontal,
+    Pause,
+    Play,
+    PlayCircle,
+    PlayIcon,
+    PlaySquare,
+  } from "lucide-svelte";
 
-  // Extract tabs from the URL
-  $: currentTabs = $page.params.tabs?.split("/") || [];
-
-  function closeTab(tabToClose: string) {
-    const newTabs = currentTabs.filter((tab) => tab !== tabToClose);
-    goto(newTabs.length ? `/${newTabs.join("/")}` : "/");
-  }
+  // Get current file name from URL
+  $: currentFile = $page.params.tabs?.split("/").pop() || "";
 </script>
 
 <div class="h-full flex flex-col">
-  <div class="tabs-container flex bg-primary/10 border-b border-primary/20">
-    {#each currentTabs as tab}
-      <div
-        class="tab group relative flex items-center px-4 py-2 border-r border-primary/20"
+  <div
+    class="flex items-center justify-between px-4 py-2 bg-primary/10 border-b border-primary/20"
+  >
+    <!-- File name -->
+    <div class="flex items-center">
+      <span class="text-sm font-medium truncate max-w-[400px]"
+        >{currentFile}</span
       >
-        <span class="max-w-[150px] truncate">{tab}</span>
-        <button
-          class="ml-2 opacity-0 group-hover:opacity-100 transition-opacity"
-          on:click|preventDefault={() => closeTab(tab)}
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="14"
-            height="14"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-          >
-            <path d="M18 6 6 18" />
-            <path d="m6 6 12 12" />
-          </svg>
-        </button>
+    </div>
 
-        <!-- Active tab indicator -->
-        {#if tab === currentTabs[currentTabs.length - 1]}
-          <div class="absolute bottom-0 left-0 right-0 h-0.5 bg-primary"></div>
-        {/if}
-      </div>
-    {/each}
+    <!-- Action buttons -->
+    <div class="flex items-center gap-2">
+      <Button
+        variant="ghost"
+        color="green"
+        size="sm"
+        class="h-8 w-8 p-0 no-hover"
+      >
+        <Play></Play>
+      </Button>
+
+      <Button variant="ghost" size="sm" class="h-8 w-8 p-0 no-hover">
+        <Pause></Pause>
+      </Button>
+
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button variant="ghost" size="sm" class="h-8 w-8 p-0 no-hover">
+            <MoreHorizontal></MoreHorizontal>
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end">
+          <DropdownMenuItem>Save</DropdownMenuItem>
+          <DropdownMenuItem>Format</DropdownMenuItem>
+          <DropdownMenuItem>Close</DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
+    </div>
   </div>
 
-  <div class="flex-1 z-50">
+  <div class="flex-1">
     <CustomCodeMirror />
   </div>
 </div>
 
 <style>
-  .tab {
-    height: 36px;
-    background-color: hsl(var(--primary) / 0.05);
+  :global(.no-hover) {
+    transition: none !important;
   }
 
-  .tab:hover {
-    background-color: hsl(var(--primary) / 0.1);
-  }
-
-  /* Style for the active tab */
-  .tab:has(.bg-primary) {
-    background-color: hsl(var(--primary) / 0.15);
+  :global(.no-hover:hover) {
+    background-color: transparent !important;
   }
 </style>

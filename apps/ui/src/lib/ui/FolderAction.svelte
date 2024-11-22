@@ -23,7 +23,7 @@
   function addFolder(type: "folder" | "file") {
     if (!folder.subfolders) folder.subfolders = [];
     folder.expand = true;
-    folder.subfolders.push({
+    folder.subfolders.unshift({
       name: "",
       subfolders: [],
       type: type,
@@ -47,19 +47,19 @@
   }
 </script>
 
-<div class="inline-flex group-hover:bg-muted bg-opacity-10">
+<div class="inline-flex">
   {#if folder.type == "folder"}
     <button
       on:click={() => addFolder("folder")}
-      class=" px-1 group-hover:opacity-100 opacity-0 hover:bg-muted rounded-sm"
+      class=" px-1 group-hover:opacity-100 opacity-0 rounded-sm"
     >
-      <FolderPlus size={16}></FolderPlus>
+      <FolderPlus size={14}></FolderPlus>
     </button>
     <button
       on:click={() => addFolder("file")}
-      class=" px-1 group-hover:opacity-100 opacity-0 hover:bg-muted rounded-sm"
+      class=" px-1 group-hover:opacity-100 opacity-0 rounded-sm"
     >
-      <FilePlus size={16}></FilePlus>
+      <FilePlus size={14}></FilePlus>
     </button>
   {:else}
     <button
@@ -68,14 +68,14 @@
       }}
       class=" px-1 group-hover:opacity-100 opacity-0 hover:bg-muted rounded-sm"
     >
-      <Trash class="text-red-500" size={16}></Trash>
+      <Trash class="text-red-500" size={14}></Trash>
     </button>
   {/if}
   <div class="group-hover:opacity-100 opacity-20">
     <DropdownMenu.Root>
       <DropdownMenu.Trigger asChild let:builder>
         <Button class="px-1" builders={[builder]} variant="link" style="icon">
-          <EllipsisVertical size={16}></EllipsisVertical>
+          <EllipsisVertical size={14}></EllipsisVertical>
         </Button>
       </DropdownMenu.Trigger>
       <DropdownMenu.Content>

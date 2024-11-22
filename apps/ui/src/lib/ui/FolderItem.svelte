@@ -5,8 +5,10 @@
 
   import FolderItem from "./FolderItem.svelte";
   import { flip } from "svelte/animate";
+  import { slide } from "svelte/transition";
   import type { FolderModel } from "../types/folder.model";
   import { createEventDispatcher } from "svelte";
+  import { quintOut } from "svelte/easing";
   export let folder: FolderModel;
 
   export let path: FolderModel;
@@ -61,9 +63,7 @@
   }
 </script>
 
-<div
-  class="folder rounded-lg {dragging ? 'bg-primary bg-blend-multiply ' : ''}"
->
+<div class=" rounded-lg {dragging ? 'bg-primary bg-blend-multiply ' : ''}">
   <div
     role="listitem"
     draggable={true}
@@ -73,7 +73,7 @@
     on:dragexit={() => (dragging = false)}
     on:dragleave={() => (dragging = false)}
     on:dragenter={() => (dragging = true)}
-    class="relative group flex hover:bg-muted
+    class="relative group flex hover:bg-primary/10
      justify-between select-none items-center rounded-sm px-2 py-0 text-sm outline-none aria-selected:bg-accent aria-selected:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50"
   >
     <FolderName
@@ -96,6 +96,7 @@
 
   {#if folder.expand && folder?.subfolders != null && folder?.subfolders?.length > 0}
     <div
+      transition:slide={{ duration: 200, easing: quintOut }}
       style="margin-left: 24px; border-left-width: 1px; border-bottom-left-radius: 12px; "
     >
       {#each folder?.subfolders as subfolder, index (index)}
@@ -116,24 +117,16 @@
       {/each}
     </div>
   {:else if folder.expand && folder.type === "folder"}
-    <!-- <div style="margin-left: 24px;  ">
-      <div class="flex flex-col flex-1">
-        <div class="flex flex-col items-center justify-center p-4">
-          <img src="%sveltekit.assets%/104-dumbbell.svg" alt="" srcset="" />
-          <span
-            class="max-w-sm mt-2 text-center whitespace-normal font-thin text-xs text-secondaryLight"
-            >🫙 Empty
-          </span>
-          <span></span>
-        </div>
-      </div>
-    </div> -->
+    <div transition:slide={{ duration: 200 }} style="margin-left: 24px;">
+      <!-- Empty folder content -->
+    </div>
   {/if}
 </div>
 
 <style>
   .folder {
     margin-left: 0.5em;
+
     /* margin-right: 0.5em; */
   }
 </style>

@@ -37,7 +37,7 @@
 
 <button
   on:click={toggle}
-  class="flex flex-auto items-center ring-0 border-0 align-middle"
+  class="flex flex-auto group-hover:bg-none h-100 items-center ring-0 border-0 align-middle"
 >
   <div class="flex-none">
     {#if folder.type == "folder"}
@@ -52,19 +52,24 @@
   </div>
 
   {#if folder.rename}
-    <Input
-      type="text"
-      class="m-1 focus-visible:ring-0 h-6 bg-muted bg-opacity-5 "
-      bind:value={folder.name}
-      on:keydown={handleKey}
-      on:focusout={() => {
-        if (folder.name != "") folder.rename = false;
-      }}
-      placeholder="Enter {folder.type} name"
-    />
+    <div class="ml-3">
+      <Input
+        type="text"
+        class=" h-6 bg-primary  rounded bg-opacity-50 focus-visible:ring-0 focus-visible:ring-offset-0 border-none"
+        bind:value={folder.name}
+        on:keydown={handleKey}
+        on:focusout={() => {
+          if (folder.name != "") folder.rename = false;
+        }}
+        placeholder="Enter {folder.type} name"
+      />
+    </div>
   {:else if folder.type === "file"}
     <a href={folder.uid} class="ml-2 flex-none">{folder.name}</a>
   {:else}
     <span class="ml-2 flex-none">{folder.name}</span>
   {/if}
 </button>
+
+<style>
+</style>
