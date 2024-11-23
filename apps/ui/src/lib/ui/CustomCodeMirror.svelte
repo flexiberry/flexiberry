@@ -10,8 +10,30 @@
   } from "@codemirror/view";
   import { StateEffect } from "@codemirror/state";
   import SuggestionWidget from "./SuggestionWidget.svelte";
+  import { onMount } from "svelte";
 
   let value = "";
+
+  let heightDifference = 0;
+
+  let toolbarHeight = 28; // Height of the bottom toolbar
+
+  onMount(() => {
+    // Create ResizeObserver to watch container size changes
+
+    const handleResize = () => {
+      const headerHeight = document?.querySelector("Header")?.clientHeight || 0;
+      const bodyHeight = window.innerHeight || 0;
+      heightDifference = bodyHeight - headerHeight - toolbarHeight;
+    };
+
+    handleResize();
+    window.addEventListener("resize", handleResize);
+
+    return () => {
+      window.removeEventListener("resize", handleResize);
+    };
+  });
 
   // Define the clear effect
   const clearSuggestionEffect = StateEffect.define<boolean>();
@@ -148,7 +170,7 @@
   ];
 </script>
 
-<div class="relative h-full">
+<div class="relative" style="height: {heightDifference}px;">
   <CodeMirror bind:value {extensions} class="editor" />
 </div>
 
@@ -156,13 +178,11 @@
   :global(.editor) {
     height: 100%;
     width: 100%;
+    overflow: hidden;
   }
 
   :global(.editor .cm-editor) {
     height: 100%;
-  }
-
-  :global(.editor .cm-scroller) {
     overflow: auto;
   }
 

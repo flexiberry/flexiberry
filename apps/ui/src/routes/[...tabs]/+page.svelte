@@ -23,34 +23,27 @@
 </script>
 
 <div class="h-full flex flex-col">
-  <div
-    class="flex items-center justify-between px-4 py-2 bg-primary/10 border-b border-primary/20"
+  <!-- <div
+    class="flex items-center justify-between px-4 py-2 border-b border-primary/20"
   >
-    <!-- File name -->
     <div class="flex items-center">
       <span class="text-sm font-medium truncate max-w-[400px]"
         >{currentFile}</span
       >
     </div>
 
-    <!-- Action buttons -->
     <div class="flex items-center gap-2">
-      <Button
-        variant="ghost"
-        color="green"
-        size="sm"
-        class="h-8 w-8 p-0 no-hover"
-      >
+      <Button variant="ghost" class=" p-0 ">
         <Play></Play>
       </Button>
 
-      <Button variant="ghost" size="sm" class="h-8 w-8 p-0 no-hover">
+      <Button variant="ghost" class=" p-0 ">
         <Pause></Pause>
       </Button>
 
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button variant="ghost" size="sm" class="h-8 w-8 p-0 no-hover">
+          <Button variant="ghost" size="sm" class=" p-0 ">
             <MoreHorizontal></MoreHorizontal>
           </Button>
         </DropdownMenuTrigger>
@@ -61,7 +54,7 @@
         </DropdownMenuContent>
       </DropdownMenu>
     </div>
-  </div>
+  </div> -->
 
   <div class="flex-1">
     <CustomCodeMirror />

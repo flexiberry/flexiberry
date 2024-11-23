@@ -124,9 +124,4 @@
 </div>
 
 <style>
-  .folder {
-    margin-left: 0.5em;
-
-    /* margin-right: 0.5em; */
-  }
 </style>

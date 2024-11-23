@@ -9,6 +9,7 @@
   import berry from "$lib/assets/berry-fotor-2024090211181.png";
   import Separator from "../lib/components/ui/separator/separator.svelte";
   import { fade, slide } from "svelte/transition";
+  import { Button } from "$lib/components/ui/button";
 
   let heightDifference = 0;
   let showRightPane = true;
@@ -27,6 +28,9 @@
    * @type {ResizeObserver}
    */
   let resizeObserver;
+
+  // Add these variables to track height
+  let toolbarHeight = 28; // Height of the bottom toolbar
 
   const updateLogoVisibility = () => {
     if (!logoContainer) return;
@@ -57,7 +61,7 @@
     const handleResize = () => {
       const headerHeight = document?.querySelector("Header")?.clientHeight || 0;
       const bodyHeight = window.innerHeight || 0;
-      heightDifference = bodyHeight - headerHeight;
+      heightDifference = bodyHeight - headerHeight - toolbarHeight;
 
       // Update right pane visibility based on screen width
       showRightPane = window.innerWidth >= 700;
@@ -88,7 +92,6 @@
 <Resizable.PaneGroup
   direction="horizontal"
   style="height: {heightDifference}px;"
-  class="h-100"
 >
   <Resizable.Pane class=" bg-opacity-10" defaultSize={25}>
     <div
@@ -154,3 +157,17 @@
     </Resizable.Pane>
   {/if}
 </Resizable.PaneGroup>
+
+<!-- Add the bottom toolbar -->
+<div
+  class="w-full border-t bg-primary-foreground bg-opacity-50 p-1 flex items-center px-2 justify-between"
+  style="height: {toolbarHeight}px"
+>
+  <div class="flex items-center gap-2">
+    <Button variant="ghost" size="sm" class="h-6">Status: Connected</Button>
+  </div>
+  <div class="flex items-center gap-2">
+    <Button variant="ghost" size="sm" class="h-6">Docs</Button>
+    <Button variant="ghost" size="sm" class="h-6">Settings</Button>
+  </div>
+</div>
