@@ -160,14 +160,14 @@
 
 <!-- Add the bottom toolbar -->
 <div
-  class="w-full border-t bg-primary-foreground bg-opacity-50 p-1 flex items-center px-2 justify-between"
+  class="w-full border-t border-primary bg-background bg-opacity-100 p-1 flex items-center px-2 justify-between"
   style="height: {toolbarHeight}px"
 >
   <div class="flex items-center gap-2">
-    <Button variant="ghost" size="sm" class="h-6">Status: Connected</Button>
+    <Button variant="ghost" size="sm" class="">Status: Connected</Button>
   </div>
   <div class="flex items-center gap-2">
-    <Button variant="ghost" size="sm" class="h-6">Docs</Button>
-    <Button variant="ghost" size="sm" class="h-6">Settings</Button>
+    <Button variant="ghost" size="sm" class="">Docs</Button>
+    <Button variant="ghost" size="sm" class="">Settings</Button>
   </div>
 </div>

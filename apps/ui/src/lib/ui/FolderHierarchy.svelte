@@ -85,18 +85,17 @@
 </script>
 
 <div style="height:{height - 40}px;" class="pb-4">
-  <div class="flex justify-between m-2 bg-primary bg-opacity-10">
-    <!-- <div class="grid grid-cols-2 gap-2 flex-none grow-0">
-      <Button variant="ghost" on:click={addFolder} style="icon">
-        <Plus size={18}></Plus>
-        New
+  <div class="flex justify-between m-2">
+    <div></div>
+    <div class="grid grid-cols-2 gap-2 flex-none grow-0">
+      <div></div>
+      <Button variant="outline" size={14} on:click={addFolder} style="icon">
+        <Plus></Plus>
+        <!-- New -->
       </Button>
-      <Button variant="ghost" style="icon">
-        <Share size={18}></Share>
-      </Button>
-    </div> -->
+    </div>
   </div>
-  <ScrollArea class=" h-full  w-full ">
+  <ScrollArea class=" h-full pt-2  w-full ">
     {#if folders == null || folders.length <= 0}
       <div class="flex flex-col mt-6 items-center justify-center p-4">
         <Inbox size={56} strokeWidth={1} />
@@ -115,7 +114,7 @@
                 <Download class="mr-2" size={14}></Download>
                 Import</Button
               >
-              <Button color="" variant="secondary">
+              <Button color="" on:click={addFolder} variant="secondary">
                 <Plus class="mr-2" size={14}></Plus>
                 Create</Button
               >
