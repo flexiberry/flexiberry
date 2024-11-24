@@ -13,9 +13,10 @@ Var @UAT variables for uat env
 
 
 Var @SIT variables
-    - name: 'rintu'
+    - name: 'rintu asdada'
     - age: 30
-    - paragraph: `lorem ipsum dolor sit amet, consectetur
+    - paragraph: 
+    `lorem ipsum dolor sit amet, consectetur
                   lorem ipsum dolor sit amet, consectetur
                   lorem ipsum dolor sit amet, consectetur`
     
@@ -23,38 +24,37 @@ Var @SIT variables
 
 Api the api is for the following testing methods
 Url 'https://api.example.com/user'
-Body JSON | 
-    {
+Body JSON newasdasda sdasdasd as asdasdas
+   ` {
         "field1": "value1",
         "field2": "value2",
         "field3": "value3"
-    } 
+    } `
 Header
-   - "Authorization": "Bearer <token>"
+   - Authorization: 'Bearer <token>'
 
 **all these wording are considered to be comments means line which is  stating with '**' then it is a comment.
 
 Api #user_token_api Fetch user information
-Url https://api.example.com/user
-Body JSON | 
-    {
-        "field1": "value1",
-        "field2": "value2",
-        "field3": "value3"
-    }
-Header 
-   - "Authorization": "Bearer {token}"
+    Url https://api.example.com/user
+    Body JSON 
+        `{
+            "field1": "value1",
+            "field2": "value2",
+            "field3": "value3"
+        }`
+    Header 
+        - Authorization: 'Bearer {token}'
 
 
 Testcase @ts001 testing the  application user information api
-Step @step1 get user information 
-Call {user_token_api}  Function to retrieve user information
-Capture   
-  - token: "response.body.token"
-  - status: "response.status"
+Step #step1 Call {user_token_api} get user information 
+Capture
+     - token: "response.body.token"
+     - status: "response.status"
 Validation 
-    token == status  // Ensure token matches status 
-    Call {user_token_api} Function to retrieve user information  
+       token == status  // Ensure token matches status 
+Step @step2 Call {user_token_api} Function to retrieve user information  
           Capture 
                - token: "response.body.token"
                - status: "response.status"

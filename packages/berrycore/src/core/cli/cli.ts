@@ -120,5 +120,5 @@ function runLexer() {
   );
 
   let lexer = new Lexer(fileContent);
-  console.log(lexer.tokenize());
+  console.dir(lexer.tokenize());
 }

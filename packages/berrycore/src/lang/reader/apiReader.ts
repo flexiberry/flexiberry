@@ -1,6 +1,7 @@
 import { Token } from "../token";
 import { TokenType } from "../tokenType";
 import { isWhitespace } from "../util";
+import { KeyValuePair } from "./keyValuePair";
 import { CReader, Reader } from "./reader";
 
 export class ApiReader extends CReader implements Reader {
@@ -16,6 +17,58 @@ export class ApiReader extends CReader implements Reader {
 
     start = this.fetchApiIdandTitle(start, tkns, value);
 
+    start = this.extractUrl(start, tkns);
+
+    start = this.extractBody(start, tkns);
+    console.log(this.input.substring(this.position));
+    start = this.extractHeader(start, tkns);
+
+    return tkns;
+  }
+  private extractBody(start: number, tkns: Token[]) {
+    while (
+      this.position < this.input.length &&
+      this.input[this.position] !== "\n"
+    ) {
+      const char = this.input[this.position];
+
+      if (isWhitespace(char)) {
+        this.position++; // Move to the next character
+        continue; // Skip whitespace
+      }
+
+      if (this.input.substring(this.position, this.position + 4) === "Body") {
+        start = this.readBody(tkns);
+        continue;
+      }
+
+      this.position++; // Move to the next
+    }
+
+    return this.position++;
+  }
+  private extractHeader(start: number, tkns: Token[]) {
+    while (
+      this.position < this.input.length &&
+      this.input[this.position] !== "\n"
+    ) {
+      const char = this.input[this.position];
+
+      if (isWhitespace(char)) {
+        this.position++; // Move to the next character
+        continue; // Skip whitespace
+      }
+      if (this.input.substring(this.position, this.position + 6) === "Header") {
+        start = this.readHeader(tkns);
+        continue;
+      }
+
+      this.position++; // Move to the next
+    }
+
+    return this.position++;
+  }
+  private extractUrl(start: number, tkns: Token[]) {
     while (
       this.position < this.input.length &&
       this.input[this.position] !== "\n"
@@ -28,14 +81,118 @@ export class ApiReader extends CReader implements Reader {
       }
       if (this.input.substring(this.position, this.position + 3) === "Url") {
         start = this.readUrl(tkns);
-        this.position++;
         continue;
       }
+      this.position++; // Move to the next
+    }
+    return this.position++;
+  }
 
+  private readHeader(tkns: Token[]): number {
+    let start = this.position;
+    let value = "";
+    this.position = this.position + 6;
+    tkns.push(
+      Token.from(
+        this.input.substring(start, this.position),
+        TokenType.Header,
+        start,
+        this.position
+      )
+    );
+    this.position++;
+
+    while (
+      this.position < this.input.length &&
+      this.input[this.position] !== "-"
+    ) {
+      this.position++; // Move to the next character
+    }
+
+    if (this.input[this.position] === "-") {
+      const kvReader = new KeyValuePair(this.input, this.position);
+      const tk = kvReader.read();
+      tkns.push(...tk);
+      this.position = kvReader.getPosition(); // Update position
+      start = this.position;
       this.position++; // Move to the next
     }
 
-    return tkns;
+    start = this.position;
+    return start;
+  }
+  private readBody(tkns: Token[]): number {
+    let start = this.position;
+    let value = "";
+    this.position = this.position + 4;
+    tkns.push(
+      Token.from(
+        this.input.substring(start, this.position),
+        TokenType.Body,
+        start,
+        this.position
+      )
+    );
+    this.position++;
+
+    while (
+      this.position < this.input.length &&
+      this.input[this.position] !== "`"
+    ) {
+      this.position++; // Move to the next character
+    }
+    start = this.position;
+    tkns.push(
+      Token.from(
+        this.input.substring(start, this.position + 1),
+        TokenType.Backtick,
+        start,
+        this.position
+      )
+    );
+    this.position++;
+    start = this.position;
+    value = "";
+    while (
+      this.position < this.input.length &&
+      this.input[this.position] !== "`"
+    ) {
+      value += this.input[this.position];
+      this.position++;
+    }
+    tkns.push(
+      Token.from(
+        this.input.substring(start, this.position),
+        TokenType.Scalar,
+        start,
+        this.position
+      )
+    );
+    this.position++;
+    start = this.position;
+    tkns.push(
+      Token.from(
+        this.input.substring(start - 1, this.position),
+        TokenType.Backtick,
+        start,
+        this.position
+      )
+    );
+
+    tkns.push(Token.from(value, TokenType.BodyType, start, this.position));
+    start = this.position;
+
+    while (
+      this.position < this.input.length &&
+      this.input[this.position] !== "\n"
+    ) {
+      const char = this.input[this.position];
+
+      this.position++;
+    }
+
+    start = this.position;
+    return start;
   }
   private readUrl(tkns: Token[]): number {
     let start = this.position;
@@ -73,7 +230,7 @@ export class ApiReader extends CReader implements Reader {
       )
     );
 
-    return this.position++;
+    return this.position;
   }
   private fetchApiIdandTitle(start: number, tkns: Token[], value: string) {
     while (

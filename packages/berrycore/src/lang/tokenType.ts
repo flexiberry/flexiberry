@@ -48,4 +48,5 @@ export enum TokenType {
   Backtick,
   Hyphen,
   Hash,
+  Quote,
 }
