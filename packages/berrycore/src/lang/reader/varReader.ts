@@ -1,6 +1,6 @@
 import { stat } from "fs";
-import { Token } from "../token";
-import { TokenType } from "../tokenType";
+import { Token } from "../tokenizer/token";
+import { TokenType } from "../tokenizer/tokenType";
 import { isWhitespace } from "../util";
 import { CReader, Reader } from "./reader";
 import { KeyValuePair } from "./keyValuePair";

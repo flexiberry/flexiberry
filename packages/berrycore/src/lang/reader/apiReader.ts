@@ -1,5 +1,5 @@
-import { Token } from "../token";
-import { TokenType } from "../tokenType";
+import { Token } from "../tokenizer/token";
+import { TokenType } from "../tokenizer/tokenType";
 import { isWhitespace } from "../util";
 import { KeyValuePair } from "./keyValuePair";
 import { CReader, Reader } from "./reader";
@@ -20,7 +20,7 @@ export class ApiReader extends CReader implements Reader {
     start = this.extractUrl(start, tkns);
 
     start = this.extractBody(start, tkns);
-    console.log(this.input.substring(this.position));
+
     start = this.extractHeader(start, tkns);
 
     return tkns;

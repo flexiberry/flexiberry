@@ -1,10 +1,10 @@
-import { ApiReader } from "./reader/apiReader";
-import { CommentReader } from "./reader/commentReader";
-import { EnvReader } from "./reader/envReader";
-import { VarReader } from "./reader/varReader";
+import { ApiReader } from "../reader/apiReader";
+import { CommentReader } from "../reader/commentReader";
+import { EnvReader } from "../reader/envReader";
+import { VarReader } from "../reader/varReader";
 import { Token } from "./token";
 import { TokenType } from "./tokenType";
-import { isApi, isComment, isEnv, isVar, isWhitespace } from "./util";
+import { isApi, isComment, isEnv, isVar, isWhitespace } from "../util";
 
 export class Lexer {
   private input: string;

@@ -1,5 +1,5 @@
-import { Position, Token } from "../token";
-import { TokenType } from "../tokenType";
+import { Position, Token } from "../tokenizer/token";
+import { TokenType } from "../tokenizer/tokenType";
 import { isWhitespace } from "../util";
 import { CReader, Reader } from "./reader";
 

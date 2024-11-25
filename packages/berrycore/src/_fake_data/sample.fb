@@ -15,10 +15,9 @@ Var @UAT variables for uat env
 Var @SIT variables
     - name: 'rintu asdada'
     - age: 30
-    - paragraph: 
-    `lorem ipsum dolor sit amet, consectetur
+    - paragraph: ` lorem ipsum dolor sit amet, consectetur
                   lorem ipsum dolor sit amet, consectetur
-                  lorem ipsum dolor sit amet, consectetur`
+                  lorem ipsum dolor sit amet, consectetur `
     
 
 

@@ -5,7 +5,8 @@ import { BerryCore } from "../berrycore";
 import { BerryRunner } from "../util/runner";
 import { RUNNER_EVENT } from "../../enum/runner.event";
 import { FileUtils } from "../functions/file";
-import { Lexer } from "../../lang/lexer";
+import { Lexer } from "../../lang/tokenizer/lexer";
+import Parser from "../../lang/ast/AstParser";
 
 const rl = readline.createInterface({
   input: process.stdin,
@@ -119,6 +120,12 @@ function runLexer() {
     "/Users/rinturajc/lib_projects/Flexiberry/flexiberry/packages/berrycore/src/_fake_data/sample.fb"
   );
 
+  console.log("Running lexer on file content...");
+
+  // eval(`console.log('rintu')`); // Executes the uploaded code
+
   let lexer = new Lexer(fileContent);
   console.dir(lexer.tokenize());
+
+  new Parser().produce(fileContent);
 }

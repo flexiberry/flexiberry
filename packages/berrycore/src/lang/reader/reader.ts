@@ -1,4 +1,4 @@
-import { Token } from "../token";
+import { Token } from "../tokenizer/token";
 
 export interface Reader {
   getPosition(): number;
