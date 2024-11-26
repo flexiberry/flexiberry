@@ -1,6 +1,4 @@
-import { TestSuite } from "../../types/types";
 import * as fs from "fs";
-import * as yaml from "js-yaml";
 import { InputType } from "../../enum/misc";
 
 export class FileUtils {
@@ -34,17 +32,6 @@ export class FileUtils {
     } catch (error) {
       console.error("Error validating file path:", error);
       return InputType.Invalid;
-    }
-  }
-  public static parseFromYmlFile(file: string): TestSuite {
-    try {
-      const fileContents = fs.readFileSync(file, "utf8");
-      const result: TestSuite = yaml.load(fileContents) as TestSuite;
-      console.log(result);
-      return result;
-    } catch (error) {
-      console.error("Failed to parse YAML file:", error);
-      throw error;
     }
   }
 

@@ -70,9 +70,6 @@ async function runRunner() {
   const eventManager = new BerryRunner();
 
   const berryCore = new BerryCore();
-  let result = await berryCore.parseAndValidateInput(
-    "/Users/rinturajc/lib_projects/Flexiberry/berrycore/src/_fake_data/d2.yaml"
-  );
 
   // Subscribe to 'myEvent' event
   eventManager
@@ -86,7 +83,7 @@ async function runRunner() {
   //   console.log("Test COMPLETED:", data);
   // });
 
-  await eventManager.run(result, "development");
+  await eventManager.run(null, "development");
 }
 
 async function parseFile(): Promise<any> {
@@ -100,11 +97,11 @@ async function parseFile(): Promise<any> {
         } else {
           try {
             showLoadingSpinner();
-            const berryCore = new BerryCore();
-            let result = await berryCore.parseAndValidateInput(input);
-            console.log(chalk.green("Converted: "), chalk.yellow(result));
-            stopLoadingSpinner();
-            resolve(result);
+            // const berryCore = new BerryCore();
+            // let result = await berryCore.parseAndValidateInput(input);
+            // console.log(chalk.green("Converted: "), chalk.yellow(result));
+            // stopLoadingSpinner();
+            // resolve(result);
           } catch (error) {
             console.error(chalk.red("Error processing file: "), error);
             reject(error);

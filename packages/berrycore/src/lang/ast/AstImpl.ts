@@ -40,11 +40,11 @@ export class CProgramBody implements ProgramBody {
     const prev = this.tokens.shift() as Token;
     if (!prev || prev.type != type) {
       console.error(
-        "Parser Error:\n",
+        `\x1b[31mParser Error:\x1b[0m\n`,
         err,
-        prev,
-        " - Expecting: ",
-        type.toString()
+        // TokenType[prev.type].toUpperCase(),
+        " - \x1b[33mExpecting:\x1b[0m ",
+        TokenType[type].toUpperCase()
       );
       //   throw new Error("Parser Error:\n" + err + prev + " - Expecting: " + type);
     }
@@ -68,7 +68,6 @@ export class CProgramBody implements ProgramBody {
       this.environment = this.parseEnvAst() as Environment;
     }
     if (this.at().type == TokenType.Api) {
-      console.log();
     }
     if (this.at().type == TokenType.Var) {
       this.store.push(this.parseStore());
@@ -89,12 +88,12 @@ export class CProgramBody implements ProgramBody {
       this.eat();
     }
     if (this.at().type === TokenType.Pointer) {
-      this.expect(
+      this.eat();
+      let v = this.expect(
         TokenType.Pointed,
         "Var pointer is expected following pointer"
       );
-      store.pointer = this.at().value;
-      this.eat();
+      store.pointer = v.value;
     }
     if (this.at().type === TokenType.Title) {
       store.comments = this.at().value;
@@ -107,12 +106,24 @@ export class CProgramBody implements ProgramBody {
         TokenType.Identifier,
         "Missing Identifier in Var decleration "
       );
+
+      let kv: StoreKv = {
+        dataType: "number",
+        key: key.value,
+        kind: NodeType.StoreKeyValue,
+        value: "",
+      };
       this.expect(
         TokenType.Colon,
         "Missing Colon in Var Key Value decleration "
       );
-      if (this.at().type == TokenType.Quote) this.eat();
-      if (this.at().type == TokenType.Backtick) this.eat();
+      if (
+        this.at().type == TokenType.Quote ||
+        this.at().type == TokenType.Backtick
+      ) {
+        kv.dataType = "string";
+        this.eat();
+      }
 
       let value = this.expect(
         TokenType.Scalar,
@@ -122,15 +133,10 @@ export class CProgramBody implements ProgramBody {
       if (this.at().type == TokenType.Quote) this.eat();
       if (this.at().type == TokenType.Backtick) this.eat();
 
-      let kv: StoreKv = {
-        dataType: "",
-        key: key.value,
-        kind: NodeType.StoreKeyValue,
-        value: value.value,
-      };
+      kv.value = value.value;
+
       store.value.push(kv);
     } while (this.at().type == TokenType.Hyphen);
-    console.log(this.at());
     return store;
   }
 
