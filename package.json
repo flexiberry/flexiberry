@@ -9,7 +9,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "runui": "cd ./apps/ui && npm run dev ",
-    "cli": "cd ./packages/berrycore && npm run start:cli "
+    "cli": "cd ./packages/berrycore && npm run start:cli ",
+    "buildcore": "cd ./packages/berrycore && npm run build "
   },
   "keywords": [
     "flexiberry",

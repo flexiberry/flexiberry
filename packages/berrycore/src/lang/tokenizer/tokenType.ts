@@ -5,9 +5,9 @@ export enum TokenType {
   Value,
 
   Identifier,
+
   // Keywords
   Env,
-
   Var,
   Pointer,
   Pointed,

@@ -60,3 +60,9 @@
     @apply bg-background text-foreground;
   }
 }
+
+.customTag {
+  color: blue; /* Change the color to your desired style */
+  font-weight: bold; /* Make the text bold */
+  /* Add any other styles you want */
+}

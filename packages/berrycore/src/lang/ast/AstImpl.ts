@@ -10,7 +10,6 @@ import {
   Store,
   StoreKv,
 } from "./Ast";
-import { isVarTokens } from "./Validations";
 
 export class CProgramBody implements ProgramBody {
   kind: NodeType.ProgramBody = NodeType.ProgramBody;
