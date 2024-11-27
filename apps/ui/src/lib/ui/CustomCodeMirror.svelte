@@ -1,30 +1,20 @@
 <script lang="ts">
   import CodeMirror from "svelte-codemirror-editor";
 
-  import {
-    EditorView,
-    ViewPlugin,
-    Decoration,
-    WidgetType,
-    ViewUpdate,
-    keymap,
-  } from "@codemirror/view";
-  import { StateEffect } from "@codemirror/state";
-  import SuggestionWidget from "./SuggestionWidget.svelte";
+  import { EditorView } from "@codemirror/view";
   import { onMount } from "svelte";
-  import { Lexer } from "berrycore";
   import {
     apiDetectorPlugin,
     customLanguage,
-    myCustomLanguageSupport,
+    themeAwareLanguageSupport,
   } from "../util/codemirrorConfig";
   import { gridTheme } from "../util/CMTheme";
+  import { mode } from "mode-watcher";
 
   export let value = "";
 
   let heightDifference = 0;
   let toolbarHeight = 28;
-
   onMount(() => {
     // const tkn = new Lexer(value).tokenize();
     // console.log(tkn);
@@ -42,7 +32,7 @@
   });
 
   const extensions = [
-    myCustomLanguageSupport,
+    themeAwareLanguageSupport($mode == "dark"),
     apiDetectorPlugin,
     customLanguage,
     gridTheme,

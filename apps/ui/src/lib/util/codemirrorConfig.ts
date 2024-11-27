@@ -6,7 +6,7 @@ import {
 } from "@codemirror/view";
 import { ApiSuggestionWidget } from "./ApiSuggestionWidget";
 import { StateEffect } from "@codemirror/state";
-import { StreamLanguage } from "@codemirror/language";
+import { StreamLanguage, syntaxHighlighting } from "@codemirror/language";
 import { Tag, tags } from "@lezer/highlight";
 import { HighlightStyle } from "@codemirror/language";
 import { LanguageSupport } from "@codemirror/language"; // Import your custom language
@@ -60,6 +60,35 @@ export const apiDetectorPlugin = ViewPlugin.fromClass(
   }
 );
 
+// Dark Theme Colors
+const darkThemeHighlightStyle = HighlightStyle.define([
+  { tag: tags.comment, color: "#6a9955" },
+  { tag: tags.number, color: "#b5cea8" },
+  { tag: tags.variableName, color: "#9cdcfe" },
+  { tag: tags.keyword, color: "#c678dd" },
+  { tag: tags.string, color: "#ce9178" },
+  { tag: tags.bool, color: "#569cd6" },
+]);
+
+// Light Theme Colors
+const lightThemeHighlightStyle = HighlightStyle.define([
+  { tag: tags.comment, color: "#008000" },
+  { tag: tags.number, color: "#098658" },
+  { tag: tags.variableName, color: "#0000ff" },
+  { tag: tags.keyword, color: "#0000ff" },
+  { tag: tags.string, color: "#a31515" },
+  { tag: tags.bool, color: "#0000ff" },
+]);
+
+// Theme Configuration
+export const themeAwareLanguageSupport = (isDarkMode: any) => {
+  const highlightStyle = isDarkMode
+    ? darkThemeHighlightStyle
+    : lightThemeHighlightStyle;
+
+  return [customLanguage, syntaxHighlighting(highlightStyle)];
+};
+
 export const customLanguage = StreamLanguage.define({
   startState() {
     return {};
@@ -67,7 +96,7 @@ export const customLanguage = StreamLanguage.define({
 
   token(stream: { match: (arg0: RegExp) => any; next: () => void }) {
     if (stream.match(/^#[a-zA-Z0-9]+/)) {
-      return "comment"; // Format as a keyword
+      return "variableName"; // Format as a keyword
     } else if (stream.match(/^\d+/)) {
       return "number"; // Format as a number
     } else if (stream.match(/^[a-zA-Z]+/)) {
@@ -79,4 +108,9 @@ export const customLanguage = StreamLanguage.define({
   },
 });
 
-export const myCustomLanguageSupport = new LanguageSupport(customLanguage);
+// export const myCustomLanguageSupport = new LanguageSupport(customLanguage);
+
+// export const myCustomLanguageSupport = [
+//   customLanguage,
+//   syntaxHighlighting(customHighlightStyle),
+// ];
