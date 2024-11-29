@@ -1,4 +1,6 @@
 <script>
+  import BottomToolBar from "../lib/ui/BottomToolBar.svelte";
+
   import { Toaster } from "svelte-sonner";
   import "../app.css";
   import { ModeWatcher } from "mode-watcher";
@@ -163,11 +165,5 @@
   class="w-full border-t border-primary bg-background bg-opacity-100 p-1 flex items-center px-2 justify-between"
   style="height: {toolbarHeight}px"
 >
-  <div class="flex items-center gap-2">
-    <Button variant="ghost" size="sm" class="">Status: Connected</Button>
-  </div>
-  <div class="flex items-center gap-2">
-    <Button variant="ghost" size="sm" class="">Docs</Button>
-    <Button variant="ghost" size="sm" class="">Settings</Button>
-  </div>
+  <BottomToolBar></BottomToolBar>
 </div>

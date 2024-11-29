@@ -88,10 +88,15 @@
   <div class="flex justify-between m-2">
     <div></div>
     <div class="grid grid-cols-2 gap-2 flex-none grow-0">
-      <div></div>
-      <Button variant="outline" size={14} on:click={addFolder} style="icon">
-        <Plus></Plus>
-        <!-- New -->
+      <div>
+        <Button variant="ghost" size="xs" on:click={addFolder}>
+          <Plus size={14}></Plus>
+          Folder
+        </Button>
+      </div>
+      <Button variant="ghost" size="xs" on:click={addFolder}>
+        <Plus size={14}></Plus>
+        Folder
       </Button>
     </div>
   </div>

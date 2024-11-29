@@ -16,9 +16,10 @@ export async function updateFolder(folder: FolderModel[]) {
       data: folder,
       id: "folder",
     });
-  } else
+  } else {
     db.folderTable.add({
       data: folder,
       id: "folder",
     });
+  }
 }

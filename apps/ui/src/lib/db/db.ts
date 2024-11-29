@@ -6,17 +6,23 @@ interface folderTable {
   data: FolderModel[];
 }
 
+interface fileStore {
+  id: string;
+  name: string;
+  data: Blob;
+  createdAt: Date;
+}
+
 const db = new Dexie("folderTable") as Dexie & {
-  folderTable: EntityTable<
-    folderTable,
-    "id" // primary key "id" (for the typings only)
-  >;
+  folderTable: EntityTable<folderTable, "id">;
+  fileStore: EntityTable<fileStore, "id">;
 };
 
 // Schema declaration:
 db.version(1).stores({
-  folderTable: "++id, data", // primary key "id" (for the runtime!)
+  folderTable: "++id", // primary key "id" (for the runtime!)
+  fileStore: "++id,name,createdAt", // primary key "id" (for the runtime!)
 });
 
-export type { folderTable };
+export type { folderTable, fileStore };
 export { db };

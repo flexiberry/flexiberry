@@ -65,7 +65,7 @@
       />
     </div>
   {:else if folder.type === "file"}
-    <a href={folder.uid} class="ml-2 flex-none">{folder.name}</a>
+    <a href={folder.name} class="ml-2 flex-none">{folder.name}</a>
   {:else}
     <span class="ml-2 flex-none">{folder.name}</span>
   {/if}

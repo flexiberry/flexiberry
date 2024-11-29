@@ -3,22 +3,17 @@
 
   import { EditorView } from "@codemirror/view";
   import { onMount } from "svelte";
-  import {
-    apiDetectorPlugin,
-    customLanguage,
-    themeAwareLanguageSupport,
-  } from "../util/codemirrorConfig";
-  import { gridTheme } from "../util/CMTheme";
+  import { apiDetectorPlugin } from "../util/codemirrorConfig";
+  import { gridTheme, themeAwareLanguageSupport } from "../util/CMTheme";
   import { mode } from "mode-watcher";
 
   export let value = "";
 
-  let heightDifference = 0;
-  let toolbarHeight = 28;
-  onMount(() => {
-    // const tkn = new Lexer(value).tokenize();
-    // console.log(tkn);
+  $: theme = themeAwareLanguageSupport($mode === "dark");
 
+  let heightDifference = 0;
+  let toolbarHeight = 28 + 49;
+  onMount(() => {
     const handleResize = () => {
       const headerHeight = document?.querySelector("Header")?.clientHeight || 0;
       const bodyHeight = window.innerHeight || 0;
@@ -31,10 +26,9 @@
     };
   });
 
-  const extensions = [
-    themeAwareLanguageSupport($mode == "dark"),
+  let extensions = [
+    ...themeAwareLanguageSupport($mode == "dark"),
     apiDetectorPlugin,
-    customLanguage,
     gridTheme,
     EditorView.theme({
       ".api-suggestion-widget": {
@@ -46,7 +40,13 @@
 </script>
 
 <div class="relative" style="height: {heightDifference}px;">
-  <CodeMirror bind:value {extensions} lineWrapping={false} class="editor" />
+  <CodeMirror
+    bind:value
+    {extensions}
+    {theme}
+    lineWrapping={false}
+    class="editor"
+  />
 </div>
 
 <style>
