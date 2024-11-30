@@ -6,7 +6,7 @@
   import FolderItem from "./FolderItem.svelte";
   import { flip } from "svelte/animate";
   import { slide } from "svelte/transition";
-  import type { FolderModel } from "../types/folder.model";
+  import type { FolderModel } from "../../types/folder.model";
   import { createEventDispatcher } from "svelte";
   import { quintOut } from "svelte/easing";
   export let folder: FolderModel;

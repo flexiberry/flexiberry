@@ -1,5 +1,5 @@
 <script lang="ts">
-  import CustomCodeMirror from "../../lib/ui/CustomCodeMirror.svelte";
+  import CustomCodeMirror from "../../lib/ui/editor/CustomCodeMirror.svelte";
   import { page } from "$app/stores";
   import { Button } from "$lib/components/ui/button";
   import {
@@ -79,11 +79,4 @@
 </div>
 
 <style>
-  :global(.no-hover) {
-    transition: none !important;
-  }
-
-  :global(.no-hover:hover) {
-    background-color: transparent !important;
-  }
 </style>

@@ -1,7 +1,7 @@
 import { StateEffect } from "@codemirror/state";
 import { EditorView, WidgetType } from "@codemirror/view";
-import SuggestionWidget from "../ui/SuggestionWidget.svelte";
 import { clearSuggestionEffect } from "./codemirrorConfig";
+import SuggestionWidget from "../ui/editor/SuggestionWidget.svelte";
 
 // Define the clear effect
 

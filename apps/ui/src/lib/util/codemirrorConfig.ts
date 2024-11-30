@@ -3,13 +3,9 @@ import {
   EditorView,
   ViewPlugin,
   ViewUpdate,
-  type DecorationSet,
 } from "@codemirror/view";
 import { ApiSuggestionWidget } from "./ApiSuggestionWidget";
 import { StateEffect } from "@codemirror/state";
-import { StreamLanguage, syntaxHighlighting } from "@codemirror/language";
-import { HighlightStyle } from "@codemirror/language";
-import { themeAwareLanguageSupport } from "./CMTheme";
 
 export const clearSuggestionEffect = StateEffect.define<boolean>();
 

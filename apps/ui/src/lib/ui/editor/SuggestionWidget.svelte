@@ -1,9 +1,6 @@
 <script lang="ts">
   import * as Card from "$lib/components/ui/card/index.js";
-  import { Cross, X } from "lucide-svelte";
-  import { Description } from "../components/ui/alert-dialog";
-  import Button from "../components/ui/button/button.svelte";
-  import Header from "./Header.svelte";
+  import { X } from "lucide-svelte";
 
   export let onInsert: (template: string) => void;
   export let onClose: () => void;

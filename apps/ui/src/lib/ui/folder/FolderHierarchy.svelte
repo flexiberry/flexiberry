@@ -8,22 +8,21 @@
     Plus,
     Share,
   } from "lucide-svelte";
-  import Button from "../components/ui/button/button.svelte";
+  import Button from "../../components/ui/button/button.svelte";
   import FolderItem from "./FolderItem.svelte";
-  import Input from "../components/ui/input/input.svelte";
-  import { moveItemInHierarchy } from "../util/util";
+  import Input from "../../components/ui/input/input.svelte";
+  import { moveItemInHierarchy } from "../../util/util";
   import { flip } from "svelte/animate";
   import { v4 as uuidv4 } from "uuid";
   import { savedFolders, updateFolder } from "$lib/writable/folder.store";
   import { ScrollArea } from "$lib/components/ui/scroll-area/index.js";
   import { onMount } from "svelte";
-  import { db } from "../db/db";
+  import { db } from "../../db/db";
   import berry from "$lib/assets/berry-fotor-2024090211181.png";
 
   export let height: number = 100;
 
   onMount(async () => {
-    console.log("onMount");
     let d = await db.folderTable.get("folder");
     if (d) updateFolder(d.data);
   });
@@ -31,8 +30,6 @@
   let folders: any[] = [];
 
   savedFolders.subscribe((data) => {
-    console.log(data);
-
     folders = data || [];
   });
 
@@ -88,12 +85,7 @@
   <div class="flex justify-between m-2">
     <div></div>
     <div class="grid grid-cols-2 gap-2 flex-none grow-0">
-      <div>
-        <Button variant="ghost" size="xs" on:click={addFolder}>
-          <Plus size={14}></Plus>
-          Folder
-        </Button>
-      </div>
+      <div></div>
       <Button variant="ghost" size="xs" on:click={addFolder}>
         <Plus size={14}></Plus>
         Folder
@@ -133,7 +125,6 @@
           <FolderItem
             {folder}
             on:folderUpdate={(f) => {
-              console.log(f.detail.fld);
               updateFolder(folders);
             }}
             path={folder}

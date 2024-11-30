@@ -1,6 +1,6 @@
 <script>
   import { Settings } from "lucide-svelte";
-  import Button from "../components/ui/button/button.svelte";
+  import Button from "../../components/ui/button/button.svelte";
 </script>
 
 <div class="flex items-center gap-2">

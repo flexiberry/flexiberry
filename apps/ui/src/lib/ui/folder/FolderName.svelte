@@ -4,7 +4,7 @@
   import { FolderOpen } from "lucide-svelte";
   import { FileCode } from "lucide-svelte";
 
-  import type { FolderModel } from "../types/folder.model";
+  import type { FolderModel } from "../../types/folder.model";
 
   import { Input } from "$lib/components/ui/input/index.js";
 

@@ -6,6 +6,8 @@
   let files = new Set<string>();
 
   $: {
+    console.log($page.params.tabs);
+
     // Update files set when URL changes
     const tabs = $page.params.tabs?.split("/") || [];
     tabs.forEach((tab) => files.add(tab));

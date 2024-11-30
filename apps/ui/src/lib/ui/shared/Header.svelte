@@ -1,6 +1,6 @@
 <script lang="ts">
-  import Button from "../components/ui/button/button.svelte";
-  import { Input } from "../components/ui/input";
+  import Button from "../../components/ui/button/button.svelte";
+  import { Input } from "../../components/ui/input";
   import { Moon, Plus, Sun, Upload } from "lucide-svelte";
   import { LifeBuoy } from "lucide-svelte";
   import { Github } from "lucide-svelte";

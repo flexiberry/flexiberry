@@ -3,8 +3,8 @@
 
   import { EditorView } from "@codemirror/view";
   import { onMount } from "svelte";
-  import { apiDetectorPlugin } from "../util/codemirrorConfig";
-  import { gridTheme, themeAwareLanguageSupport } from "../util/CMTheme";
+  import { apiDetectorPlugin } from "../../util/codemirrorConfig";
+  import { gridTheme, themeAwareLanguageSupport } from "../../util/CMTheme";
   import { mode } from "mode-watcher";
 
   export let value = "";
