@@ -1,3 +1,7 @@
+export function TokenTypeValueOf(value: TokenType) {
+  return TokenType[value]; // Return the name of the TokenType
+}
+
 export enum TokenType {
   // Literal Types
   Number,
@@ -13,6 +17,7 @@ export enum TokenType {
   Pointed,
 
   Api,
+  ApiMethod,
   Url,
   Body,
   BodyType,

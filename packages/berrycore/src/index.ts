@@ -6,15 +6,17 @@ import packageFile from "../package.json";
 // console.log("Version: " + packageFile.version);
 
 import { Lexer } from "./lang/tokenizer/lexer";
+import { Command } from "commander";
+import { handleInput } from "./core/cli/cli";
 // initialize the application
 
-// const program = new Command();
-// program
-//   .version(packageFile.version)
-//   .description("CLI to process JSON input")
-//   .option("-i, --input", "Input file string")
-//   .action(handleInput);
+const program = new Command();
+program
+  .version(packageFile.version)
+  .description("CLI to process JSON input")
+  .option("-i, --input", "Input file string")
+  .action(handleInput);
 
-// program.parse(process.argv);
+program.parse(process.argv);
 
 export { Lexer };

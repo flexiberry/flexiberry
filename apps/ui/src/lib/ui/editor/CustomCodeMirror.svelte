@@ -6,6 +6,7 @@
   import { apiDetectorPlugin } from "../../util/codemirrorConfig";
   import { gridTheme, themeAwareLanguageSupport } from "../../util/CMTheme";
   import { mode } from "mode-watcher";
+  import { berryLanguageSupport } from "../../util/berryLanguage";
 
   export let value = "";
 
@@ -27,7 +28,8 @@
   });
 
   let extensions = [
-    ...themeAwareLanguageSupport($mode == "dark"),
+    // ...themeAwareLanguageSupport($mode == "dark"),
+    berryLanguageSupport(),
     apiDetectorPlugin,
     gridTheme,
     EditorView.theme({
@@ -79,4 +81,61 @@
       transform: translateY(0);
     }
   }
+  /*
+  :global(.cm-keyword) {
+    color: #c678dd;
+  }
+
+  :global(.cm-function) {
+    color: #61afef;
+  }
+
+  :global(.cm-variable) {
+    color: #e06c75;
+  }
+
+  :global(.cm-string) {
+    color: #98c379;
+  }
+
+  :global(.cm-comment) {
+    color: #5c6370;
+    font-style: italic;
+  }
+
+  :global(.cm-number) {
+    color: #d19a66;
+  }
+
+  :global(.cm-operator) {
+    color: #56b6c2;
+  }
+
+  :global(.dark .cm-keyword) {
+    color: #c678dd;
+  }
+
+  :global(.dark .cm-function) {
+    color: #61afef;
+  }
+
+  :global(.dark .cm-variable) {
+    color: #e06c75;
+  }
+
+  :global(.dark .cm-string) {
+    color: #98c379;
+  }
+
+  :global(.dark .cm-comment) {
+    color: #5c6370;
+  }
+
+  :global(.dark .cm-number) {
+    color: #d19a66;
+  }
+
+  :global(.dark .cm-operator) {
+    color: #56b6c2;
+  }*/
 </style>

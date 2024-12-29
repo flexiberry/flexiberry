@@ -7,6 +7,7 @@ import { RUNNER_EVENT } from "../../enum/runner.event";
 import { FileUtils } from "../functions/file";
 import { Lexer } from "../../lang/tokenizer/lexer";
 import Parser from "../../lang/ast/AstParser";
+import { TokenType, TokenTypeValueOf } from "../../lang/tokenizer/tokenType";
 
 const rl = readline.createInterface({
   input: process.stdin,
@@ -122,7 +123,15 @@ function runLexer() {
   // eval(`console.log('rintu')`); // Executes the uploaded code
 
   let lexer = new Lexer(fileContent);
-  console.dir(lexer.tokenize());
+  const tokens = lexer.tokenize();
+  console.table(
+    tokens.map((token) => ({
+      Value: token.value,
+      TokenType: TokenTypeValueOf(token.type),
+      Start: token.position.start,
+      End: token.position.end,
+    }))
+  );
 
-  new Parser().produce(fileContent);
+  // new Parser().produce(fileContent);
 }

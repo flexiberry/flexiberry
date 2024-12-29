@@ -1,4 +1,4 @@
-<script>
+<!-- <script>
   import { onMount } from "svelte";
   import ScrollArea from "../../components/ui/scroll-area/scroll-area.svelte";
 </script>
@@ -116,4 +116,4 @@
     expedita eaque a enim natus unde, ipsum laudantium dicta exercitationem
     animi optio illum, architecto nisi blanditiis aspernatur aut quas?
   </p>
-</ScrollArea>
+</ScrollArea> -->
