@@ -4,7 +4,21 @@ import { EnvReader } from "../reader/envReader";
 import { VarReader } from "../reader/varReader";
 import { Token } from "./token";
 import { TokenType } from "./tokenType";
-import { isApi, isComment, isEnv, isVar, isWhitespace } from "../util";
+import {
+  isApi,
+  isCapture,
+  isCheck,
+  isComment,
+  isEnv,
+  isParams,
+  isStep,
+  isVar,
+  isWhitespace,
+} from "../util";
+import { StepReader } from "../reader/stepReader";
+import { CaptureReader } from "../reader/captureReader";
+import { ParamsReader } from "../reader/paramsReader";
+import { CheckReader } from "../reader/checkReader";
 
 export class Lexer {
   private input: string;
@@ -56,6 +70,35 @@ export class Lexer {
         this.position = apiReader.getPosition(); // Update position
         continue;
       }
+
+      if (isStep(this.input, this.position)) {
+        const stepReader = new StepReader(this.input, this.position);
+        const tkns = stepReader.read();
+        tokens.push(...tkns);
+        this.position = stepReader.getPosition(); // Update position
+        continue;
+      }
+      if (isCapture(this.input, this.position)) {
+        const captureReader = new CaptureReader(this.input, this.position);
+        const tkns = captureReader.read();
+        tokens.push(...tkns);
+        this.position = captureReader.getPosition(); // Update position
+        continue;
+      }
+      if (isParams(this.input, this.position)) {
+        const paramsReader = new ParamsReader(this.input, this.position);
+        const tkns = paramsReader.read();
+        tokens.push(...tkns);
+        this.position = paramsReader.getPosition(); // Update position
+        continue;
+      }
+      // if (isCheck(this.input, this.position)) {
+      //   const checkReader = new CheckReader(this.input, this.position);
+      //   const tkns = checkReader.read();
+      //   tokens.push(...tkns);
+      //   this.position = checkReader.getPosition(); // Update position
+      //   continue;
+      // }
 
       this.position++; // Move to the next character if no match
     }

@@ -10,7 +10,6 @@ export class VarReader extends CReader implements Reader {
     let tkns: Token[] = [];
     let start = this.position;
     let value = "";
-
     tkns.push(this.readVar());
 
     while (
@@ -27,27 +26,59 @@ export class VarReader extends CReader implements Reader {
       if (char === "@") {
         start = this.varPointerAndDetails(tkns, char, start);
         this.position++;
-        continue;
+        value = "";
+        break;
       }
 
-      if (char === "-") {
+      value += char;
+      this.position++; // Move to the next
+    }
+
+    if (!!value) {
+      tkns.push(Token.from(value, TokenType.Title, start, this.position));
+      value = "";
+      this.position++; // Move to the next
+    }
+
+    // Parse key-value pairs until empty line
+    while (this.position < this.input.length) {
+      // Skip whitespace at start of line
+      let lineStart = this.position;
+      while (
+        this.position < this.input.length &&
+        isWhitespace(this.input[this.position]) &&
+        this.input[this.position] !== "\n"
+      ) {
+        this.position++;
+      }
+
+      // Check for empty line
+      if (
+        this.input[this.position] === "\n" ||
+        this.input[this.position] === undefined
+      ) {
+        break;
+      }
+
+      // Parse key-value pair if line starts with hyphen
+      if (this.input[this.position] === "-") {
         const kvReader = new KeyValuePair(this.input, this.position);
         const tk = kvReader.read();
         tkns.push(...tk);
         this.position = kvReader.getPosition(); // Update position
-        start = this.position;
-        this.position++; // Move to the next
-        continue;
       }
-      value += char;
 
-      if (this.input[this.position + 1] === "\n") {
-        tkns.push(Token.from(value, TokenType.Title, start, this.position));
-        this.position++; // Move to the next
-        this.position++; // Move to the next
-        continue;
+      // Move to next line
+      // while (
+      //   this.position < this.input.length &&
+      //   this.input[this.position] !== "\n"
+      // ) {
+      //   this.position++;
+      // }
+
+      if (this.position < this.input.length) {
+        this.position++; // Move past newline
       }
-      this.position++; // Move to the next
     }
 
     return tkns;

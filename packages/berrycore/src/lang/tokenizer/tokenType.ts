@@ -54,4 +54,8 @@ export enum TokenType {
   Hyphen,
   Hash,
   Quote,
+
+  Capture,
+  Params,
+  Check,
 }

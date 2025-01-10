@@ -1,17 +1,16 @@
 Env UAT,SIT,TAS
 
-Var without Pointer
+Var without Pointer 
 - userid: 'rintu'
 - age: 30
 
 Var @UAT variables for uat env
-
 - name: 'rintu'
 - age: 30
 - importdVar: Import.userName ?? 
 
-Var @SIT variables
 
+Var @SIT variables
 - name: 'rintu asdada'
 - age: 30
 - paragraph: `lorem ipsum dolor sit amet, consectetur
@@ -25,13 +24,14 @@ Body JSON
         "field1": "value1",
         "field2": "value2",
         "field3": "value3"
-    }`
+}`
+
 Header
 - Authorization: 'Bearer <token>'
 
-**all these wording are considered to be comments means line which is stating with '**' then it is a comment.
 
 Api POST #API Fetch user information
+**s asdadas asdasd asd asd a sda sdasdasda sd asdasdas
 Url https://api.example.com/user/{{userId}}
 Body JSON
 `{
@@ -42,19 +42,23 @@ Body JSON
 Header - Authorization: 'Bearer {{token}}'
 
 
-Task testing the application user information api
-Step #1 Call API ApiOne
-Capture
+Task testing the application user information api 
+
+Step  Call Api ApiOne   **testing comments
+
+Capture **capture the token and status
 - token: "response.body.token"
 - status: "response.status"
 
-Check
+Check 
 - status == 200 OR status == 300
 - Body != null 
 - token == 'NA'
-If Check is true Break Else Goto Step 3
 
-Step #2 Call API2  
+Jump To @3 If Check is True
+ 
+Step #2 Call Api API2  
+
 Params
 - userId: Var.userid
 - token: Step.1.token
@@ -63,7 +67,22 @@ Capture
 - token: "response.body.token"
 - status: "response.status"
 
+Check 
+- status == 200 OR status == 300
+- Body != null 
+- token == 'NA'
+
+Break if Check is true
+
 Step #3 Call API2  
+
 Capture
 - token: "response.body.token"
 - status: "response.status"
+
+Check 
+- status == 200 OR status == 300
+- Body != null 
+- token == 'NA'
+ 
+Result 

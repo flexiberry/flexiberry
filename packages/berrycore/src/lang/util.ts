@@ -21,3 +21,18 @@ export function isVar(input: string, position: number): boolean {
 export function isApi(input: string, position: number): boolean {
   return input.substr(position, 3) === "Api";
 }
+// Check for API declaration
+export function isStep(input: string, position: number): boolean {
+  return input.substr(position, 4) === "Step";
+}
+
+export function isCapture(input: string, position: number) {
+  return input.substr(position, 7) === "Capture";
+}
+
+export function isParams(input: string, position: number) {
+  return input.substr(position, 6) === "Params";
+}
+export function isCheck(input: string, position: number) {
+  return input.substr(position, 5) === "Check";
+}

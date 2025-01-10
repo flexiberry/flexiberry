@@ -1,6 +1,7 @@
 import { Token } from "../tokenizer/token";
 import { TokenType } from "../tokenizer/tokenType";
-import { isWhitespace } from "../util";
+import { isComment, isWhitespace } from "../util";
+import { CommentReader } from "./commentReader";
 import { KeyValuePair } from "./keyValuePair";
 import { CReader, Reader } from "./reader";
 
@@ -16,14 +17,34 @@ export class ApiReader extends CReader implements Reader {
     let start = this.position;
 
     start = this.fetchApiIdandTitle(start, tkns, value);
+    start = this.readComments(tkns);
 
     start = this.extractUrl(start, tkns);
+    start = this.readComments(tkns);
 
     start = this.extractBody(start, tkns);
+    start = this.readComments(tkns);
 
     start = this.extractHeader(start, tkns);
+    start = this.readComments(tkns);
 
     return tkns;
+  }
+
+  private readComments(tkns: Token[]): number {
+    // New function
+    if (isComment(this.input, this.position)) {
+      const commentReader = new CommentReader(
+        this.input,
+        this.position
+      ).readComments();
+      if (commentReader) {
+        this.position = commentReader.position;
+        tkns.push(...commentReader.token);
+        return this.position++;
+      }
+    }
+    return this.position; // Return updated position
   }
   private extractBody(start: number, tkns: Token[]) {
     while (
