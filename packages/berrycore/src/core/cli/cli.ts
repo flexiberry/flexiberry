@@ -8,6 +8,7 @@ import { FileUtils } from "../functions/file";
 import { Lexer } from "../../lang/tokenizer/lexer";
 import Parser from "../../lang/ast/AstParser";
 import { TokenType, TokenTypeValueOf } from "../../lang/tokenizer/tokenType";
+import { printTable } from "console-table-printer";
 
 const rl = readline.createInterface({
   input: process.stdin,
@@ -124,7 +125,8 @@ function runLexer() {
 
   let lexer = new Lexer(fileContent);
   const tokens = lexer.tokenize();
-  console.table(
+
+  printTable(
     tokens.map((token) => ({
       Value: token.value,
       TokenType: TokenTypeValueOf(token.type),

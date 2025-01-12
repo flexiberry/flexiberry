@@ -24,8 +24,7 @@ export enum TokenType {
   Header,
   HeaderValue,
 
-  TestCase,
-  TestCaseName,
+  Task,
   Step,
   StepName,
   Call,
@@ -41,6 +40,9 @@ export enum TokenType {
   Equal,
   Lhs,
   Rhs,
+  Operands,
+  Operator,
+  OperandsScalar,
 
   Comment,
   DocumentStart,
@@ -58,4 +60,6 @@ export enum TokenType {
   Capture,
   Params,
   Check,
+  NotEqual,
+  Unknown,
 }

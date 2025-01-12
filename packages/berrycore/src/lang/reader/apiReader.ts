@@ -142,6 +142,7 @@ export class ApiReader extends CReader implements Reader {
     start = this.position;
     return start;
   }
+
   private readBody(tkns: Token[]): number {
     let start = this.position;
     let value = "";
@@ -154,14 +155,23 @@ export class ApiReader extends CReader implements Reader {
         this.position
       )
     );
-    this.position++;
-
     while (
       this.position < this.input.length &&
       this.input[this.position] !== "`"
     ) {
       this.position++; // Move to the next character
+      if (
+        !isWhitespace(this.input[this.position]) &&
+        this.input[this.position] !== "`" &&
+        this.input[this.position] !== "\n"
+      )
+        value += this.input[this.position];
     }
+
+    if (value !== null && value !== "") {
+      tkns.push(Token.from(value, TokenType.BodyType, start, this.position));
+    }
+
     start = this.position;
     tkns.push(
       Token.from(
@@ -200,7 +210,7 @@ export class ApiReader extends CReader implements Reader {
       )
     );
 
-    tkns.push(Token.from(value, TokenType.BodyType, start, this.position));
+    // tkns.push(Token.from(value, TokenType.BodyType, start, this.position));
     start = this.position;
 
     while (

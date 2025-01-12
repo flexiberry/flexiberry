@@ -4,7 +4,7 @@ Var without Pointer
 - userid: 'rintu'
 - age: 30
 
-Var @UAT variables for uat env
+Var @UAT #test  variables for uat env
 - name: 'rintu'
 - age: 30
 - importdVar: Import.userName ?? 
@@ -17,8 +17,9 @@ Var @SIT variables
               lorem ipsum dolor sit amet, consectetur
               lorem ipsum dolor sit amet, consectetur`
 
+
 Api POST #ApiOne the api is for the following testing methods
-Url 'https://api.example.com/user'
+Url https://api.example.com/user
 Body JSON
 `{
         "field1": "value1",
@@ -33,17 +34,15 @@ Header
 Api POST #API Fetch user information
 **s asdadas asdasd asd asd a sda sdasdasda sd asdasdas
 Url https://api.example.com/user/{{userId}}
-Body JSON
-`{
+Body JSON `{
         "field1": {{value}},
         "field2": "value2",
         "field3": "value3"
     }`
 Header - Authorization: 'Bearer {{token}}'
 
-
-Task testing the application user information api 
-
+ 
+Task testing the application user information api  **tesing comments
 Step  Call Api ApiOne   **testing comments
 
 Capture **capture the token and status
@@ -55,8 +54,8 @@ Check
 - Body != null 
 - token == 'NA'
 
-Jump To @3 If Check is True
- 
+
+
 Step #2 Call Api API2  
 
 Params
@@ -72,7 +71,6 @@ Check
 - Body != null 
 - token == 'NA'
 
-Break if Check is true
 
 Step #3 Call API2  
 
@@ -81,8 +79,14 @@ Capture
 - status: "response.status"
 
 Check 
-- status == 200 OR status == 300
-- Body != null 
-- token == 'NA'
+- status == 200 Or Status == 400
+- Body != null  
+- token == 'NA' 
+
+
+
+** last line
+
+
  
-Result 
+ 

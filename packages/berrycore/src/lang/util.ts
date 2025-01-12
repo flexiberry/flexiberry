@@ -3,6 +3,9 @@ export function isWhitespace(char: string): boolean {
   return /\s/.test(char);
 }
 
+export function isEof(input: string, position: number) {
+  return input.length >= position;
+}
 // Check for comments
 export function isComment(input: string, position: number): boolean {
   return input.substr(position, 2) === "**";
@@ -35,4 +38,7 @@ export function isParams(input: string, position: number) {
 }
 export function isCheck(input: string, position: number) {
   return input.substr(position, 5) === "Check";
+}
+export function isTask(input: string, position: number) {
+  return input.substr(position, 4) === "Task";
 }

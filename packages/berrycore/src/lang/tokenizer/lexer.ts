@@ -12,6 +12,7 @@ import {
   isEnv,
   isParams,
   isStep,
+  isTask,
   isVar,
   isWhitespace,
 } from "../util";
@@ -19,6 +20,7 @@ import { StepReader } from "../reader/stepReader";
 import { CaptureReader } from "../reader/captureReader";
 import { ParamsReader } from "../reader/paramsReader";
 import { CheckReader } from "../reader/checkReader";
+import { TaskReader } from "../reader/taskReader";
 
 export class Lexer {
   private input: string;
@@ -92,13 +94,21 @@ export class Lexer {
         this.position = paramsReader.getPosition(); // Update position
         continue;
       }
-      // if (isCheck(this.input, this.position)) {
-      //   const checkReader = new CheckReader(this.input, this.position);
-      //   const tkns = checkReader.read();
-      //   tokens.push(...tkns);
-      //   this.position = checkReader.getPosition(); // Update position
-      //   continue;
-      // }
+      if (isTask(this.input, this.position)) {
+        const taskReader = new TaskReader(this.input, this.position);
+        const tkns = taskReader.read();
+        tokens.push(...tkns);
+        this.position = taskReader.getPosition(); // Update position
+        continue;
+      }
+
+      if (isCheck(this.input, this.position)) {
+        const checkReader = new CheckReader(this.input, this.position);
+        const tkns = checkReader.read();
+        tokens.push(...tkns);
+        this.position = checkReader.getPosition(); // Update position
+        continue;
+      }
 
       this.position++; // Move to the next character if no match
     }
