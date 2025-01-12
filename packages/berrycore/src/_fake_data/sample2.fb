@@ -1,0 +1,85 @@
+Env DEV, QA, PROD
+
+Var without Pointer 
+        - userid: 'john_doe'
+        - age: 28
+
+Var @DEV variables for development environment
+        - name: 'John Doe'
+        - email: 'john.doe@example.com'
+        - password: 'securePassword123'
+
+Var @QA variables for QA environment
+        - name: 'Jane Smith'
+        - email: 'jane.smith@example.com'
+        - password: 'anotherSecurePassword456'
+
+Api POST #ApiRegister User Registration API
+        Url https://api.example.com/register
+        Body JSON
+        `{
+                "name": Var.name,
+                "email": Var.email,
+                "password": Var.password
+        }`
+
+        Header
+        - Content-Type: 'application/json'
+
+Api POST #ApiLogin User Login API
+        Url https://api.example.com/login
+        Body JSON
+        `{
+                "email": Var.@DEV.email,
+                "password": Var.@DEV.password
+        }`
+
+        Header
+        - Content-Type: 'application/json'
+
+Api GET #ApiFetchUserDetails Fetch User Details API
+        Url https://api.example.com/user/{{userId}}
+        Header 
+        - Authorization: 'Bearer {{token}}'
+
+Task testing user registration and login
+
+        Step 1 Call Api ApiRegister
+                Capture
+                - userId: "response.body.userId"
+                - token: "response.body.token"
+                - status: "response.status"
+
+                Check 
+                - status == 200
+                - userDetails != null
+ 
+        Catch Error 
+
+        Step 2 Call Api ApiLogin
+                Capture
+                - token: "response.body.token"
+                - status: "response.status"
+
+                Check 
+                - status == 200
+                - userDetails != null
+
+        Break if Check is true
+
+
+        Step 3 Call ApiFetchUserDetails
+                Params
+                - userId: Step.1.userId
+                - token: Step.2.token
+
+                Capture
+                - userDetails: "response.body"
+                - status: "response.status"
+
+                Check 
+                - status == 200
+                - userDetails != null
+
+
+** End of scenarios

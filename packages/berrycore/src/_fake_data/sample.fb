@@ -1,87 +1,89 @@
 Env UAT,SIT,TAS
 
 Var without Pointer 
-- userid: 'rintu'
-- age: 30
+        - userid: 'rintu'
+        - age: 30
 
 Var @UAT #test  variables for uat env
-- name: 'rintu'
-- age: 30
-- importdVar: Import.userName ?? 
+        - name: 'rintu'
+        - age: 30
+        - importdVar: Import.userName ?? 
 
 
 Var @SIT variables
-- name: 'rintu asdada'
-- age: 30
-- paragraph: `lorem ipsum dolor sit amet, consectetur
-              lorem ipsum dolor sit amet, consectetur
-              lorem ipsum dolor sit amet, consectetur`
+        - name: 'rintu asdada'
+        - age: 30
+        - paragraph: `lorem ipsum dolor sit amet, consectetur
+                lorem ipsum dolor sit amet, consectetur
+                lorem ipsum dolor sit amet, consectetur`
 
 
 Api POST #ApiOne the api is for the following testing methods
-Url https://api.example.com/user
-Body JSON
-`{
-        "field1": "value1",
-        "field2": "value2",
-        "field3": "value3"
-}`
+        Url https://api.example.com/user
+        Body JSON
+        `{
+                "field1": "value1",
+                "field2": "value2",
+                "field3": "value3"
+        }`
 
-Header
-- Authorization: 'Bearer <token>'
+        Header
+        - Authorization: 'Bearer <token>'
 
+**s asdadas asdasd asd asd a sda sdasdasda sd asdasdas
 
 Api POST #API Fetch user information
-**s asdadas asdasd asd asd a sda sdasdasda sd asdasdas
-Url https://api.example.com/user/{{userId}}
-Body JSON `{
-        "field1": {{value}},
-        "field2": "value2",
-        "field3": "value3"
-    }`
-Header - Authorization: 'Bearer {{token}}'
+        Url https://api.example.com/user/{{userId}}
+        Body JSON `{
+                "field1": {{value}},
+                "field2": "value2",
+                "field3": "value3"
+        }`
+        Header 
+        - Authorization: 'Bearer {{token}}'
 
  
 Task testing the application user information api  **tesing comments
-Step  Call Api ApiOne   **testing comments
+       
+        Step  Call Api ApiOne   **testing comments
 
-Capture **capture the token and status
-- token: "response.body.token"
-- status: "response.status"
+                Capture **capture the token and status
+                - token: "response.body.token"
+                - status: "response.status"
 
-Check 
-- status == 200 OR status == 300
-- Body != null 
-- token == 'NA'
-
-
-
-Step #2 Call Api API2  
-
-Params
-- userId: Var.userid
-- token: Step.1.token
-
-Capture
-- token: "response.body.token"
-- status: "response.status"
-
-Check 
-- status == 200 OR status == 300
-- Body != null 
-- token == 'NA'
+                Check 
+                - status == 200 OR status == 300
+                - Body != null 
+                - token == 'NA'
 
 
-Step #3 Call API2  
 
-Capture
-- token: "response.body.token"
-- status: "response.status"
+        Step #2 Call Api API2  
 
-Check 
-- status == 200 Or Status == 400
-- Body != null  
-- token == 'NA' 
+                Params
+                - userId: Var.userid
+                - token: Step.1.token
+
+                Capture
+                - token: "response.body.token"
+                - status: "response.status"
+
+                Check 
+                - status == 200 OR status == 300
+                - Body != null 
+                - token == 'NA'
+
+
+        Step #3 Call Api API2  
+
+                Capture
+                - token: "response.body.token"
+                - status: "response.status"
+
+                Check 
+                - status == 200 Or Status == 400
+                - Body != null  
+                - token == 'NA' 
 
 
 
