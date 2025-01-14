@@ -61,14 +61,6 @@ export class CaptureReader extends CReader implements Reader {
         this.position = kvReader.getPosition(); // Update position
       }
 
-      // Move to next line
-      // while (
-      //   this.position < this.input.length &&
-      //   this.input[this.position] !== "\n"
-      // ) {
-      //   this.position++;
-      // }
-
       if (this.position < this.input.length) {
         this.position++; // Move past newline
       }

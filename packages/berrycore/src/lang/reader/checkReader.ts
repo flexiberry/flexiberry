@@ -1,7 +1,7 @@
 import { stat } from "fs";
 import { Token } from "../tokenizer/token";
 import { TokenType, TokenTypeValueOf } from "../tokenizer/tokenType";
-import { isComment, isEof, isWhitespace } from "../util";
+import { isComment, isNotEof, isWhitespace } from "../util";
 import { CommentReader } from "./commentReader";
 import { KeyValuePair } from "./keyValuePair";
 import { CReader, Reader } from "./reader";
@@ -159,7 +159,10 @@ export class CheckReader extends CReader implements Reader {
 
   private readOperands(tkns: Token[]) {
     let start = this.position;
-    while (isWhitespace(this.input[this.position])) {
+    while (
+      this.position < this.input.length &&
+      isWhitespace(this.input[this.position])
+    ) {
       this.position++;
     }
     let char = this.input[this.position];
@@ -168,14 +171,20 @@ export class CheckReader extends CReader implements Reader {
       char = this.input[this.position];
       start = this.position;
       this.position++;
-      while (char != this.input[this.position]) {
+      while (
+        this.position < this.input.length &&
+        char != this.input[this.position]
+      ) {
         this.position++;
       }
       tokenType = TokenType.OperandsScalar;
       this.position++;
     } else {
       start = this.position;
-      while (!isWhitespace(this.input[this.position])) {
+      while (
+        this.position < this.input.length &&
+        !isWhitespace(this.input[this.position])
+      ) {
         if (this.input[this.position] == "\n") break;
         this.position++;
       }
@@ -183,7 +192,10 @@ export class CheckReader extends CReader implements Reader {
     let value = this.input.substring(start, this.position);
 
     tkns.push(Token.from(value, tokenType, start, this.position));
-    while (isWhitespace(this.input[this.position])) {
+    while (
+      this.position < this.input.length &&
+      isWhitespace(this.input[this.position])
+    ) {
       this.position++;
       if (this.input[this.position] == "\n") break;
     }

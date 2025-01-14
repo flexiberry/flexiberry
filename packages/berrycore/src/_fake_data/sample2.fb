@@ -43,8 +43,8 @@ Api GET #ApiFetchUserDetails Fetch User Details API
         - Authorization: 'Bearer {{token}}'
 
 Task testing user registration and login
-
-        Step 1 Call Api ApiRegister
+** custom asdasdad asdasd asd
+        Step #1 Call Api ApiRegister
                 Capture
                 - userId: "response.body.userId"
                 - token: "response.body.token"
@@ -56,7 +56,7 @@ Task testing user registration and login
  
         Catch Error 
 
-        Step 2 Call Api ApiLogin
+        Step #2 Call Api ApiLogin
                 Capture
                 - token: "response.body.token"
                 - status: "response.status"
@@ -65,10 +65,10 @@ Task testing user registration and login
                 - status == 200
                 - userDetails != null
 
-        Break if Check is true
 
 
-        Step 3 Call ApiFetchUserDetails
+        Step #3 Call ApiFetchUserDetails
+
                 Params
                 - userId: Step.1.userId
                 - token: Step.2.token
@@ -78,7 +78,7 @@ Task testing user registration and login
                 - status: "response.status"
 
                 Check 
-                - status == 200
+                - status == 200 Or status == 300
                 - userDetails != null
 
 

@@ -3,8 +3,8 @@ export function isWhitespace(char: string): boolean {
   return /\s/.test(char);
 }
 
-export function isEof(input: string, position: number) {
-  return input.length >= position;
+export function isNotEof(input: string, position: number) {
+  return position < input.length;
 }
 // Check for comments
 export function isComment(input: string, position: number): boolean {
