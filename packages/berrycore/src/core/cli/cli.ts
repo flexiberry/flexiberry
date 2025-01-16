@@ -9,6 +9,7 @@ import { Lexer } from "../../lang/tokenizer/lexer";
 import Parser from "../../lang/ast/AstParser";
 import { TokenType, TokenTypeValueOf } from "../../lang/tokenizer/tokenType";
 import { printTable } from "console-table-printer";
+import { CProgramBody } from "../../lang/ast/AstImpl";
 
 const rl = readline.createInterface({
   input: process.stdin,
@@ -115,6 +116,8 @@ async function parseFile(): Promise<any> {
 }
 
 function runLexer() {
+  console.time("Time");
+
   let fileContent = FileUtils.loadFile(
     "/Users/rinturajc/lib_projects/Flexiberry/flexiberry/packages/berrycore/src/_fake_data/sample2.fb"
   );
@@ -125,15 +128,23 @@ function runLexer() {
 
   let lexer = new Lexer(fileContent);
   const tokens = lexer.tokenize();
+  console.timeLog("Time", "tokenized");
 
-  printTable(
-    tokens.map((token) => ({
-      Value: token.value,
-      TokenType: TokenTypeValueOf(token.type),
-      Start: token.position.start,
-      End: token.position.end,
-    }))
-  );
+  let program = new CProgramBody().build(tokens);
+
+  console.log(JSON.stringify(program, null, 2));
+
+  // console.dir(program);
+  console.timeEnd("Time");
+
+  // printTable(
+  //   tokens.map((token) => ({
+  //     Value: token.value,
+  //     TokenType: TokenTypeValueOf(token.type),
+  //     Start: token.position.start,
+  //     End: token.position.end,
+  //   }))
+  // );
 
   // new Parser().produce(fileContent);
 }

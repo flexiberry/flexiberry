@@ -22,7 +22,6 @@ Api POST #ApiRegister User Registration API
                 "email": Var.email,
                 "password": Var.password
         }`
-
         Header
         - Content-Type: 'application/json'
 

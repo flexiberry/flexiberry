@@ -23,6 +23,7 @@ export enum TokenType {
   BodyType,
   Header,
   HeaderValue,
+  ApiEnd,
 
   Task,
   Step,

@@ -7,52 +7,37 @@ import {
   ProgramBody,
   Scope,
   Statement,
-  Store,
-  StoreKv,
+  Task,
+  Variable,
 } from "./Ast";
+import { ApiParser } from "./ApiParser";
+import { EnvironmentParser } from "./EnvironmentParser";
+import { VariableParser } from "./VariableParser";
+import { BaseParser } from "./BaseParser";
 
-export class CProgramBody implements ProgramBody {
+export class CProgramBody extends BaseParser implements ProgramBody {
   kind: NodeType.ProgramBody = NodeType.ProgramBody;
   environment?: Environment;
-  store: Store[] = [];
+  variables: Variable[] = [];
   api: ApiStatement[] = [];
+  tasks: Task[] = [];
 
-  //token Collection
-  tokens: Token[] = [];
+  private apiParser: ApiParser;
+  private envParser: EnvironmentParser;
+  private varParser: VariableParser;
 
-  constructor() {}
-
-  private not_eof(): boolean {
-    return this.tokens[0].type != TokenType.Eof;
-  }
-
-  private at() {
-    return this.tokens[0] as Token;
-  }
-
-  private eat() {
-    const prev = this.tokens.shift() as Token;
-    return prev;
-  }
-
-  private expect(type: TokenType, err: any) {
-    const prev = this.tokens.shift() as Token;
-    if (!prev || prev.type != type) {
-      console.error(
-        `\x1b[31mParser Error:\x1b[0m\n`,
-        err,
-        // TokenType[prev.type].toUpperCase(),
-        " - \x1b[33mExpecting:\x1b[0m ",
-        TokenType[type].toUpperCase()
-      );
-      //   throw new Error("Parser Error:\n" + err + prev + " - Expecting: " + type);
-    }
-
-    return prev;
+  constructor() {
+    super();
+    this.apiParser = new ApiParser();
+    this.envParser = new EnvironmentParser();
+    this.varParser = new VariableParser();
   }
 
   build(tokens: Token[]) {
     this.tokens = tokens;
+    this.apiParser.setTokens(tokens);
+    this.envParser.setTokens(tokens);
+    this.varParser.setTokens(tokens);
 
     while (this.not_eof()) {
       this.parseBody();
@@ -64,108 +49,14 @@ export class CProgramBody implements ProgramBody {
 
   parseBody() {
     if (this.at().type == TokenType.Env) {
-      this.environment = this.parseEnvAst() as Environment;
+      this.environment = this.envParser.parseEnv() as Environment;
     }
     if (this.at().type == TokenType.Api) {
+      this.api.push(this.apiParser.parseApi());
+      console.log(this.at());
     }
     if (this.at().type == TokenType.Var) {
-      this.store.push(this.parseStore());
+      this.variables.push(this.varParser.parseStore());
     }
-  }
-
-  parseStore(): Store {
-    let store: Store = {
-      comments: "",
-      identifier: "",
-      kind: NodeType.Store,
-      pointer: "",
-      scope: Scope.Environment,
-      value: [] as StoreKv[],
-    };
-
-    if (this.at().type === TokenType.Var) {
-      this.eat();
-    }
-    if (this.at().type === TokenType.Pointer) {
-      this.eat();
-      let v = this.expect(
-        TokenType.Pointed,
-        "Var pointer is expected following pointer"
-      );
-      store.pointer = v.value;
-    }
-    if (this.at().type === TokenType.Title) {
-      store.comments = this.at().value;
-      this.eat();
-    }
-
-    do {
-      this.expect(TokenType.Hyphen, "Missing Hyphen in Var decleration ");
-      let key = this.expect(
-        TokenType.Identifier,
-        "Missing Identifier in Var decleration "
-      );
-
-      let kv: StoreKv = {
-        dataType: "number",
-        key: key.value,
-        kind: NodeType.StoreKeyValue,
-        value: "",
-      };
-      this.expect(
-        TokenType.Colon,
-        "Missing Colon in Var Key Value decleration "
-      );
-      if (
-        this.at().type == TokenType.Quote ||
-        this.at().type == TokenType.Backtick
-      ) {
-        kv.dataType = "string";
-        this.eat();
-      }
-
-      let value = this.expect(
-        TokenType.Scalar,
-        "Missing Value in Var Key Value decleration  "
-      );
-
-      if (this.at().type == TokenType.Quote) this.eat();
-      if (this.at().type == TokenType.Backtick) this.eat();
-
-      kv.value = value.value;
-
-      store.value.push(kv);
-    } while (this.at().type == TokenType.Hyphen);
-    return store;
-  }
-
-  parseEnvAst(): Statement {
-    const isEnv = this.eat().type == TokenType.Env;
-
-    let values: string[] = [];
-
-    while (
-      this.at().type == TokenType.Comma ||
-      this.at().type == TokenType.Value
-    ) {
-      if (this.at().type == TokenType.Comma) {
-        this.eat();
-        continue;
-      }
-      if (this.at().type == TokenType.Value) {
-        let v = this.eat().value;
-        values.push(v);
-        continue;
-      }
-      this.expect(
-        TokenType.Value,
-        "Enviroment values are missing. Env decleration is invalid"
-      );
-      break;
-    }
-    return {
-      kind: NodeType.Environment,
-      value: values,
-    } as Environment;
   }
 }

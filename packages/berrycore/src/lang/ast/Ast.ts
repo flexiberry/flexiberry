@@ -6,11 +6,12 @@ export enum NodeType {
 
   Environment,
 
-  Store,
-  StoreKeyValue,
+  Variable,
+  VariableKeyValue,
 
   Capture,
   ApiFunction,
+  ApiSturcture,
 }
 
 export enum Scope {
@@ -31,22 +32,23 @@ export interface Program extends Statement {
 export interface ProgramBody extends Statement {
   kind: NodeType.ProgramBody;
   environment?: Environment;
-  store: Store[];
+  variables: Variable[];
   api: ApiStatement[];
+  tasks: Task[];
 }
-
-export type Store = Statement & {
-  kind: NodeType.Store;
+export interface Task extends Statement {}
+export type Variable = Statement & {
+  kind: NodeType.Variable;
   identifier: string;
   scope: Scope;
   pointer: string;
   comments: string;
 
-  value: StoreKv[];
+  value: VariableKv[];
 };
 
-export interface StoreKv extends Statement {
-  kind: NodeType.StoreKeyValue;
+export interface VariableKv extends Statement {
+  kind: NodeType.VariableKeyValue;
   value: any;
   key: string;
   dataType: string;
@@ -62,5 +64,11 @@ export interface ApiStatement extends Statement {
   identifier: string;
   title: string;
   sturct: ApiStructure;
+  method: string;
 }
-export interface ApiStructure extends Statement {}
+export interface ApiStructure extends Statement {
+  url?: string;
+  type?: string;
+  body?: string;
+  header?: Record<string, string>;
+}

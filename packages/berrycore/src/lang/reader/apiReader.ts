@@ -28,6 +28,8 @@ export class ApiReader extends CReader implements Reader {
     start = this.extractHeader(start, tkns);
     start = this.readComments(tkns);
 
+    // tkns.push(Token.from("", TokenType.ApiEnd, start, start));
+
     return tkns;
   }
 
