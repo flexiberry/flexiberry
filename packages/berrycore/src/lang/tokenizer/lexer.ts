@@ -6,13 +6,16 @@ import { Token } from "./token";
 import { TokenType } from "./tokenType";
 import {
   isApi,
+  isBody,
   isCapture,
   isCheck,
   isComment,
   isEnv,
+  isHeader,
   isParams,
   isStep,
   isTask,
+  isUrl,
   isVar,
   isWhitespace,
 } from "../util";
@@ -67,9 +70,32 @@ export class Lexer {
 
       if (isApi(this.input, this.position)) {
         const apiReader = new ApiReader(this.input, this.position);
-        const tkns = apiReader.read();
+        const tkns = apiReader.read(TokenType.Api);
         tokens.push(...tkns);
         this.position = apiReader.getPosition(); // Update position
+        continue;
+      }
+
+      // Check for Body, Header, and Url
+      if (isBody(this.input, this.position)) {
+        const bodyReader = new ApiReader(this.input, this.position);
+        const bodyTkns = bodyReader.read(TokenType.Body);
+        tokens.push(...bodyTkns);
+        this.position = bodyReader.getPosition(); // Update position
+        continue;
+      }
+      if (isHeader(this.input, this.position)) {
+        const headerReader = new ApiReader(this.input, this.position);
+        const headerTkns = headerReader.read(TokenType.Header);
+        tokens.push(...headerTkns);
+        this.position = headerReader.getPosition(); // Update position
+        continue;
+      }
+      if (isUrl(this.input, this.position)) {
+        const urlReader = new ApiReader(this.input, this.position);
+        const urlTkns = urlReader.read(TokenType.Url);
+        tokens.push(...urlTkns);
+        this.position = urlReader.getPosition(); // Update position
         continue;
       }
 

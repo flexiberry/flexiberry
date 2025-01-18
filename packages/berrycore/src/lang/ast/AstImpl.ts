@@ -41,22 +41,35 @@ export class CProgramBody extends BaseParser implements ProgramBody {
 
     while (this.not_eof()) {
       this.parseBody();
-      this.eat();
     }
 
     return this;
   }
 
+  getAst() {
+    return {
+      kind: this.kind,
+      environment: this.environment,
+      variables: this.variables,
+      api: this.api,
+      tasks: this.tasks,
+    };
+  }
+
   parseBody() {
     if (this.at().type == TokenType.Env) {
       this.environment = this.envParser.parseEnv() as Environment;
+      return;
     }
     if (this.at().type == TokenType.Api) {
       this.api.push(this.apiParser.parseApi());
-      console.log(this.at());
+      return;
     }
     if (this.at().type == TokenType.Var) {
       this.variables.push(this.varParser.parseStore());
+      return;
     }
+    this.eat();
+    return;
   }
 }

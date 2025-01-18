@@ -130,21 +130,21 @@ function runLexer() {
   const tokens = lexer.tokenize();
   console.timeLog("Time", "tokenized");
 
+  printTable(
+    tokens.map((token) => ({
+      Value: token.value,
+      TokenType: TokenTypeValueOf(token.type),
+      Start: token.position.start,
+      End: token.position.end,
+    }))
+  );
+
   let program = new CProgramBody().build(tokens);
 
-  console.log(JSON.stringify(program, null, 2));
+  console.log(JSON.stringify(program.getAst(), null, 2));
 
   // console.dir(program);
   console.timeEnd("Time");
-
-  // printTable(
-  //   tokens.map((token) => ({
-  //     Value: token.value,
-  //     TokenType: TokenTypeValueOf(token.type),
-  //     Start: token.position.start,
-  //     End: token.position.end,
-  //   }))
-  // );
 
   // new Parser().produce(fileContent);
 }

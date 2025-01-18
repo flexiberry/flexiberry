@@ -1,8 +1,9 @@
 import { Token } from "../tokenizer/token";
+import { TokenType } from "../tokenizer/tokenType";
 
 export interface Reader {
   getPosition(): number;
-  read(): Token[];
+  read(token?: TokenType): Token[];
 }
 
 export class CReader {

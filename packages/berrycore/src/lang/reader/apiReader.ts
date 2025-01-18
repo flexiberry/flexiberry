@@ -9,24 +9,21 @@ export class ApiReader extends CReader implements Reader {
   constructor(input: string, position: number) {
     super(input, position);
   }
-  read(): Token[] {
+  read(token: TokenType): Token[] {
     let tkns: Token[] = [];
     let value = "";
 
-    tkns.push(this.readApi());
     let start = this.position;
 
-    start = this.fetchApiIdandTitle(start, tkns, value);
-    start = this.readComments(tkns);
+    if (TokenType.Api == token) {
+      tkns.push(this.readApi());
+      start = this.position;
+      start = this.fetchApiIdandTitle(start, tkns, value);
+    }
 
-    start = this.extractUrl(start, tkns);
-    start = this.readComments(tkns);
-
-    start = this.extractBody(start, tkns);
-    start = this.readComments(tkns);
-
-    start = this.extractHeader(start, tkns);
-    start = this.readComments(tkns);
+    if (TokenType.Url == token) start = this.extractUrl(start, tkns);
+    if (TokenType.Body == token) start = this.extractBody(start, tkns);
+    if (TokenType.Header == token) start = this.extractHeader(start, tkns);
 
     // tkns.push(Token.from("", TokenType.ApiEnd, start, start));
 

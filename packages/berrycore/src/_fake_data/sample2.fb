@@ -32,7 +32,6 @@ Api POST #ApiLogin User Login API
                 "email": Var.@DEV.email,
                 "password": Var.@DEV.password
         }`
-
         Header
         - Content-Type: 'application/json'
 
