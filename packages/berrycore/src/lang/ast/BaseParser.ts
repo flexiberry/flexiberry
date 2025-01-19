@@ -37,4 +37,8 @@ export class BaseParser {
   setTokens(tokens: Token[]) {
     this.tokens = tokens;
   }
+
+  getTokens(): Token[] {
+    return this.tokens;
+  }
 }

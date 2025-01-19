@@ -29,22 +29,6 @@ export class ApiReader extends CReader implements Reader {
 
     return tkns;
   }
-
-  private readComments(tkns: Token[]): number {
-    // New function
-    if (isComment(this.input, this.position)) {
-      const commentReader = new CommentReader(
-        this.input,
-        this.position
-      ).readComments();
-      if (commentReader) {
-        this.position = commentReader.position;
-        tkns.push(...commentReader.token);
-        return this.position++;
-      }
-    }
-    return this.position; // Return updated position
-  }
   private extractBody(start: number, tkns: Token[]) {
     while (
       this.position < this.input.length &&
@@ -129,13 +113,37 @@ export class ApiReader extends CReader implements Reader {
       this.position++; // Move to the next character
     }
 
-    if (this.input[this.position] === "-") {
-      const kvReader = new KeyValuePair(this.input, this.position);
-      const tk = kvReader.read();
-      tkns.push(...tk);
-      this.position = kvReader.getPosition(); // Update position
-      start = this.position;
-      this.position++; // Move to the next
+    // Parse key-value pairs until empty line
+    while (this.position < this.input.length) {
+      // Skip whitespace at start of line
+      let lineStart = this.position;
+      while (
+        this.position < this.input.length &&
+        isWhitespace(this.input[this.position]) &&
+        this.input[this.position] !== "\n"
+      ) {
+        this.position++;
+      }
+
+      // Check for empty line
+      if (
+        this.input[this.position] === "\n" ||
+        this.input[this.position] === undefined
+      ) {
+        break;
+      }
+
+      // Parse key-value pair if line starts with hyphen
+      if (this.input[this.position] === "-") {
+        const kvReader = new KeyValuePair(this.input, this.position);
+        const tk = kvReader.read();
+        tkns.push(...tk);
+        this.position = kvReader.getPosition(); // Update position
+      }
+
+      if (this.position < this.input.length) {
+        this.position++; // Move past newline
+      }
     }
 
     start = this.position;

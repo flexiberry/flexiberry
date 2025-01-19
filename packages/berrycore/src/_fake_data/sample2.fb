@@ -15,13 +15,13 @@ Var @QA variables for QA environment
         - password: 'anotherSecurePassword456'
 
 Api POST #ApiRegister User Registration API
-        Url https://api.example.com/register
         Body JSON
         `{
                 "name": Var.name,
                 "email": Var.email,
                 "password": Var.password
         }`
+        Url https://api.example.com/register
         Header
         - Content-Type: 'application/json'
 
@@ -39,6 +39,7 @@ Api GET #ApiFetchUserDetails Fetch User Details API
         Url https://api.example.com/user/{{userId}}
         Header 
         - Authorization: 'Bearer {{token}}'
+        - Content: Var.content
 
 Task testing user registration and login
 ** custom asdasdad asdasd asd

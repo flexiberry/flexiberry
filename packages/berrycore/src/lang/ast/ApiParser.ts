@@ -1,6 +1,7 @@
 import { ApiStatement, NodeType } from "./Ast";
 import { TokenType } from "../tokenizer/tokenType";
 import { BaseParser } from "./BaseParser";
+import { KeyValueParser } from "./KeyValueParser";
 
 export class ApiParser extends BaseParser {
   parseApi(): ApiStatement {
@@ -24,7 +25,7 @@ export class ApiParser extends BaseParser {
 
     // Set identifier if Hash token is present
     if (this.at().type === TokenType.Hash) {
-      this.eat();
+      this.expect(TokenType.Hash, "Expecting Hash");
       api.identifier = this.expect(
         TokenType.Identifier,
         "Expecting Identifier"
@@ -36,26 +37,48 @@ export class ApiParser extends BaseParser {
       api.title = this.expect(TokenType.Title, "Expecting Identifier").value;
     }
 
-    // Set URL if Url token is present
-    if (this.at().type === TokenType.Url) {
-      this.eat();
-      api.sturct.url = this.expect(TokenType.Value, "Expecting Url").value;
-    }
+    do {
+      switch (this.at().type) {
+        case TokenType.Url:
+          this.eat();
+          api.sturct.url = this.expect(TokenType.Value, "Expecting Url").value;
+          break;
+        case TokenType.Body:
+          this.eat();
+          if (this.at().type === TokenType.BodyType) {
+            api.sturct.type = this.at().value;
+            this.eat();
+          }
+          this.expect(TokenType.Backtick, "Expecting Backtick ");
+          api.sturct.body = this.expect(
+            TokenType.Scalar,
+            "Expecting Scalar "
+          ).value;
+          this.expect(TokenType.Backtick, "Expecting Backtick ");
+          break;
+        case TokenType.Header:
+          this.expect(TokenType.Header, "Expected Header ");
 
-    // Handle Body and BodyType tokens
-    if (this.at().type === TokenType.Body) {
-      this.eat();
-      if (this.at().type === TokenType.BodyType) {
-        api.sturct.type = this.at().value;
-        this.eat();
+          api.sturct.header = {};
+
+          while (this.at().type === TokenType.Hyphen) {
+            const kvParser = new KeyValueParser();
+            kvParser.setTokens(this.getTokens());
+            const { key, value } = kvParser.parseKeyValue();
+            api.sturct.header[key] = value;
+            this.setTokens(kvParser.getTokens()); // Update tokens after parsing
+          }
+
+          break;
+
+        default:
+          break;
       }
-      this.expect(TokenType.Backtick, "Expecting Backtick ");
-      api.sturct.body = this.expect(
-        TokenType.Scalar,
-        "Expecting Scalar "
-      ).value;
-      this.expect(TokenType.Backtick, "Expecting Backtick ");
-    }
+    } while (
+      this.at().type === TokenType.Url ||
+      this.at().type === TokenType.Body ||
+      this.at().type === TokenType.Header
+    );
 
     return api;
   }
