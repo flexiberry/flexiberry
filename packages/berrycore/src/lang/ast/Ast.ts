@@ -12,6 +12,12 @@ export enum NodeType {
   Capture,
   ApiFunction,
   ApiSturcture,
+
+  Task,
+
+  Step,
+  Call,
+  Check,
 }
 
 export enum Scope {
@@ -71,4 +77,30 @@ export interface ApiStructure extends Statement {
   type?: string;
   body?: string;
   header?: Record<string, string>;
+}
+
+export interface Task extends Statement {
+  kind: NodeType.Task;
+  identifier: string;
+  title: string;
+  steps: Step[];
+}
+
+export interface Step extends Statement {
+  kind: NodeType.Step;
+  identifier: string;
+  title: string;
+  action: string;
+  target: string;
+  functionId: string;
+  capture: Capture[];
+  check: Check[];
+}
+
+export interface Capture extends Statement {
+  kind: NodeType.Capture;
+}
+
+export interface Check extends Statement {
+  kind: NodeType.Check;
 }

@@ -14,6 +14,7 @@ import { ApiParser } from "./ApiParser";
 import { EnvironmentParser } from "./EnvironmentParser";
 import { VariableParser } from "./VariableParser";
 import { BaseParser } from "./BaseParser";
+import { TaskParser } from "./TaskParser";
 
 export class CProgramBody extends BaseParser implements ProgramBody {
   kind: NodeType.ProgramBody = NodeType.ProgramBody;
@@ -25,12 +26,14 @@ export class CProgramBody extends BaseParser implements ProgramBody {
   private apiParser: ApiParser;
   private envParser: EnvironmentParser;
   private varParser: VariableParser;
+  private taskParser: TaskParser;
 
   constructor() {
     super();
     this.apiParser = new ApiParser();
     this.envParser = new EnvironmentParser();
     this.varParser = new VariableParser();
+    this.taskParser = new TaskParser();
   }
 
   build(tokens: Token[]) {
@@ -38,6 +41,7 @@ export class CProgramBody extends BaseParser implements ProgramBody {
     this.apiParser.setTokens(tokens);
     this.envParser.setTokens(tokens);
     this.varParser.setTokens(tokens);
+    this.taskParser.setTokens(tokens);
 
     while (this.not_eof()) {
       this.parseBody();
@@ -57,17 +61,20 @@ export class CProgramBody extends BaseParser implements ProgramBody {
   }
 
   parseBody() {
-    if (this.at().type == TokenType.Env) {
+    if (this.at().type === TokenType.Env) {
       this.environment = this.envParser.parseEnv() as Environment;
       return;
     }
-    if (this.at().type == TokenType.Api) {
+    if (this.at().type === TokenType.Api) {
       this.api.push(this.apiParser.parseApi());
       return;
     }
-    if (this.at().type == TokenType.Var) {
+    if (this.at().type === TokenType.Var) {
       this.variables.push(this.varParser.parseStore());
       return;
+    }
+    if (this.at().type === TokenType.Task) {
+      this.tasks.push(this.taskParser.parseTask());
     }
     this.eat();
     return;
