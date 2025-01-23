@@ -119,7 +119,7 @@ function runLexer() {
   console.time("Time");
 
   let fileContent = FileUtils.loadFile(
-    "/Users/rinturajc/lib_projects/Flexiberry/flexiberry/packages/berrycore/src/_fake_data/sample2.fb"
+    "/Users/rinturajc/lib_projects/Flexiberry/flexiberry/packages/berrycore/src/_fake_data/sample.fb"
   );
 
   console.log("Running lexer on file content...");

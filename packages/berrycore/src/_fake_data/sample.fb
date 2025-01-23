@@ -83,7 +83,7 @@ Task testing the application user information api  **tesing comments
                 Check 
                 - status == 200 Or Status == 400
                 - Body != null  
-                - token == 'NA' 
+                - token == 'NA'
 
 
 
