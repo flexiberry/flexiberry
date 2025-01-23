@@ -9,7 +9,7 @@ export class BaseParser {
   }
 
   protected eof(): boolean {
-    return this.tokens[0].type == TokenType.Eof;
+    return this.tokens.length === 0 || this.tokens[0].type == TokenType.Eof;
   }
   protected at() {
     return this.tokens[0] as Token;

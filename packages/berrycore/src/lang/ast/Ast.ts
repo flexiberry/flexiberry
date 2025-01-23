@@ -18,6 +18,7 @@ export enum NodeType {
   Step,
   Call,
   Check,
+  Params,
 }
 
 export enum Scope {
@@ -95,12 +96,31 @@ export interface Step extends Statement {
   functionId: string;
   capture: Capture[];
   check: Check[];
+  params: Params[];
+}
+
+export interface Params extends Statement {
+  kind: NodeType.Params;
+  key: string;
+  value: string;
+  type: string;
 }
 
 export interface Capture extends Statement {
   kind: NodeType.Capture;
+  key: string;
+  value: string;
+  type: string;
 }
 
 export interface Check extends Statement {
   kind: NodeType.Check;
+  conditions: Condition[];
+}
+
+export interface Condition extends Statement {
+  operator?: string; // Optional operator for conditions (e.g., "AND", "OR")
+  leftOperand?: string; // Optional left operand for complex conditions
+  rightOperand?: string; // Optional right operand for complex conditions
+  logicalOperator?: string;
 }

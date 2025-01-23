@@ -42,8 +42,9 @@ Api GET #ApiFetchUserDetails Fetch User Details API
         - Content: Var.content
 
 Task testing user registration and login
-** custom asdasdad asdasd asd
+
         Step #1 Call Api ApiRegister regis title sample
+
                 Capture
                 - userId: "response.body.userId"
                 - token: "response.body.token"
@@ -54,6 +55,46 @@ Task testing user registration and login
                 - userDetails != null
 
         Step #2 Call Api ApiLogin
+
+                Capture
+                - token: "response.body.token"
+                - status: "response.status"
+
+                Check 
+                - status == 200
+                - userDetails != null
+
+
+
+        Step #3 Call ApiFetchUserDetails
+
+                Params
+                - userId: Step.1.userId
+                - token: Step.2.token
+
+                Capture
+                - userDetails: "response.body"
+                - status: "response.status"
+
+                Check 
+                - status == 200 Or status == 300
+                - userDetails != null
+
+Task  rasi @ewewewetesting user registration and login
+
+        Step #1 Call Api ApiRegister regis title sample
+
+                Capture
+                - userId: "response.body.userId"
+                - token: "response.body.token"
+                - status: "response.status"
+
+                Check 
+                - status == 200
+                - userDetails != null
+
+        Step #2 Call Api ApiLogin
+
                 Capture
                 - token: "response.body.token"
                 - status: "response.status"

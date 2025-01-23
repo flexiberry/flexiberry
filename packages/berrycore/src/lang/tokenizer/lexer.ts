@@ -38,14 +38,7 @@ export class Lexer {
     const tokens = [];
     while (this.position < this.input.length) {
       const char = this.input[this.position];
-
-      // if (this.input[this.position] === "\n") {
-      //   const start = this.position;
-      //   this.position++;
-      //   tokens.push(
-      //     Token.from("\n", TokenType.EmptyLine, start, this.position)
-      //   );
-      // }
+      console.log(this.input.substring(this.position, 3));
 
       if (isWhitespace(char)) {
         this.position++;

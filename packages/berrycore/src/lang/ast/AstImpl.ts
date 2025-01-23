@@ -75,6 +75,7 @@ export class CProgramBody extends BaseParser implements ProgramBody {
     }
     if (this.at().type === TokenType.Task) {
       this.tasks.push(this.taskParser.parseTask());
+      return;
     }
     this.eat();
     return;

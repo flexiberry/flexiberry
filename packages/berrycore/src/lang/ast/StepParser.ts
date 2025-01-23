@@ -1,6 +1,8 @@
-import { NodeType, Step, Capture, Check } from "./Ast";
+import { NodeType, Step, Capture, Check, Params, Condition } from "./Ast";
 import { TokenType } from "../tokenizer/tokenType";
 import { BaseParser } from "./BaseParser";
+import { KeyValueParser } from "./KeyValueParser";
+import { CheckParser } from "./CheckParser";
 
 export class StepParser extends BaseParser {
   parseStep(): Step {
@@ -13,6 +15,7 @@ export class StepParser extends BaseParser {
       functionId: "",
       capture: [],
       check: [],
+      params: [],
     };
 
     // Expect and consume Step token
@@ -36,35 +39,64 @@ export class StepParser extends BaseParser {
       "Expected target function identifier"
     ).value;
 
-    // // Parse until next step, task, or EOF
-    // while (
-    //   this.not_eof() &&
-    //   this.at().type !== TokenType.Step &&
-    //   this.at().type !== TokenType.Task
-    // ) {
-    //   switch (this.at().type) {
-    //     case TokenType.Capture:
-    //       this.eat(); // Consume capture token
-    //       const capture: Capture = {
-    //         kind: NodeType.Capture,
-    //       };
-    //       step.capture.push(capture);
-    //       break;
+    // Parse until next step, task, or EOF
+    while (
+      this.not_eof() &&
+      this.at().type !== TokenType.Step &&
+      this.at().type !== TokenType.Task
+    ) {
+      switch (this.at().type) {
+        case TokenType.Params:
+          this.eat(); // Consume params token
+          while (this.at().type === TokenType.Hyphen) {
+            const params: Params = {
+              kind: NodeType.Params,
+              key: "",
+              value: "",
+              type: "",
+            };
+            const kvParser = new KeyValueParser();
+            kvParser.setTokens(this.getTokens());
+            const { key, value } = kvParser.parseKeyValue();
+            params.key = key;
+            params.value = value;
+            this.setTokens(kvParser.getTokens());
+            step.params.push(params);
+          }
+          break;
+        case TokenType.Capture:
+          this.eat(); // Consume capture token
+          while (this.at().type === TokenType.Hyphen) {
+            const capture: Capture = {
+              kind: NodeType.Capture,
+              key: "",
+              value: "",
+              type: "",
+            };
+            const kvParser = new KeyValueParser();
+            kvParser.setTokens(this.getTokens());
+            const { key, value } = kvParser.parseKeyValue();
+            capture.key = key;
+            capture.value = value;
+            this.setTokens(kvParser.getTokens());
+            step.capture.push(capture);
+          }
+          break;
 
-    //     case TokenType.Check:
-    //       this.eat(); // Consume check token
-    //       const check: Check = {
-    //         kind: NodeType.Check,
-    //       };
-    //       step.check.push(check);
-    //       break;
+        case TokenType.Check:
+          const checkParser = new CheckParser();
+          checkParser.setTokens(this.getTokens());
+          const check = checkParser.parseCheck();
+          step.check.push(...check);
+          this.setTokens(checkParser.getTokens());
+          break;
 
-    //     default:
-    //       // Skip unknown tokens
-    //       this.eat();
-    //       break;
-    //   }
-    // }
+        default:
+          // Skip unknown tokens
+          this.eat();
+          break;
+      }
+    }
 
     return step;
   }

@@ -7,22 +7,6 @@ import { KeyValuePair } from "./keyValuePair";
 import { CReader, Reader } from "./reader";
 
 export class CheckReader extends CReader implements Reader {
-  private static readonly OPERATORS = {
-    ADD: "+",
-    SUB: "-",
-    MUL: "*",
-    DIV: "/",
-    MOD: "%",
-    EQ: "==",
-    NEQ: "!=",
-    LT: "<",
-    LTE: "<=",
-    GT: ">",
-    GTE: ">=",
-    AND: "&&",
-    OR: "||",
-    NOT: "!",
-  };
   private readonly operandsScalar = ["'", "`"];
   private readonly logicalOperator = ["AND", "OR"];
 
@@ -64,8 +48,9 @@ export class CheckReader extends CReader implements Reader {
       // Skip whitespace at start of line
 
       if (this.input[this.position] === "-") {
-        this.position++;
+        // this.position++;
         tkns.push(...this.readExpression());
+        continue;
       }
 
       this.position++; // Move past newline
@@ -83,16 +68,19 @@ export class CheckReader extends CReader implements Reader {
     let tkns: Token[] = [];
     let lineStart = this.position;
     tkns.push(Token.from("-", TokenType.Hyphen, lineStart, this.position));
-
+    this.position++;
     let hasLogicalOperator: Boolean = false;
     do {
       // Read left hand side (identifier)
+      tkns.push(Token.from("Lhs", TokenType.Lhs, lineStart, this.position));
       let start = this.readOperands(tkns);
 
       this.readOperator(tkns, start);
 
-      // Read right hand side (value)
+      tkns.push(Token.from("Rhs", TokenType.Rhs, lineStart, this.position));
       start = this.readOperands(tkns);
+
+      console.log(this.input[this.position]);
 
       // Check if there is a logical operator after the current operand
       hasLogicalOperator = this.hasLogicalOperator(
@@ -101,7 +89,7 @@ export class CheckReader extends CReader implements Reader {
         tkns
       );
 
-      // this.position++;
+      this.position++;
     } while (hasLogicalOperator);
 
     console.log(this.input[this.position]);
@@ -128,6 +116,8 @@ export class CheckReader extends CReader implements Reader {
           ? TokenType.And
           : TokenType.Or
         : TokenType.Unknown;
+
+      if (token == TokenType.Unknown) return false;
 
       tkns.push(Token.from(lgOprtor, token, start, this.position));
     } else {
@@ -165,6 +155,7 @@ export class CheckReader extends CReader implements Reader {
     ) {
       this.position++;
     }
+
     let char = this.input[this.position];
     let tokenType = TokenType.Operands;
     if (this.operandsScalar.includes(char)) {
@@ -183,7 +174,8 @@ export class CheckReader extends CReader implements Reader {
       start = this.position;
       while (
         this.position < this.input.length &&
-        !isWhitespace(this.input[this.position])
+        !isWhitespace(this.input[this.position]) &&
+        this.input[this.position] !== "\n"
       ) {
         if (this.input[this.position] == "\n") break;
         this.position++;
