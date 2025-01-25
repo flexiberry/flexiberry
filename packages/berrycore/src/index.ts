@@ -8,6 +8,7 @@ import packageFile from "../package.json";
 import { Lexer } from "./lang/tokenizer/lexer";
 import { Command } from "commander";
 import { handleInput } from "./core/cli/cli";
+import Parser from "./lang/ast/AstParser";
 // initialize the application
 
 const program = new Command();
@@ -19,4 +20,4 @@ program
 
 program.parse(process.argv);
 
-export { Lexer };
+export { Lexer, Parser };
