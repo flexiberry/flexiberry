@@ -1,6 +1,6 @@
-import { Token } from "../tokenizer/token";
-import { TokenType } from "../tokenizer/tokenType";
-import { isComment } from "../util";
+import { isComment } from "../../util";
+import { Token } from "../token";
+import { TokenType } from "../tokenType";
 import { CReader, Reader } from "./reader";
 
 export class CommentReader extends CReader implements Reader {

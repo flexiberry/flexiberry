@@ -1,18 +1,18 @@
-import { Token } from "../tokenizer/token";
-import { TokenType } from "../tokenizer/tokenType";
-import { isComment, isWhitespace } from "../util";
+import { isWhitespace, isComment } from "../../util";
+import { Token } from "../token";
+import { TokenType } from "../tokenType";
 import { CommentReader } from "./commentReader";
 import { KeyValuePair } from "./keyValuePair";
 import { CReader, Reader } from "./reader";
 
-export class ParamsReader extends CReader implements Reader {
+export class CaptureReader extends CReader implements Reader {
   constructor(input: string, position: number) {
     super(input, position);
   }
   read(): Token[] {
     let tkns: Token[] = [];
 
-    tkns.push(this.readParams());
+    tkns.push(this.readCapture());
     var start = this.position;
     // Handle any trailing comments
     while (
@@ -61,24 +61,16 @@ export class ParamsReader extends CReader implements Reader {
         this.position = kvReader.getPosition(); // Update position
       }
 
-      // Move to next line
-      // while (
-      //   this.position < this.input.length &&
-      //   this.input[this.position] !== "\n"
-      // ) {
-      //   this.position++;
-      // }
-
       if (this.position < this.input.length) {
         this.position++; // Move past newline
       }
     }
     return tkns;
   }
-  private readParams(): Token {
+  private readCapture(): Token {
     const start = this.position;
-    this.position += 6;
+    this.position += 7;
     const value = this.input.substring(start, this.position);
-    return Token.from(value, TokenType.Params, start, this.position);
+    return Token.from(value, TokenType.Capture, start, this.position);
   }
 }

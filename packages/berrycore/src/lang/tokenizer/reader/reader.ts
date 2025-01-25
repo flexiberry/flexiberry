@@ -1,5 +1,5 @@
-import { Token } from "../tokenizer/token";
-import { TokenType } from "../tokenizer/tokenType";
+import { Token } from "../token";
+import { TokenType } from "../tokenType";
 
 export interface Reader {
   getPosition(): number;

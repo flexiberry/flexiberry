@@ -1,10 +1,11 @@
 import { stat } from "fs";
-import { Token } from "../tokenizer/token";
-import { TokenType, TokenTypeValueOf } from "../tokenizer/tokenType";
-import { isComment, isNotEof, isWhitespace } from "../util";
+
 import { CommentReader } from "./commentReader";
 import { KeyValuePair } from "./keyValuePair";
 import { CReader, Reader } from "./reader";
+import { isWhitespace, isComment } from "../../util";
+import { Token } from "../token";
+import { TokenType } from "../tokenType";
 
 export class CheckReader extends CReader implements Reader {
   private readonly operandsScalar = ["'", "`"];

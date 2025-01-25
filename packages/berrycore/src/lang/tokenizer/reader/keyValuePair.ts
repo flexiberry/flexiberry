@@ -1,6 +1,6 @@
-import { Token } from "../tokenizer/token";
-import { TokenType } from "../tokenizer/tokenType";
-import { isWhitespace } from "../util";
+import { isWhitespace } from "../../util";
+import { Token } from "../token";
+import { TokenType } from "../tokenType";
 import { CReader, Reader } from "./reader";
 
 export class KeyValuePair extends CReader implements Reader {

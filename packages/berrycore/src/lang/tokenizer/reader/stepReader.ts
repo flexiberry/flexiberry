@@ -1,6 +1,6 @@
-import { Token } from "../tokenizer/token";
-import { TokenType } from "../tokenizer/tokenType";
-import { isComment, isStep, isWhitespace } from "../util";
+import { isWhitespace, isComment } from "../../util";
+import { Token } from "../token";
+import { TokenType } from "../tokenType";
 import { CommentReader } from "./commentReader";
 import { CReader, Reader } from "./reader";
 

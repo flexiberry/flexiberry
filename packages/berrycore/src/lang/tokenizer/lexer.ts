@@ -1,29 +1,29 @@
-import { ApiReader } from "../reader/apiReader";
-import { CommentReader } from "../reader/commentReader";
-import { EnvReader } from "../reader/envReader";
-import { VarReader } from "../reader/varReader";
-import { Token } from "./token";
-import { TokenType } from "./tokenType";
 import {
-  isApi,
-  isBody,
-  isCapture,
-  isCheck,
+  isWhitespace,
   isComment,
   isEnv,
-  isHeader,
-  isParams,
-  isStep,
-  isTask,
-  isUrl,
   isVar,
-  isWhitespace,
+  isApi,
+  isBody,
+  isHeader,
+  isUrl,
+  isStep,
+  isCapture,
+  isParams,
+  isTask,
+  isCheck,
 } from "../util";
-import { StepReader } from "../reader/stepReader";
-import { CaptureReader } from "../reader/captureReader";
-import { ParamsReader } from "../reader/paramsReader";
-import { CheckReader } from "../reader/checkReader";
-import { TaskReader } from "../reader/taskReader";
+import { ApiReader } from "./reader/apiReader";
+import { CaptureReader } from "./reader/captureReader";
+import { CheckReader } from "./reader/checkReader";
+import { CommentReader } from "./reader/commentReader";
+import { EnvReader } from "./reader/envReader";
+import { ParamsReader } from "./reader/paramsReader";
+import { StepReader } from "./reader/stepReader";
+import { TaskReader } from "./reader/taskReader";
+import { VarReader } from "./reader/varReader";
+import { Token } from "./token";
+import { TokenType } from "./tokenType";
 
 export class Lexer {
   private input: string;
