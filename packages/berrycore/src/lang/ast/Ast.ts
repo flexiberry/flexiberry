@@ -43,7 +43,6 @@ export interface ProgramBody extends Statement {
   api: ApiStatement[];
   tasks: Task[];
 }
-export interface Task extends Statement {}
 export type Variable = Statement & {
   kind: NodeType.Variable;
   identifier: string;

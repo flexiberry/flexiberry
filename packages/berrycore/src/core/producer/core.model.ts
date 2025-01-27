@@ -27,8 +27,49 @@ export type ApiCoreModel = {
   title: string;
 };
 
+export type KeyValueCoreModel = {
+  key: string;
+  value: string;
+};
+
+export type CaptureCoreModel = KeyValueCoreModel & {
+  type: string;
+  id: string;
+};
+export type ParamsCoreModel = KeyValueCoreModel & {
+  type: string;
+  id: string;
+};
+export type CheckCoreModel = {
+  type: string;
+  conditions: ConditionCoreModel[];
+  taskId: string;
+  stepId: string;
+};
+export type ConditionCoreModel = {
+  operator?: string; // Optional operator for conditions (e.g., "AND", "OR")
+  leftOperand?: string;
+  rightOperand?: string;
+  logicalOperator?: string;
+};
+export type StepCoreModel = {
+  id: string;
+  title: string;
+  action: string;
+  target: string;
+  functionId: string;
+  capture?: CaptureCoreModel[];
+  check?: CheckCoreModel[];
+  params?: ParamsCoreModel[];
+};
+export type TaskCoreModel = {
+  title: string;
+  id: string;
+  steps?: StepCoreModel[];
+};
 export type CoreModel = {
-  environments: EnvCoreModel[];
-  variables: VarCoreModel[];
+  environments?: EnvCoreModel[];
+  variables?: VarCoreModel[];
   apis: ApiCoreModel[];
+  tasks?: TaskCoreModel[];
 };

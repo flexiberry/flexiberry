@@ -1,7 +1,8 @@
 import { ProgramBody } from "../../lang/ast/Ast";
 import { ApiProducer } from "./api.producer";
-import { CoreModel } from "./core.model";
+import { CoreModel, TaskCoreModel } from "./core.model";
 import { EnvProducer } from "./env.producer";
+import { TaskProducer } from "./task.producer";
 import { VarProducer } from "./var.producer";
 
 export interface IProducer<T, V> {
@@ -19,6 +20,7 @@ export class Producer implements IProducer<CoreModel, ProgramBody> {
   private envProducer: EnvProducer = new EnvProducer();
   private varProducer: VarProducer = new VarProducer();
   private apiProducer: ApiProducer = new ApiProducer();
+  private taskProducer: TaskProducer = new TaskProducer();
 
   /**
    * Builds a CoreModel from the given ProgramBody AST.
@@ -36,11 +38,13 @@ export class Producer implements IProducer<CoreModel, ProgramBody> {
       .map((x) => this.varProducer.build(x))
       .flatMap((x) => x);
     let a = ast.api.map((x) => this.apiProducer.build(x));
+    let t = ast.tasks.map((x, i) => this.taskProducer.build(x, i));
 
     let core: CoreModel = {
       apis: a,
       environments: e,
       variables: v,
+      tasks: t,
     };
 
     return core;

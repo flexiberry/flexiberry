@@ -14,7 +14,7 @@ export class TaskParser extends BaseParser {
 
     // Expect and consume Task token
     this.expect(TokenType.Task, "Expected task keyword");
-
+    this.eat();
     // Parse title
     if (this.at().type === TokenType.Title) {
       task.title = this.at().value;
