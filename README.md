@@ -1,6 +1,6 @@
 # 🚀 FlexiBerry
 
-<pre style="font-family: monospace;">
+<pre style="font-family: monospace; animation: scroll-left-to-right 5s linear infinite;">
 🌟 FlexiBerry** is a comprehensive API testing framework that supports a wide range of testing scenarios, including functional, load, security, data comparison, response validation, unit, and end-to-end testing.
 </pre>
 
