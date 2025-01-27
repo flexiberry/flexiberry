@@ -39,7 +39,7 @@ export interface Program extends Statement {
 export interface ProgramBody extends Statement {
   kind: NodeType.ProgramBody;
   environment?: Environment;
-  variables: Variable[];
+  variables?: Variable[];
   api: ApiStatement[];
   tasks: Task[];
 }

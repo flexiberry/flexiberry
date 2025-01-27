@@ -1,0 +1,39 @@
+import {
+  Environment,
+  NodeType,
+  Variable,
+  VariableKv,
+} from "../../lang/ast/Ast";
+import { EnvCoreModel, VarCoreModel } from "./core.model";
+import { IProducer, ProducerError } from "./producer";
+
+/**
+ * EnvProducer class responsible for producing environment models from AST.
+ */
+export class VarProducer implements IProducer<VarCoreModel[], Variable> {
+  build(ast: Variable | undefined): VarCoreModel[] {
+    if (ast === undefined) return [];
+
+    if (ast.kind !== NodeType.Variable)
+      throw new ProducerError(
+        "Invalid Node. expected node is " + NodeType[NodeType.Variable]
+      );
+
+    return ast.value.map((x) => {
+      let t: VarCoreModel = {
+        comments: ast.comments,
+        id: ast.identifier,
+        key: x.key,
+        pointer: ast.pointer,
+        scope: !!ast.pointer ? "ENVIRONMENT" : "GLOBAL",
+        value: x.value,
+        valueType: x.dataType == "identifier" ? "IDENTIFIER" : "LITERAL",
+        dataType: x.dataType,
+        statement: !!ast.pointer
+          ? `Var.${ast.pointer}.${x.key}`
+          : `Var.${x.key}`,
+      };
+      return t;
+    });
+  }
+}

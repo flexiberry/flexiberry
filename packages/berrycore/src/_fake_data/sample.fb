@@ -20,6 +20,7 @@ Var @SIT variables
 
 Api POST #ApiOne the api is for the following testing methods
         Url https://api.example.com/user
+
         Body JSON
         `{
                 "field1": "value1",

@@ -10,6 +10,7 @@ import Parser from "../../lang/ast/AstParser";
 import { TokenType, TokenTypeValueOf } from "../../lang/tokenizer/tokenType";
 import { printTable } from "console-table-printer";
 import { CProgramBody } from "../../lang/ast/AstImpl";
+import { Producer } from "../producer/producer";
 
 const rl = readline.createInterface({
   input: process.stdin,
@@ -142,6 +143,10 @@ function runLexer() {
   let program = new CProgramBody().build(tokens);
 
   console.log(JSON.stringify(program.getAst(), null, 2));
+
+  let producer = new Producer();
+
+  console.log(JSON.stringify(producer.build(program.getAst()), null, 2));
 
   // console.dir(program);
   console.timeEnd("Time");
