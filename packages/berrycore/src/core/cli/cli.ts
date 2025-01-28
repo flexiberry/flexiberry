@@ -11,6 +11,7 @@ import { TokenType, TokenTypeValueOf } from "../../lang/tokenizer/tokenType";
 import { printTable } from "console-table-printer";
 import { CProgramBody } from "../../lang/ast/AstImpl";
 import { Producer } from "../producer/producer";
+import { EnvBuilder } from "../builder/env.builder";
 
 const rl = readline.createInterface({
   input: process.stdin,
@@ -145,8 +146,15 @@ function runLexer() {
   console.log(JSON.stringify(program.getAst(), null, 2));
 
   let producer = new Producer();
+  let pro = producer.build(program.getAst());
+  console.log(JSON.stringify(pro, null, 2));
 
-  console.log(JSON.stringify(producer.build(program.getAst()), null, 2));
+  if (pro.environments) {
+    EnvBuilder.init(pro.environments);
+    console.log(EnvBuilder.getEnv());
+    console.log(EnvBuilder.isExists("SIT"));
+    console.log(EnvBuilder.getScope("SIT"));
+  }
 
   // console.dir(program);
   console.timeEnd("Time");
