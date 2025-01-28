@@ -26,7 +26,7 @@ export class EnvBuilder {
   }
 
   //  utility function to get all keys from the environment map
-  public static getEnvs(): string[] {
+  public static getEnvList(): string[] {
     return Array.from(EnvBuilder.env.keys());
   }
 
