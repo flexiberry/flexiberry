@@ -12,6 +12,7 @@ import { printTable } from "console-table-printer";
 import { CProgramBody } from "../../lang/ast/AstImpl";
 import { Producer } from "../producer/producer";
 import { EnvBuilder } from "../builder/env.builder";
+import { VarBuilder } from "../builder/var.builder";
 
 const rl = readline.createInterface({
   input: process.stdin,
@@ -154,6 +155,12 @@ function runLexer() {
     console.log(EnvBuilder.getEnv());
     console.log(EnvBuilder.isExists("SIT"));
     console.log(EnvBuilder.getScope("SIT"));
+  }
+
+  if (pro.variables) {
+    console.log();
+    VarBuilder.init(pro.variables);
+    console.log(VarBuilder.getVars());
   }
 
   // console.dir(program);
