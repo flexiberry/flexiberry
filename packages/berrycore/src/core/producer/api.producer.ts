@@ -10,18 +10,44 @@ export class ApiProducer implements IProducer<ApiCoreModel, ApiStatement> {
         "Invalid Node. expected node is " + NodeType[NodeType.ApiFunction]
       );
 
+    let interPolation: string[] = [];
+    if (ast.sturct.body !== undefined) {
+      interPolation.push(...this.extractInterpolation(ast.sturct.body));
+    }
+    if (ast.sturct.url !== undefined) {
+      interPolation.push(...this.extractInterpolation(ast.sturct.url));
+    }
+    if (ast.sturct.header !== undefined) {
+      for (const key in ast.sturct.header) {
+        interPolation.push(
+          ...this.extractInterpolation(ast.sturct.header[key])
+        );
+      }
+    }
+
     const a: ApiCoreModel = {
       body: ast.sturct.body,
       bodyType: ast.sturct.type,
       url: ast.sturct.url,
       header: ast.sturct.header,
-      methode: ast.method,
+      method: ast.method,
       params: undefined,
-      interpolation: undefined,
+      interpolation: interPolation,
       id: ast.identifier,
       title: ast.title,
     };
 
     return a;
+  }
+  extractInterpolation(input: string): string[] {
+    const regex = /{{(.*?)}}/g;
+    const keys: string[] = [];
+    let match;
+
+    while ((match = regex.exec(input)) !== null) {
+      keys.push(match[1]); // Extract the key from the match
+    }
+
+    return keys;
   }
 }

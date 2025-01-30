@@ -13,6 +13,7 @@ import { CProgramBody } from "../../lang/ast/AstImpl";
 import { Producer } from "../producer/producer";
 import { EnvBuilder } from "../builder/env.builder";
 import { VarBuilder } from "../builder/var.builder";
+import { ApiBuilder } from "../builder/api.builder";
 
 const rl = readline.createInterface({
   input: process.stdin,
@@ -161,6 +162,10 @@ function runLexer() {
     console.log();
     VarBuilder.init(pro.variables);
     console.log(VarBuilder.getVars());
+  }
+  if (pro.apis) {
+    ApiBuilder.init(pro.apis);
+    console.log(ApiBuilder.getApis());
   }
 
   // console.dir(program);

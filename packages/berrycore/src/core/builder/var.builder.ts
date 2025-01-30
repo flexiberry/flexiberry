@@ -1,7 +1,16 @@
 import { VarCoreModel } from "../producer/core.model";
 
+export type VarMap = {
+  scope: string;
+  env: string;
+  value: any;
+  datatype: string;
+  key: string;
+  valueType: string;
+};
+
 export class VarBuilder {
-  private static vars: Map<string, any>;
+  private static vars: Map<string, VarMap>;
 
   public static init(varsJson: VarCoreModel[]): void {
     VarBuilder.vars = VarBuilder.convertJsonArrayToMap(varsJson);
@@ -12,7 +21,14 @@ export class VarBuilder {
   ): Map<string, any> {
     const map = new Map<string, any>();
     varsJson.forEach((vars) => {
-      map.set(vars.statement, vars.value);
+      map.set(vars.statement, {
+        scope: vars.scope,
+        env: vars.pointer,
+        value: vars.value,
+        datatype: vars.dataType,
+        key: vars.key,
+        valueType: vars.valueType,
+      });
     });
     return map;
   }
