@@ -1,4 +1,8 @@
 import { ProgramBody } from "../../lang/ast/Ast";
+import { ApiBuilder } from "../builder/api.builder";
+import { EnvBuilder } from "../builder/env.builder";
+import { VarBuilder } from "../builder/var.builder";
+import { Test } from "../cli/test";
 import { ApiProducer } from "./api.producer";
 import { CoreModel, TaskCoreModel } from "./core.model";
 import { EnvProducer } from "./env.producer";
@@ -46,6 +50,16 @@ export class Producer implements IProducer<CoreModel, ProgramBody> {
       variables: v,
       tasks: t,
     };
+
+    if (core.environments) {
+      EnvBuilder.init(core.environments);
+    }
+    if (core.variables) {
+      VarBuilder.init(core.variables);
+    }
+    if (core.apis) {
+      ApiBuilder.init(core.apis);
+    }
 
     return core;
   }

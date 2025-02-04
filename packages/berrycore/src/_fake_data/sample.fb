@@ -3,6 +3,7 @@ Env UAT,SIT,TAS
 Var without Pointer 
         - userid: 'rintu'
         - age: 30
+        - token: 'tkn'
 
 Var @UAT #test  variables for uat env
         - name: 'rintu'
@@ -34,7 +35,7 @@ Api POST #ApiOne the api is for the following testing methods
 **s asdadas asdasd asd asd a sda sdasdasda sd asdasdas
 
 Api POST #API Fetch user information
-        Url https://api.example.com/user/{{userId}}
+        Url https://api.example.com/user/{{userid}}
         Body JSON `{
                 "field1": {{value}},
                 "field2": "value2",

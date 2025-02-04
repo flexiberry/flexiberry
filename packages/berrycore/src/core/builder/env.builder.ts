@@ -3,6 +3,19 @@ import { EnvCoreModel } from "../producer/core.model";
 export class EnvBuilder {
   private static env: Map<string, any>;
 
+  private static activeEnv: string;
+
+  public static setActiveEnv(env: string): void {
+    EnvBuilder.activeEnv = env;
+  }
+
+  public static getActiveEnv(): string {
+    if (!EnvBuilder.activeEnv) {
+      return "default";
+    }
+    return EnvBuilder.activeEnv;
+  }
+
   public static init(envJson: EnvCoreModel[]): void {
     EnvBuilder.env = EnvBuilder.convertJsonArrayToMap(envJson);
   }

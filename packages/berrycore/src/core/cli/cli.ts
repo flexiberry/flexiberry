@@ -14,6 +14,7 @@ import { Producer } from "../producer/producer";
 import { EnvBuilder } from "../builder/env.builder";
 import { VarBuilder } from "../builder/var.builder";
 import { ApiBuilder } from "../builder/api.builder";
+import { Test } from "./test";
 
 const rl = readline.createInterface({
   input: process.stdin,
@@ -151,25 +152,10 @@ function runLexer() {
   let pro = producer.build(program.getAst());
   console.log(JSON.stringify(pro, null, 2));
 
-  if (pro.environments) {
-    EnvBuilder.init(pro.environments);
-    console.log(EnvBuilder.getEnv());
-    console.log(EnvBuilder.isExists("SIT"));
-    console.log(EnvBuilder.getScope("SIT"));
-  }
-
-  if (pro.variables) {
-    console.log();
-    VarBuilder.init(pro.variables);
-    console.log(VarBuilder.getVars());
-  }
-  if (pro.apis) {
-    ApiBuilder.init(pro.apis);
-    console.log(ApiBuilder.getApis());
-  }
-
   // console.dir(program);
   console.timeEnd("Time");
+
+  new Test().test();
 
   // new Parser().produce(fileContent);
 }
