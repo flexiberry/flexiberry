@@ -1,5 +1,5 @@
 import { NodeType, Params } from "../../lang/ast/Ast";
-import { SequenceGenerator } from "../util/SequenceGenerator";
+import { SEQUENCE_NAMES, SequenceGenerator } from "../util/SequenceGenerator";
 import { ParamsCoreModel } from "./core.model";
 import { IProducer, ProducerError } from "./producer";
 
@@ -11,7 +11,7 @@ export class ParamsProducer implements IProducer<ParamsCoreModel, Params> {
       );
 
     const p: ParamsCoreModel = {
-      id: SequenceGenerator.getNext("params").toString(),
+      id: SequenceGenerator.getNext("PARAMS").toString(),
       value: ast.value,
       key: ast.key,
       type: ast.type,

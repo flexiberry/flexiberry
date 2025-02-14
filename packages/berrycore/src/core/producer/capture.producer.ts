@@ -11,7 +11,7 @@ export class CaptureProducer implements IProducer<CaptureCoreModel, Capture> {
       );
 
     const c: CaptureCoreModel = {
-      id: SequenceGenerator.getNext("capture").toString(),
+      id: SequenceGenerator.getNext("CAPTURE").toString(),
       key: ast.key,
       value: ast.value,
       type: ast.type,

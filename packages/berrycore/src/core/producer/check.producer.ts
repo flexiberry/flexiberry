@@ -11,7 +11,7 @@ export class CheckProducer implements IProducer<CheckCoreModel, Check> {
       );
 
     const c: CheckCoreModel = {
-      id: SequenceGenerator.getNext("check").toString(),
+      id: SequenceGenerator.getNext("CHECK").toString(),
       conditions: ast.conditions.map((x) => x),
     };
     return c;

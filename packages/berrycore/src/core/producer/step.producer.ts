@@ -21,7 +21,7 @@ export class StepProducer implements IProducer<StepCoreModel, Step> {
       action: ast.action,
       target: ast.target,
       functionId: ast.functionId,
-      id: SequenceGenerator.getNext("step").toString(),
+      id: SequenceGenerator.getNext("STEP").toString(),
       title: ast.title,
       capture: ast.capture.map((x) => this.captureProducer.build(x)),
       check: ast.check.map((x) => this.checkProducer.build(x)),
