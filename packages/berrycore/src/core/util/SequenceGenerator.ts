@@ -2,7 +2,7 @@
  * A static class for generating and managing sequence numbers across the application.
  */
 
-export const SEQUENCE_NAMES = {
+const SEQUENCE_NAMES = {
   TASK: "task",
   CAPTURE: "capture",
   STEP: "step",
