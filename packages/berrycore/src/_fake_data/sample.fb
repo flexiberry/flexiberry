@@ -37,7 +37,7 @@ Api POST #ApiOne the api is for the following testing methods
 Api POST #API Fetch user information
         Url https://api.example.com/user/{{userid}}
         Body JSON `{
-                "field1": {{value}},
+                "field1": {{userid}}, 
                 "field2": "value2",
                 "field3": "value3"
         }`
@@ -50,8 +50,8 @@ Task testing the application user information api  **tesing comments
         Step  Call Api ApiOne   **testing comments
 
                 Capture **capture the token and status
-                - token: "response.body.token"
-                - status: "response.status"
+                - token: response.body.token
+                - status: response.status
 
                 Check 
                 - status == 200 OR status == 300
@@ -67,8 +67,8 @@ Task testing the application user information api  **tesing comments
                 - token: Step.1.token
 
                 Capture
-                - token: "response.body.token"
-                - status: "response.status"
+                - token: response.body.token
+                - status: response.status
 
                 Check 
                 - status == 200 OR status == 300
@@ -79,7 +79,7 @@ Task testing the application user information api  **tesing comments
         Step #3 Call Api API2  
 
                 Capture
-                - token: "response.body.token"
+                - token: 'response.body.token'
                 - status: "response.status"
 
                 Check 

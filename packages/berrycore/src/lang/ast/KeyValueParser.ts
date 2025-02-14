@@ -33,6 +33,7 @@ export class KeyValueParser extends BaseParser {
       this.expect(TokenType.Backtick, "Expected closing backtick");
       type = TokenTypeValueOf(TokenType.Scalar);
     }
+
     // Handle plain scalar values
     else {
       value = this.expect(TokenType.Scalar, "Expected scalar value").value;

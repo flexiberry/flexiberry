@@ -64,8 +64,6 @@ Task testing user registration and login
                 - status == 200
                 - userDetails != null
 
-
-
         Step #3 Call ApiFetchUserDetails
 
                 Params

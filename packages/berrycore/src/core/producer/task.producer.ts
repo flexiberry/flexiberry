@@ -14,7 +14,7 @@ export class TaskProducer implements IProducer<TaskCoreModel, Task> {
 
     const t: TaskCoreModel = {
       title: ast.title,
-      steps: ast.steps.map((x, i) => this.stepProducer.build(x, i)),
+      steps: ast.steps.map((x) => this.stepProducer.build(x)),
       id: `TASK-${i}`,
     };
     return t;

@@ -57,9 +57,10 @@ export class StepParser extends BaseParser {
             };
             const kvParser = new KeyValueParser();
             kvParser.setTokens(this.getTokens());
-            const { key, value } = kvParser.parseKeyValue();
+            const { key, value, type } = kvParser.parseKeyValue();
             params.key = key;
             params.value = value;
+            params.type = type;
             this.setTokens(kvParser.getTokens());
             step.params.push(params);
           }
@@ -75,9 +76,10 @@ export class StepParser extends BaseParser {
             };
             const kvParser = new KeyValueParser();
             kvParser.setTokens(this.getTokens());
-            const { key, value } = kvParser.parseKeyValue();
+            const { key, value, type } = kvParser.parseKeyValue();
             capture.key = key;
             capture.value = value;
+            capture.type = type;
             this.setTokens(kvParser.getTokens());
             step.capture.push(capture);
           }

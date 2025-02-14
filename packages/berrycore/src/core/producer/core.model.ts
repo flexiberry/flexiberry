@@ -41,10 +41,8 @@ export type ParamsCoreModel = KeyValueCoreModel & {
   id: string;
 };
 export type CheckCoreModel = {
-  type: string;
   conditions: ConditionCoreModel[];
-  taskId: string;
-  stepId: string;
+  id: string;
 };
 export type ConditionCoreModel = {
   operator?: string; // Optional operator for conditions (e.g., "AND", "OR")
