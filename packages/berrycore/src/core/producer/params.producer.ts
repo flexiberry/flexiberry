@@ -1,7 +1,7 @@
-import { NodeType, Params } from "../../lang/ast/Ast";
+import { NodeType, type Params } from "../../lang/ast/Ast";
 import { SequenceGenerator } from "../util/SequenceGenerator";
-import { ParamsCoreModel } from "./core.model";
-import { IProducer, ProducerError } from "./producer";
+import type { ParamsCoreModel } from "./core.model";
+import { type IProducer, ProducerError } from "./producer";
 
 export class ParamsProducer implements IProducer<ParamsCoreModel, Params> {
   build(ast: Params): ParamsCoreModel {

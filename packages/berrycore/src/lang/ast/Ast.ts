@@ -1,5 +1,3 @@
-import { KV } from "./types";
-
 export enum NodeType {
   Program,
   ProgramBody,

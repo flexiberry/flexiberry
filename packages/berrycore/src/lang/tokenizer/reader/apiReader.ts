@@ -3,15 +3,15 @@ import { Token } from "../token";
 import { TokenType } from "../tokenType";
 import { CommentReader } from "./commentReader";
 import { KeyValuePair } from "./keyValuePair";
-import { CReader, Reader } from "./reader";
+import { CReader, type Reader } from "./reader";
 
 export class ApiReader extends CReader implements Reader {
   constructor(input: string, position: number) {
     super(input, position);
   }
   read(token: TokenType): Token[] {
-    let tkns: Token[] = [];
-    let value = "";
+    const tkns: Token[] = [];
+    const value = "";
 
     let start = this.position;
 
@@ -94,7 +94,7 @@ export class ApiReader extends CReader implements Reader {
 
   private readHeader(tkns: Token[]): number {
     let start = this.position;
-    let value = "";
+    const value = "";
     this.position = this.position + 6;
     tkns.push(
       Token.from(
@@ -116,7 +116,7 @@ export class ApiReader extends CReader implements Reader {
     // Parse key-value pairs until empty line
     while (this.position < this.input.length) {
       // Skip whitespace at start of line
-      let lineStart = this.position;
+      const lineStart = this.position;
       while (
         this.position < this.input.length &&
         isWhitespace(this.input[this.position]) &&

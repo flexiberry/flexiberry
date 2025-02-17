@@ -1,4 +1,4 @@
-import { EnvCoreModel } from "../producer/core.model";
+import type { EnvCoreModel } from "../producer/core.model";
 
 export class EnvBuilder {
   private static env: Map<string, any>;

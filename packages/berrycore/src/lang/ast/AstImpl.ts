@@ -1,14 +1,12 @@
 import { Token } from "../tokenizer/token";
 import { TokenType } from "../tokenizer/tokenType";
 import {
-  ApiStatement,
-  Environment,
+  type ApiStatement,
+  type Environment,
   NodeType,
-  ProgramBody,
-  Scope,
-  Statement,
-  Task,
-  Variable,
+  type ProgramBody,
+  type Task,
+  type Variable,
 } from "./Ast";
 import { ApiParser } from "./ApiParser";
 import { EnvironmentParser } from "./EnvironmentParser";

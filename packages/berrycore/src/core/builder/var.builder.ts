@@ -1,4 +1,4 @@
-import { VarCoreModel } from "../producer/core.model";
+import type { VarCoreModel } from "../producer/core.model";
 
 export type VarMap = {
   scope: string;

@@ -1,11 +1,6 @@
-import {
-  Environment,
-  NodeType,
-  Variable,
-  VariableKv,
-} from "../../lang/ast/Ast";
-import { EnvCoreModel, VarCoreModel } from "./core.model";
-import { IProducer, ProducerError } from "./producer";
+import { NodeType, type Variable } from "../../lang/ast/Ast";
+import type { VarCoreModel } from "./core.model";
+import { type IProducer, ProducerError } from "./producer";
 
 /**
  * EnvProducer class responsible for producing environment models from AST.
@@ -20,18 +15,16 @@ export class VarProducer implements IProducer<VarCoreModel[], Variable> {
       );
 
     return ast.value.map((x) => {
-      let t: VarCoreModel = {
+      const t: VarCoreModel = {
         comments: ast.comments,
         id: ast.identifier,
         key: x.key,
         pointer: ast.pointer,
-        scope: !!ast.pointer ? "ENVIRONMENT" : "GLOBAL",
+        scope: ast.pointer ? "ENVIRONMENT" : "GLOBAL",
         value: x.value,
         valueType: x.dataType == "identifier" ? "IDENTIFIER" : "LITERAL",
         dataType: x.dataType,
-        statement: !!ast.pointer
-          ? `Var.${ast.pointer}.${x.key}`
-          : `Var.${x.key}`,
+        statement: ast.pointer ? `Var.${ast.pointer}.${x.key}` : `Var.${x.key}`,
       };
       return t;
     });

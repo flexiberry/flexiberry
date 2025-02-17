@@ -1,7 +1,7 @@
 import { isWhitespace } from "../../util";
 import { Token } from "../token";
 import { TokenType } from "../tokenType";
-import { CReader, Reader } from "./reader";
+import { CReader, type Reader } from "./reader";
 
 export class KeyValuePair extends CReader implements Reader {
   constructor(input: string, position: number) {
@@ -9,8 +9,8 @@ export class KeyValuePair extends CReader implements Reader {
   }
 
   read(): Token[] {
-    let tkns: Token[] = [];
-    let start = this.position;
+    const tkns: Token[] = [];
+    const start = this.position;
     this.varKeyValuePairExtract(tkns, this.input[this.position], start);
     return tkns;
   }

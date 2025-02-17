@@ -1,11 +1,11 @@
-import { NodeType, Task } from "./Ast";
+import { NodeType, type Task } from "./Ast";
 import { TokenType } from "../tokenizer/tokenType";
 import { BaseParser } from "./BaseParser";
 import { StepParser } from "./StepParser";
 
 export class TaskParser extends BaseParser {
   parseTask(): Task {
-    let task: Task = {
+    const task: Task = {
       kind: NodeType.Task,
       identifier: "",
       title: "",

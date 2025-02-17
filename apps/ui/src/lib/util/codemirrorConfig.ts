@@ -36,8 +36,8 @@ export const apiDetectorPlugin = ViewPlugin.fromClass(
 
     update(update: ViewUpdate) {
       // Check for clear effect
-      for (let tr of update.transactions) {
-        for (let effect of tr.effects) {
+      for (const tr of update.transactions) {
+        for (const effect of tr.effects) {
           if (effect.is(clearSuggestionEffect)) {
             this.decorations = Decoration.none;
             return;

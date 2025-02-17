@@ -1,7 +1,7 @@
-import { Capture, NodeType } from "../../lang/ast/Ast";
+import { type Capture, NodeType } from "../../lang/ast/Ast";
 import { SequenceGenerator } from "../util/SequenceGenerator";
-import { CaptureCoreModel } from "./core.model";
-import { IProducer, ProducerError } from "./producer";
+import type { CaptureCoreModel } from "./core.model";
+import { type IProducer, ProducerError } from "./producer";
 
 export class CaptureProducer implements IProducer<CaptureCoreModel, Capture> {
   build(ast: Capture, i?: number): CaptureCoreModel {

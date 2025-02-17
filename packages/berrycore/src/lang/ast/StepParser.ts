@@ -1,4 +1,11 @@
-import { NodeType, Step, Capture, Check, Params, Condition } from "./Ast";
+import {
+  NodeType,
+  type Step,
+  type Capture,
+  type Check,
+  type Params,
+  type Condition,
+} from "./Ast";
 import { TokenType } from "../tokenizer/tokenType";
 import { BaseParser } from "./BaseParser";
 import { KeyValueParser } from "./KeyValueParser";
@@ -6,7 +13,7 @@ import { CheckParser } from "./CheckParser";
 
 export class StepParser extends BaseParser {
   parseStep(): Step {
-    let step: Step = {
+    const step: Step = {
       kind: NodeType.Step,
       identifier: "",
       title: "",

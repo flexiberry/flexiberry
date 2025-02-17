@@ -1,25 +1,23 @@
 #!/usr/bin/env node
 
-import figlet from "figlet";
-import packageFile from "../package.json";
-
-// Adjust the path as necessary
-// console.log(figlet.textSync("FlexiBerry"));
-// console.log("Version: " + packageFile.version);
-
-import { Lexer } from "./lang/tokenizer/lexer";
-import { Command } from "commander";
-import { handleInput } from "./core/cli/cli";
-import Parser from "./lang/ast/AstParser";
 // initialize the application
+
+import { Command } from "commander";
+import { handleInput } from "./core/cli/cli.js";
+// import { handleInput } from "./core/cli/cli";
+
+// import Parser from "./lang/ast/AstParser.js";
+// import { Lexer } from "./lang/tokenizer/lexer.js";
+
+console.log("FlexiBerry CLI v0.0.1");
 
 const program = new Command();
 program
-  .version(packageFile.version)
+  .version("0.0.1")
   .description("CLI to process JSON input")
   .option("-i, --input", "Input file string")
   .action(handleInput);
 
 program.parse(process.argv);
 
-export { Lexer, Parser };
+// export { Lexer, Parser };

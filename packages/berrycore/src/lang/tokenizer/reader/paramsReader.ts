@@ -3,17 +3,17 @@ import { Token } from "../token";
 import { TokenType } from "../tokenType";
 import { CommentReader } from "./commentReader";
 import { KeyValuePair } from "./keyValuePair";
-import { CReader, Reader } from "./reader";
+import { CReader, type Reader } from "./reader";
 
 export class ParamsReader extends CReader implements Reader {
   constructor(input: string, position: number) {
     super(input, position);
   }
   read(): Token[] {
-    let tkns: Token[] = [];
+    const tkns: Token[] = [];
 
     tkns.push(this.readParams());
-    var start = this.position;
+    const start = this.position;
     // Handle any trailing comments
     while (
       this.position < this.input.length &&
@@ -36,7 +36,7 @@ export class ParamsReader extends CReader implements Reader {
     // Parse key-value pairs until empty line
     while (this.position < this.input.length) {
       // Skip whitespace at start of line
-      let lineStart = this.position;
+      const lineStart = this.position;
       while (
         this.position < this.input.length &&
         isWhitespace(this.input[this.position]) &&

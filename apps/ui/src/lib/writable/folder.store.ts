@@ -8,7 +8,7 @@ export const savedFolders = writable<FolderModel[]>([]);
 export async function updateFolder(folder: FolderModel[]) {
   removeIfFileNameisEmpty(folder);
   savedFolders.update((f) => folder);
-  let count = await db.folderTable.count();
+  const count = await db.folderTable.count();
   //   if (count > 0) {
   //     db.folderTable.update("folder", {
   //       data: folder,

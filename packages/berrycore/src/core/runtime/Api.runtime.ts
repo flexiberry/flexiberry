@@ -1,6 +1,6 @@
 import { log } from "console";
 import { VarReader } from "../../lang/tokenizer/reader/varReader";
-import { ApiModel } from "../builder/api.builder";
+import { type ApiModel } from "../builder/api.builder";
 import { VarBuilder } from "../builder/var.builder";
 import { StringUtil } from "../util/StringUtil";
 
@@ -40,7 +40,7 @@ export class ApiCaller {
 
   buildHeaders(
     header: Record<string, string> | undefined
-  ): HeadersInit | undefined {
+  ): Headers | undefined {
     if (!header) {
       return undefined;
     }

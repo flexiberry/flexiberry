@@ -1,6 +1,10 @@
-import { Environment, NodeType, VariableKv } from "../../lang/ast/Ast";
-import { EnvCoreModel, VarCoreModel } from "./core.model";
-import { IProducer, ProducerError } from "./producer";
+import {
+  type Environment,
+  NodeType,
+  type VariableKv,
+} from "../../lang/ast/Ast";
+import type { EnvCoreModel, VarCoreModel } from "./core.model";
+import { type IProducer, ProducerError } from "./producer";
 
 /**
  * EnvProducer class responsible for producing environment models from AST.

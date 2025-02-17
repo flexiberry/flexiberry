@@ -20,6 +20,6 @@ export class BerryRunner {
   }
 
   async emit(event: string, data: any) {
-    if (!!this.events[event]) await this.events[event](data); // Await the execution of each handler
+    if (this.events[event]) await this.events[event](data); // Await the execution of each handler
   }
 }

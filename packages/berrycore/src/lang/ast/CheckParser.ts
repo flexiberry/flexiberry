@@ -1,4 +1,4 @@
-import { Check, Condition, NodeType } from "./Ast";
+import { type Check, type Condition, NodeType } from "./Ast";
 import { TokenType } from "../tokenizer/tokenType";
 import { BaseParser } from "./BaseParser";
 
@@ -6,7 +6,7 @@ export class CheckParser extends BaseParser {
   parseCheck(): Check[] {
     // Expect and consume Check token
     this.expect(TokenType.Check, "Expected check keyword");
-    let checkList: Check[] = [];
+    const checkList: Check[] = [];
     // Parse conditions until next block or EOF
     while (this.at().type === TokenType.Hyphen) {
       const check: Check = {
@@ -26,7 +26,7 @@ export class CheckParser extends BaseParser {
   }
 
   private parseCondition(): Condition[] {
-    let conditionList: Condition[] = [];
+    const conditionList: Condition[] = [];
 
     let hasLogicalOperator: boolean = false;
     do {

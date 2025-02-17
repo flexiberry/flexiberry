@@ -7,10 +7,14 @@
     "apps/*"
   ],
   "scripts": {
+    "build": "pnpm -r build",
+    "dev": "pnpm -r dev",
     "test": "echo \"Error: no test specified\" && exit 1",
     "runui": "cd ./apps/ui && npm run dev ",
     "cli": "cd ./packages/berrycore && npm run start:cli ",
-    "buildcore": "cd ./packages/berrycore && npm run build "
+    "buildcore": "cd ./packages/berrycore && npm run build ",
+    "lint": "eslint . --ext .ts,.tsx --fix",
+    "lint:check": "eslint . --ext .ts,.tsx"
   },
   "keywords": [
     "flexiberry",
@@ -30,6 +34,11 @@
   "devDependencies": {
     "@types/node": "^20.14.11",
     "ts-node": "^10.9.2",
-    "typescript": "^5.5.3"
+    "typescript": "^5.5.3",
+    "@typescript-eslint/eslint-plugin": "^7.0.0",
+    "@typescript-eslint/parser": "^7.0.0",
+    "eslint": "^8.56.0",
+    "eslint-import-resolver-typescript": "^3.6.1",
+    "eslint-plugin-import": "^2.29.1"
   }
 }

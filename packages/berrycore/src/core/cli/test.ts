@@ -12,7 +12,7 @@ export class Test {
 
     const api = ApiBuilder.getApi("API");
     if (api) {
-      let resp = new ApiCaller(api).callApi();
+      const resp = new ApiCaller(api).callApi();
       resp.then((resp) => {
         console.log(resp);
       });

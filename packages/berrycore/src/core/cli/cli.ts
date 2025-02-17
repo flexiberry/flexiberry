@@ -1,20 +1,16 @@
-import chalk from "chalk";
 import readline from "readline";
-import { showLoadingSpinner, stopLoadingSpinner } from "../util/loader";
+import { showLoadingSpinner } from "../util/loader";
 import { BerryCore } from "../berrycore";
 import { BerryRunner } from "../util/runner";
 import { RUNNER_EVENT } from "../../enum/runner.event";
 import { FileUtils } from "../functions/file";
 import { Lexer } from "../../lang/tokenizer/lexer";
-import Parser from "../../lang/ast/AstParser";
-import { TokenType, TokenTypeValueOf } from "../../lang/tokenizer/tokenType";
+import { TokenTypeValueOf } from "../../lang/tokenizer/tokenType";
 import { printTable } from "console-table-printer";
 import { CProgramBody } from "../../lang/ast/AstImpl";
 import { Producer } from "../producer/producer";
-import { EnvBuilder } from "../builder/env.builder";
-import { VarBuilder } from "../builder/var.builder";
-import { ApiBuilder } from "../builder/api.builder";
 import { Test } from "./test";
+import chalk from "chalk";
 
 const rl = readline.createInterface({
   input: process.stdin,
@@ -123,7 +119,7 @@ async function parseFile(): Promise<any> {
 function runLexer() {
   console.time("Time");
 
-  let fileContent = FileUtils.loadFile(
+  const fileContent = FileUtils.loadFile(
     "/Users/rinturajc/lib_projects/Flexiberry/flexiberry/packages/berrycore/src/_fake_data/sample.fb"
   );
 
@@ -131,7 +127,7 @@ function runLexer() {
 
   // eval(`console.log('rintu')`); // Executes the uploaded code
 
-  let lexer = new Lexer(fileContent);
+  const lexer = new Lexer(fileContent);
   const tokens = lexer.tokenize();
   console.timeLog("Time", "tokenized");
 
@@ -144,12 +140,12 @@ function runLexer() {
     }))
   );
 
-  let program = new CProgramBody().build(tokens);
+  const program = new CProgramBody().build(tokens);
 
   console.log(JSON.stringify(program.getAst(), null, 2));
 
-  let producer = new Producer();
-  let pro = producer.build(program.getAst());
+  const producer = new Producer();
+  const pro = producer.build(program.getAst());
   console.log(JSON.stringify(pro, null, 2));
 
   // console.dir(program);

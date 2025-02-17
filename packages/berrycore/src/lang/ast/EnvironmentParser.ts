@@ -1,11 +1,11 @@
-import { Environment, NodeType, Statement } from "./Ast";
+import { type Environment, NodeType, type Statement } from "./Ast";
 import { TokenType } from "../tokenizer/tokenType";
 import { BaseParser } from "./BaseParser";
 
 export class EnvironmentParser extends BaseParser {
   parseEnv(): Statement {
     const isEnv = this.eat().type == TokenType.Env;
-    let values: string[] = [];
+    const values: string[] = [];
 
     while (
       this.at().type == TokenType.Comma ||
@@ -16,7 +16,7 @@ export class EnvironmentParser extends BaseParser {
         continue;
       }
       if (this.at().type == TokenType.Value) {
-        let v = this.eat().value;
+        const v = this.eat().value;
         values.push(v);
         continue;
       }

@@ -2,7 +2,7 @@ import { stat } from "fs";
 
 import { CommentReader } from "./commentReader";
 import { KeyValuePair } from "./keyValuePair";
-import { CReader, Reader } from "./reader";
+import { CReader, type Reader } from "./reader";
 import { isWhitespace, isComment } from "../../util";
 import { Token } from "../token";
 import { TokenType } from "../tokenType";
@@ -15,7 +15,7 @@ export class CheckReader extends CReader implements Reader {
     super(input, position);
   }
   read(): Token[] {
-    let tkns: Token[] = [];
+    const tkns: Token[] = [];
 
     tkns.push(this.readcheck());
 
@@ -66,11 +66,11 @@ export class CheckReader extends CReader implements Reader {
   }
 
   private readExpression(): Token[] {
-    let tkns: Token[] = [];
-    let lineStart = this.position;
+    const tkns: Token[] = [];
+    const lineStart = this.position;
     tkns.push(Token.from("-", TokenType.Hyphen, lineStart, this.position));
     this.position++;
-    let hasLogicalOperator: Boolean = false;
+    let hasLogicalOperator: boolean = false;
     do {
       // Read left hand side (identifier)
       tkns.push(Token.from("Lhs", TokenType.Lhs, lineStart, this.position));
@@ -99,7 +99,7 @@ export class CheckReader extends CReader implements Reader {
   }
 
   private hasLogicalOperator(
-    hasLogicalOperator: Boolean,
+    hasLogicalOperator: boolean,
     start: number,
     tkns: Token[]
   ) {
@@ -182,7 +182,7 @@ export class CheckReader extends CReader implements Reader {
         this.position++;
       }
     }
-    let value = this.input.substring(start, this.position);
+    const value = this.input.substring(start, this.position);
 
     tkns.push(Token.from(value, tokenType, start, this.position));
     while (

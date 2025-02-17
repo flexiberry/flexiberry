@@ -1,11 +1,11 @@
-import { ApiStatement, NodeType } from "./Ast";
+import { type ApiStatement, NodeType } from "./Ast";
 import { TokenType } from "../tokenizer/tokenType";
 import { BaseParser } from "./BaseParser";
 import { KeyValueParser } from "./KeyValueParser";
 
 export class ApiParser extends BaseParser {
   parseApi(): ApiStatement {
-    let api: ApiStatement = {
+    const api: ApiStatement = {
       kind: NodeType.ApiFunction,
       identifier: "",
       title: "",

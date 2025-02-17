@@ -1,10 +1,10 @@
-import { NodeType, Step } from "../../lang/ast/Ast";
+import { NodeType, type Step } from "../../lang/ast/Ast";
 import { SequenceGenerator } from "../util/SequenceGenerator";
 import { CaptureProducer } from "./capture.producer";
 import { CheckProducer } from "./check.producer";
-import { StepCoreModel } from "./core.model";
+import { type StepCoreModel } from "./core.model";
 import { ParamsProducer } from "./params.producer";
-import { IProducer, ProducerError } from "./producer";
+import { type IProducer, ProducerError } from "./producer";
 
 export class StepProducer implements IProducer<StepCoreModel, Step> {
   private captureProducer: CaptureProducer = new CaptureProducer();

@@ -1,7 +1,7 @@
 import { isWhitespace } from "../../util";
 import { Token } from "../token";
 import { TokenType } from "../tokenType";
-import { CReader, Reader } from "./reader";
+import { CReader, type Reader } from "./reader";
 
 export class EnvReader extends CReader implements Reader {
   constructor(input: string, position: number) {
@@ -22,7 +22,7 @@ export class EnvReader extends CReader implements Reader {
   }
 
   read(): Token[] {
-    let tkns: Token[] = [];
+    const tkns: Token[] = [];
     let start = this.position;
     let envValues = "";
 

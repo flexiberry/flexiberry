@@ -1,10 +1,10 @@
-import { NodeType, Scope, Variable, VariableKv } from "./Ast";
+import { NodeType, Scope, type Variable, type VariableKv } from "./Ast";
 import { TokenType } from "../tokenizer/tokenType";
 import { BaseParser } from "./BaseParser";
 
 export class VariableParser extends BaseParser {
   parseStore(): Variable {
-    let store: Variable = {
+    const store: Variable = {
       comments: "",
       identifier: "",
       kind: NodeType.Variable,
@@ -19,7 +19,7 @@ export class VariableParser extends BaseParser {
 
     if (this.at().type === TokenType.Pointer) {
       this.eat();
-      let v = this.expect(
+      const v = this.expect(
         TokenType.Pointed,
         "Var pointer is expected following pointer"
       );
@@ -33,12 +33,12 @@ export class VariableParser extends BaseParser {
 
     do {
       this.expect(TokenType.Hyphen, "Missing Hyphen in Var decleration ");
-      let key = this.expect(
+      const key = this.expect(
         TokenType.Identifier,
         "Missing Identifier in Var decleration "
       );
 
-      let kv: VariableKv = {
+      const kv: VariableKv = {
         dataType: "number",
         key: key.value,
         kind: NodeType.VariableKeyValue,
@@ -58,7 +58,7 @@ export class VariableParser extends BaseParser {
         this.eat();
       }
 
-      let value = this.expect(
+      const value = this.expect(
         TokenType.Scalar,
         "Missing Value in Var Key Value decleration  "
       );

@@ -1,4 +1,4 @@
-import { CReader, Reader } from "./reader";
+import { CReader, type Reader } from "./reader";
 import { KeyValuePair } from "./keyValuePair";
 import { isWhitespace } from "../../util";
 import { Token } from "../token";
@@ -6,7 +6,7 @@ import { TokenType } from "../tokenType";
 
 export class VarReader extends CReader implements Reader {
   read(): Token[] {
-    let tkns: Token[] = [];
+    const tkns: Token[] = [];
     let start = this.position;
     let value = "";
     tkns.push(this.readVar());
@@ -33,7 +33,7 @@ export class VarReader extends CReader implements Reader {
       this.position++; // Move to the next
     }
 
-    if (!!value) {
+    if (value) {
       tkns.push(Token.from(value, TokenType.Title, start, this.position));
       value = "";
       this.position++; // Move to the next
@@ -42,7 +42,7 @@ export class VarReader extends CReader implements Reader {
     // Parse key-value pairs until empty line
     while (this.position < this.input.length) {
       // Skip whitespace at start of line
-      let lineStart = this.position;
+      const lineStart = this.position;
       while (
         this.position < this.input.length &&
         isWhitespace(this.input[this.position]) &&

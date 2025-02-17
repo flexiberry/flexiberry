@@ -1,4 +1,4 @@
-import { KV } from "./types";
+import type { KV } from "./types";
 import { TokenType, TokenTypeValueOf } from "../tokenizer/tokenType";
 import { BaseParser } from "./BaseParser";
 

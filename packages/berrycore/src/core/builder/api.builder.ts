@@ -1,6 +1,4 @@
-import exp from "constants";
-import { ApiCoreModel, VarCoreModel } from "../producer/core.model";
-import { VarMap } from "./var.builder";
+import type { ApiCoreModel } from "../producer/core.model";
 
 export type ApiModel = {
   url?: string;

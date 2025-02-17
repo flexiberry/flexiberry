@@ -1,7 +1,7 @@
 import { title } from "process";
-import { ApiStatement, NodeType } from "../../lang/ast/Ast";
-import { ApiCoreModel } from "./core.model";
-import { IProducer, ProducerError } from "./producer";
+import { type ApiStatement, NodeType } from "../../lang/ast/Ast";
+import type { ApiCoreModel } from "./core.model";
+import { type IProducer, ProducerError } from "./producer";
 
 export class ApiProducer implements IProducer<ApiCoreModel, ApiStatement> {
   build(ast: ApiStatement): ApiCoreModel {
@@ -10,7 +10,7 @@ export class ApiProducer implements IProducer<ApiCoreModel, ApiStatement> {
         "Invalid Node. expected node is " + NodeType[NodeType.ApiFunction]
       );
 
-    let interPolation: string[] = [];
+    const interPolation: string[] = [];
     if (ast.sturct.body !== undefined) {
       interPolation.push(...this.extractInterpolation(ast.sturct.body));
     }

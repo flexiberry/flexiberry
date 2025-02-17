@@ -1,10 +1,10 @@
-import { ProgramBody } from "../../lang/ast/Ast";
+import type { ProgramBody } from "../../lang/ast/Ast";
 import { ApiBuilder } from "../builder/api.builder";
 import { EnvBuilder } from "../builder/env.builder";
 import { VarBuilder } from "../builder/var.builder";
 import { Test } from "../cli/test";
 import { ApiProducer } from "./api.producer";
-import { CoreModel, TaskCoreModel } from "./core.model";
+import type { CoreModel } from "./core.model";
 import { EnvProducer } from "./env.producer";
 import { TaskProducer } from "./task.producer";
 import { VarProducer } from "./var.producer";
@@ -37,14 +37,14 @@ export class Producer implements IProducer<CoreModel, ProgramBody> {
       throw new ProducerError("Invalid AST: Programs are not set or invalid.");
     }
 
-    let e = this.envProducer.build(ast.environment);
-    let v = (ast.variables ?? [])
+    const e = this.envProducer.build(ast.environment);
+    const v = (ast.variables ?? [])
       .map((x) => this.varProducer.build(x))
       .flatMap((x) => x);
-    let a = ast.api.map((x) => this.apiProducer.build(x));
-    let t = ast.tasks.map((x, i) => this.taskProducer.build(x, i));
+    const a = ast.api.map((x) => this.apiProducer.build(x));
+    const t = ast.tasks.map((x, i) => this.taskProducer.build(x, i));
 
-    let core: CoreModel = {
+    const core: CoreModel = {
       apis: a,
       environments: e,
       variables: v,

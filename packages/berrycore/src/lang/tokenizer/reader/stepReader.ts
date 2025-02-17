@@ -2,7 +2,7 @@ import { isWhitespace, isComment } from "../../util";
 import { Token } from "../token";
 import { TokenType } from "../tokenType";
 import { CommentReader } from "./commentReader";
-import { CReader, Reader } from "./reader";
+import { CReader, type Reader } from "./reader";
 
 export class StepReader extends CReader implements Reader {
   constructor(input: string, position: number) {
@@ -10,7 +10,7 @@ export class StepReader extends CReader implements Reader {
   }
 
   read(): Token[] {
-    let tkns: Token[] = [];
+    const tkns: Token[] = [];
 
     tkns.push(this.readStepKeyword());
 
@@ -76,7 +76,7 @@ export class StepReader extends CReader implements Reader {
 
   private readIdentifier(): Token {
     this.position++;
-    let start = this.position;
+    const start = this.position;
 
     while (
       this.position < this.input.length &&

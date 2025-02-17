@@ -1,7 +1,7 @@
-import { Check, Condition, NodeType } from "../../lang/ast/Ast";
+import { type Check, type Condition, NodeType } from "../../lang/ast/Ast";
 import { SequenceGenerator } from "../util/SequenceGenerator";
-import { CheckCoreModel, ConditionCoreModel } from "./core.model";
-import { IProducer, ProducerError } from "./producer";
+import type { CheckCoreModel, ConditionCoreModel } from "./core.model";
+import { type IProducer, ProducerError } from "./producer";
 
 export class CheckProducer implements IProducer<CheckCoreModel, Check> {
   build(ast: Check): CheckCoreModel {

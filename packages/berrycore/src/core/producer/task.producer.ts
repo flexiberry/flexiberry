@@ -1,7 +1,7 @@
-import { NodeType, Task } from "../../lang/ast/Ast";
+import { NodeType, type Task } from "../../lang/ast/Ast";
 import { SequenceGenerator } from "../util/SequenceGenerator";
-import { TaskCoreModel } from "./core.model";
-import { IProducer, ProducerError } from "./producer";
+import type { TaskCoreModel } from "./core.model";
+import { type IProducer, ProducerError } from "./producer";
 import { StepProducer } from "./step.producer";
 
 export class TaskProducer implements IProducer<TaskCoreModel, Task> {

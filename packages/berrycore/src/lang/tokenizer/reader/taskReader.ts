@@ -2,7 +2,7 @@ import { isComment } from "../../util";
 import { Token } from "../token";
 import { TokenType } from "../tokenType";
 import { CommentReader } from "./commentReader";
-import { CReader, Reader } from "./reader";
+import { CReader, type Reader } from "./reader";
 
 export class TaskReader extends CReader implements Reader {
   constructor(input: string, position: number) {
@@ -10,14 +10,14 @@ export class TaskReader extends CReader implements Reader {
   }
 
   read(): Token[] {
-    let tkns: Token[] = [];
+    const tkns: Token[] = [];
 
     tkns.push(this.readTaskKeyword());
 
     let value = "";
 
     // Handle any trailing comments
-    let start = this.position;
+    const start = this.position;
     while (
       this.position < this.input.length &&
       this.input[this.position] !== "\n"
