@@ -3,7 +3,7 @@
 // initialize the application
 
 import { Command } from "commander";
-import { handleInput } from "./core/cli/cli.js";
+import { handleInput } from "./core/cli/cli";
 // import { handleInput } from "./core/cli/cli";
 
 // import Parser from "./lang/ast/AstParser.js";

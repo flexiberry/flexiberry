@@ -1,4 +1,4 @@
-import { Main } from "./_cli/main.js";
+import { Main } from "./_cli/main";
 
 console.log("FlexiBerry CLI v0.0.1");
 

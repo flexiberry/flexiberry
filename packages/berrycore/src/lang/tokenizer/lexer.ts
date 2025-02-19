@@ -19,7 +19,7 @@ import { CheckReader } from "./reader/checkReader";
 import { CommentReader } from "./reader/commentReader";
 import { EnvReader } from "./reader/envReader";
 import { ParamsReader } from "./reader/paramsReader";
-import { StepReader } from "./reader/stepReader.js";
+import { StepReader } from "./reader/stepReader";
 import { TaskReader } from "./reader/taskReader";
 import { VarReader } from "./reader/varReader";
 import { Token } from "./token";

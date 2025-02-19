@@ -3,11 +3,9 @@
   "version": "1.0.0",
   "description": "Cli package for flexiberry",
   "main": "src/index.ts",
-  "type": "module",
   "types": "dist/index.d.ts",
   "scripts": {
-    "start": "node --import ./loader.js src/index.ts",
-    "dev": "nodemon --exec 'node --import ./loader.js' src/index.ts",
+    "dev": "nodemon  src/index.ts",
     "build": "tsc",
     "clean": "rm -rf dist"
   },
