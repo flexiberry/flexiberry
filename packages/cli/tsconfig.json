@@ -4,7 +4,12 @@
     "rootDir": "./src",
     "outDir": "./dist",
     "sourceMap": true,
-    "resolveJsonModule": true
+    "resolveJsonModule": true,
+    "declaration": true,
+    "declarationMap": true,
+    "module": "CommonJS",
+    "moduleResolution": "Node",
+    "target": "ESNext"
   },
   "include": ["src"],
   "exclude": ["node_modules", "dist"]

@@ -1,14 +1,15 @@
 {
-  "name": "berrycore",
+  "name": "@flexiberry/berrycore",
   "version": "1.0.0",
   "description": "",
-  "main": "src/index.ts",
+  "main": "./dist/index.js",
+  "type": "commonjs",
   "bin": {
     "berrycore": "./dist/index.js"
   },
   "scripts": {
     "start": "node --no-warnings --loader ts-node/esm src/index.ts -i",
-    "dev": "nodemon src/index.ts",
+    "dev": "nodemon src/index.ts --input",
     "build": "tsc",
     "clean": "rm -rf dist"
   },

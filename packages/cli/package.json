@@ -1,21 +1,21 @@
 {
-  "name": "cli",
+  "name": "@flexiberry/cli",
   "version": "1.0.0",
   "description": "Cli package for flexiberry",
   "main": "src/index.ts",
   "types": "dist/index.d.ts",
   "scripts": {
-    "dev": "nodemon  src/index.ts",
+    "dev": "nodemon  src/index.ts -i",
     "build": "tsc",
     "clean": "rm -rf dist"
   },
   "keywords": [],
   "author": "rintu raj.c",
   "license": "MIT",
+  "dependencies": {
+    "@flexiberry/berrycore": "workspace:*"
+  },
   "devDependencies": {
-    "@types/node": "^20.14.11",
-    "nodemon": "^3.1.0",
-    "ts-node": "^10.9.2",
-    "typescript": "^5.0.0"
+    "nodemon": "^3.1.0"
   }
 }

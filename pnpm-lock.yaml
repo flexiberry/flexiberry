@@ -59,6 +59,9 @@ importers:
       '@codemirror/view':
         specifier: ^6.34.3
         version: 6.34.3
+      '@flexiberry/berrycore':
+        specifier: workspace:*
+        version: link:../../packages/berrycore
       '@lezer/common':
         specifier: ^1.2.0
         version: 1.2.3
@@ -71,9 +74,6 @@ importers:
       '@lucide/lab':
         specifier: ^0.1.2
         version: 0.1.2
-      berrycore:
-        specifier: workspace:*
-        version: link:../../packages/berrycore
       bits-ui:
         specifier: ^0.21.12
         version: 0.21.12(svelte@4.2.18)
@@ -231,19 +231,14 @@ importers:
         version: 5.5.3
 
   packages/cli:
+    dependencies:
+      '@flexiberry/berrycore':
+        specifier: workspace:*
+        version: link:../berrycore
     devDependencies:
-      '@types/node':
-        specifier: ^20.14.11
-        version: 20.14.11
       nodemon:
         specifier: ^3.1.0
         version: 3.1.4
-      ts-node:
-        specifier: ^10.9.2
-        version: 10.9.2(@types/node@20.14.11)(typescript@5.5.3)
-      typescript:
-        specifier: ^5.0.0
-        version: 5.5.3
 
 packages:
 
