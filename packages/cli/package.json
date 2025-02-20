@@ -2,20 +2,31 @@
   "name": "@flexiberry/cli",
   "version": "1.0.0",
   "description": "Cli package for flexiberry",
-  "main": "src/index.ts",
+  "main": "dist/index.js",
   "types": "dist/index.d.ts",
+  "bin": {
+    "flexiberry": "./dist/index.js"
+  },
+  "type": "commonjs",
   "scripts": {
-    "dev": "nodemon  src/index.ts -i",
+    "dev": "nodemon src/index.ts",
     "build": "tsc",
-    "clean": "rm -rf dist"
+    "clean": "rm -rf dist",
+    "prepare": "npm run build"
   },
   "keywords": [],
   "author": "rintu raj.c",
   "license": "MIT",
   "dependencies": {
-    "@flexiberry/berrycore": "workspace:*"
+    "@flexiberry/berrycore": "workspace:*",
+    "chalk": "^5.4.1",
+    "chalk-animation": "^2.0.3",
+    "commander": "^12.0.0",
+    "figlet": "^1.7.0"
   },
   "devDependencies": {
+    "@types/chalk-animation": "^1.6.3",
+    "@types/figlet": "^1.7.0",
     "nodemon": "^3.1.0"
   }
 }

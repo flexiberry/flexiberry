@@ -1,17 +1,39 @@
-import { Main } from "./_cli/main";
-import { Lexer } from "@flexiberry/berrycore";
+#!/usr/bin/env node
 
-console.log("FlexiBerry CLI v0.0.1");
+import { Command } from "commander";
+import { version } from "../package.json";
+import figlet from "figlet";
 
-export const name = "FlexiBerry";
+import chalkAnimation from "chalk-animation";
 
-console.log("Version: " + "0.0.1");
+const program = new Command();
 
-console.log("Hello, World!");
+program
+  .name("flexiberry")
+  .description("FlexiBerry CLI - A powerful tool for testing your apis")
+  .version(version);
 
-console.error("Error: " + "This is an error message");
+program
+  .command("cli")
+  .description("Welcome to FlexiBerry CLI")
+  .action(() => {
+    console.log("Welcome to FlexiBerry CLI!");
+  });
 
-Main.main();
+const text =
+  "\n\n" +
+  figlet.textSync("FlexiBerry", {
+    horizontalLayout: "full",
+    whitespaceBreak: true,
+    font: "Big Money-sw",
+    showHardBlanks: true,
+  });
+const rainbow = chalkAnimation.rainbow(text);
+rainbow.render(); // Animation starts
+console.log("Version: " + version);
+console.log("Welcome to FlexiBerry CLI! \n\n");
 
-const lexer = new Lexer("Hello, World!");
-console.log(lexer.tokenize());
+setTimeout(() => {
+  rainbow.stop(); // Stop the animation after a delay
+  program.parse();
+}, 500);
