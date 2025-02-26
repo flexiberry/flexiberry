@@ -4,15 +4,15 @@
   "description": "Cli package for flexiberry",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
+  "type": "module",
   "bin": {
     "flexiberry": "./dist/index.js"
   },
-  "type": "commonjs",
   "scripts": {
-    "dev": "nodemon src/index.ts",
+    "dev": "tsx src/index.ts",
     "build": "tsc",
     "clean": "rm -rf dist",
-    "prepare": "npm run build"
+    "prepare": "npm run clean && npm run build"
   },
   "keywords": [],
   "author": "rintu raj.c",
@@ -27,6 +27,8 @@
   "devDependencies": {
     "@types/chalk-animation": "^1.6.3",
     "@types/figlet": "^1.7.0",
-    "nodemon": "^3.1.0"
+    "@types/node": "^20.11.0",
+    "tsx": "^4.7.1",
+    "typescript": "^5.3.3"
   }
 }

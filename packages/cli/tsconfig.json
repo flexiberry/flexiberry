@@ -7,9 +7,13 @@
     "resolveJsonModule": true,
     "declaration": true,
     "declarationMap": true,
-    "module": "CommonJS",
-    "moduleResolution": "Node",
-    "target": "ESNext"
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "target": "ES2022",
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "strict": true,
+    "forceConsistentCasingInFileNames": true
   },
   "include": ["src"],
   "exclude": ["node_modules", "dist"]
