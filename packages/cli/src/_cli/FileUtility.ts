@@ -5,16 +5,14 @@ import * as path from "path";
 export class FileUtility {
   static create(file: string, template?: string, force?: boolean) {
     console.log(chalk.blue("Creating a new file... \n"));
-    // Validate file extension
-    if (!file.endsWith(".berry")) {
-      file = `${file}.berry`;
-    }
-
-    // Create file path
-    const filePath = path.join(process.cwd(), file);
+    // Validate file extension and create file path
+    const filePath = path.join(
+      process.cwd(),
+      file.endsWith(".berry") ? file : `${file}.berry`
+    );
 
     try {
-      // Check if file exists
+      // Check if file exists and handle accordingly
       if (fs.existsSync(filePath)) {
         if (!force) {
           console.log(
