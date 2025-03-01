@@ -87,12 +87,15 @@ export class FileUtility {
 
   static async updateBerryCode(content: string) {
     const fileSelected = db.get("selectedFile");
-    if (!fileSelected) {
-      consola.error("❌ No file selected");
+
+    if (!fileSelected || !fs.existsSync(fileSelected.path)) {
+      consola.error("❌ No file selected or file does not exist");
       return;
     }
+
     consola.ready(chalk.green(" File found!"));
     consola.info("Selected File Name: ", chalk.blue(` ${fileSelected.name}`));
+
     fs.appendFileSync(fileSelected.path, "\n\n".concat(content));
     consola.success(" File updated successfully!");
 
