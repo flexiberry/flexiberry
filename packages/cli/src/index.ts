@@ -14,6 +14,7 @@ const packageJson = JSON.parse(
 
 import { FileUtility } from "./_cli/FileUtility.js";
 import { Cli } from "./_cli/Cli.js";
+import { Main } from "./_cli/main.js";
 
 const program = new Command();
 program
@@ -37,6 +38,14 @@ program
   .description("Create a new .berry file with specified template")
   .action((file, template, options) => {
     FileUtility.create(file, template, options.force);
+  });
+
+program
+  .command("select")
+  .argument("[file]", "File name to select")
+  .description("Select a  *.berry file from the current directory")
+  .action(async (file) => {
+    await FileUtility.select(file);
   });
 
 program.parse();

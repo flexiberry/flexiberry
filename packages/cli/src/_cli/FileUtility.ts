@@ -3,49 +3,79 @@
 import chalk from "chalk";
 import * as fs from "fs";
 import * as path from "path";
+import { consola } from "consola";
 
 export class FileUtility {
   static create(file: string, template?: string, force?: boolean) {
-    console.log(chalk.blue("Creating a new file... \n"));
-    // Validate file extension and create file path
+    consola.info(chalk.blue("Creating a new file... \n"));
     const filePath = path.join(
       process.cwd(),
       file.endsWith(".berry") ? file : `${file}.berry`
     );
-
     try {
-      // Check if file exists and handle accordingly
       if (fs.existsSync(filePath)) {
         if (!force) {
-          console.log(
+          consola.error(
             chalk.red(
               "\nError: File already exists. Use -f or --force to overwrite"
             )
           );
           return;
         } else {
-          console.log(chalk.yellow("\nOverwriting existing file..."));
+          consola.warn(chalk.yellow("\nOverwriting existing file..."));
           fs.unlinkSync(filePath);
         }
       }
-
-      // Create the file
       fs.writeFileSync(filePath, template || "");
 
-      console.log(chalk.green("\nFile created successfully! ✨"));
-      console.log(chalk.blue(`\nLocation: ${filePath}`));
+      consola.box(
+        chalk.green("\nFile created successfully! ✨"),
+        chalk.blue(`\nLocation: ${filePath}`)
+      );
 
       if (template) {
-        console.log(chalk.gray(`Template: ${template}`));
+        consola.log(chalk.gray(`Template: ${template}`));
       }
     } catch (error) {
-      console.error(
+      consola.error(
         chalk.red("\nError creating file:"),
         error instanceof Error ? error.message : "Unknown error"
       );
       process.exit(1);
     }
+  }
 
-    console.log("\n");
+  static async select(file?: string) {
+    if (!!file) {
+      consola.start(chalk.blue(`Selecting file: ${file}... \n`));
+      const filePath = path.join(process.cwd(), file);
+      if (!fs.existsSync(filePath)) {
+        console.log(chalk.red(`😬 Error: File not found at ${filePath}`));
+        return;
+      }
+
+      consola.box(" 🥳 File found!", chalk.blue(`Location: ${filePath}`));
+      consola.info(chalk.green("✅ File selected!"));
+      return;
+    }
+
+    consola.start(chalk.blue("Selecting a file... \n"));
+    const files = fs.readdirSync(process.cwd());
+    const projectType = await consola.prompt(
+      "Files in the current directory. Pick a file",
+      {
+        type: "select",
+        options: files.filter((x) => x.endsWith(".berry")),
+        cancel: "undefined",
+      }
+    );
+
+    if (!projectType) {
+      consola.error("❌ No file selected");
+      return;
+    }
+    const filePath = path.join(process.cwd(), projectType);
+    consola.box("✔️", chalk.blue(`Location: ${filePath}`));
+    consola.info(chalk.green("✅ File selected!"));
   }
 }
