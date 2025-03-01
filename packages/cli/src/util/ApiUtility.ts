@@ -2,6 +2,7 @@ import consola from "consola";
 import { FormatUtil } from "../berry/FormatUtil.js";
 import { FileUtility } from "./FileUtility.js";
 import { createConsola } from "consola/core";
+import { intro, outro, spinner } from "@clack/prompts";
 
 export class ApiUtility {
   static add(
@@ -11,9 +12,16 @@ export class ApiUtility {
     console.log("Adding API", name, arg1);
   }
   static addFromCurl(name: any, curl: any) {
-    consola.start(`Adding API from cURL: ${name}`);
-
+    intro(`📦 Adding API from cURL `);
+    const s = spinner();
+    s.start("Coverting cURL to Berry");
     const apiCode = FormatUtil.convertCurlToBerry(curl, name);
-    FileUtility.updateBerryCode(apiCode);
+    s.stop("Convertion completed successfully");
+    const status = FileUtility.updateBerryCode(apiCode);
+    outro(
+      status == "Success"
+        ? "Successfully updated ✅"
+        : "Failed to update berry code 😔"
+    );
   }
 }

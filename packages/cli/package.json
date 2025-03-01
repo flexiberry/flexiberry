@@ -18,6 +18,7 @@
   "author": "rintu raj.c",
   "license": "MIT",
   "dependencies": {
+    "@clack/prompts": "^0.10.0",
     "@flexiberry/berrycore": "workspace:*",
     "chalk": "^5.4.1",
     "chalk-animation": "^2.0.3",
