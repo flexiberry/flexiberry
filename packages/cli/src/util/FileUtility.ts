@@ -4,6 +4,7 @@ import chalk from "chalk";
 import * as fs from "fs";
 import * as path from "path";
 import { consola } from "consola";
+import { db } from "../index.js";
 
 export class FileUtility {
   static create(file: string, template?: string, force?: boolean) {
@@ -75,7 +76,26 @@ export class FileUtility {
       return;
     }
     const filePath = path.join(process.cwd(), projectType);
+    db.set("selectedFile", {
+      path: filePath,
+      name: projectType,
+      date: new Date().toISOString(),
+    });
     consola.box("✔️", chalk.blue(`Location: ${filePath}`));
     consola.info(chalk.green("✅ File selected!"));
+  }
+
+  static async updateBerryCode(content: string) {
+    const fileSelected = db.get("selectedFile");
+    if (!fileSelected) {
+      consola.error("❌ No file selected");
+      return;
+    }
+    consola.ready(chalk.green(" File found!"));
+    consola.info("Selected File Name: ", chalk.blue(` ${fileSelected.name}`));
+    fs.appendFileSync(fileSelected.path, "\n\n".concat(content));
+    consola.success(" File updated successfully!");
+
+    return fileSelected;
   }
 }
