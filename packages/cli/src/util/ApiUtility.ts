@@ -1,7 +1,5 @@
-import consola from "consola";
 import { FormatUtil } from "../berry/FormatUtil.js";
 import { FileUtility } from "./FileUtility.js";
-import { createConsola } from "consola/core";
 import { intro, outro, spinner } from "@clack/prompts";
 
 export class ApiUtility {

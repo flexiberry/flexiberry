@@ -3,13 +3,12 @@
 import chalk from "chalk";
 import * as fs from "fs";
 import * as path from "path";
-import { consola } from "consola";
 import { db } from "../index.js";
 import { intro, log, note, outro, select, spinner } from "@clack/prompts";
 
 export class FileUtility {
   static create(file: string, template?: string, force?: boolean) {
-    consola.info(chalk.blue("Creating a new file... \n"));
+    intro(chalk.blue("Creating a new file... \n"));
     const filePath = path.join(
       process.cwd(),
       file.endsWith(".berry") ? file : `${file}.berry`
@@ -17,33 +16,32 @@ export class FileUtility {
     try {
       if (fs.existsSync(filePath)) {
         if (!force) {
-          consola.error(
+          log.error(
             chalk.red(
               "\nError: File already exists. Use -f or --force to overwrite"
             )
           );
           return;
         } else {
-          consola.warn(chalk.yellow("\nOverwriting existing file..."));
+          log.warn(chalk.yellow("\nOverwriting existing file..."));
           fs.unlinkSync(filePath);
         }
       }
       fs.writeFileSync(filePath, template || "");
 
-      consola.box(
-        chalk.green("\nFile created successfully! ✨"),
-        chalk.blue(`\nLocation: ${filePath}`)
-      );
+      log.success(chalk.green("\nFile created successfully! ✨"));
+      log.message(chalk.blue(`\nLocation: ${filePath}`));
 
       if (template) {
-        consola.log(chalk.gray(`Template: ${template}`));
+        log.info(chalk.gray(`Template: ${template}`));
       }
+      outro("done");
     } catch (error) {
-      consola.error(
-        chalk.red("\nError creating file:"),
-        error instanceof Error ? error.message : "Unknown error"
+      log.error(
+        chalk.red("\nError creating file:") +
+          (error instanceof Error ? error.message : "Unknown error")
       );
-      process.exit(1);
+      outro(chalk.red("Error"));
     }
   }
 
