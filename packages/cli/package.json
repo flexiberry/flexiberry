@@ -12,7 +12,8 @@
     "dev": "tsx src/index.ts ",
     "build": "tsc",
     "clean": "rm -rf dist",
-    "prepare": "npm run clean && npm run build"
+    "prepare": "npm run clean && npm run build",
+    "install": "npm i -g ."
   },
   "keywords": [],
   "author": "rintu raj.c",

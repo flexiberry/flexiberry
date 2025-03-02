@@ -10,12 +10,11 @@ const packageJson = JSON.parse(
 
 import { FileUtility } from "./util/FileUtility.js";
 import { Cli } from "./util/Cli.js";
-import { ApiUtility } from "./util/ApiUtility.js";
-import { EnvUtility } from "./util/EnvUtility.js";
-import { StepUtility } from "./util/StepUtility.js";
-import { TaskUtility } from "./util/TaskUtility.js";
+
 import os from "os";
 import path from "path";
+import { log } from "@clack/prompts";
+import { AddCommand } from "./command/AddCommand.js";
 
 const systemDocumentFolder = path.join(os.homedir(), "Documents");
 
@@ -66,38 +65,7 @@ program
   .option("-b, --body <body>", "Request body")
   .description("Add a new configuration item")
   .action((type, name, options) => {
-    switch (type.toLowerCase()) {
-      case "api":
-        if (!name) throw new Error("Name is required for API");
-        if (options.curl) {
-          ApiUtility.addFromCurl(name, options.curl);
-        } else {
-          ApiUtility.add(name, {
-            url: options.url,
-            method: options.method,
-            headers: options.headers?.split(","),
-            body: options.body,
-          });
-        }
-        break;
-
-      case "env":
-        EnvUtility.add(name?.split(",") || []);
-        break;
-
-      case "task":
-        if (!name) throw new Error("Name is required for task");
-        TaskUtility.add(name);
-        break;
-
-      case "step":
-        if (!name) throw new Error("Name is required for step");
-        StepUtility.add(name, options);
-        break;
-
-      default:
-        console.error(`Unknown type: ${type}`);
-    }
+    AddCommand.run(type, name, options);
   });
 
 program.parse();
