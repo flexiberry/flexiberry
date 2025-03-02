@@ -4,28 +4,28 @@ import { EnvUtility } from "./../util/EnvUtility.js";
 import { StepUtility } from "./../util/StepUtility.js";
 import { TaskUtility } from "./../util/TaskUtility.js";
 
+export type CmdOptions = {
+  curl?: any;
+  url?: any;
+  method?: any;
+  headers?: string;
+  body?: any;
+  bodyType: any;
+};
+
 export class AddCommand {
-  static run(
-    type: string,
-    name: string,
-    options: { curl: any; url: any; method: any; headers: string; body: any }
-  ) {
+  static run(type: string, name: string, options: CmdOptions) {
     switch (type.toLowerCase()) {
       case "api":
         if (options.curl) {
           ApiUtility.addFromCurl(name, options.curl);
         } else {
-          ApiUtility.add(name, {
-            url: options.url,
-            method: options.method,
-            headers: options.headers?.split(","),
-            body: options.body,
-          });
+          ApiUtility.add(name, options);
         }
         break;
 
       case "env":
-        EnvUtility.add(name?.split(",") || []);
+        EnvUtility.add(name, options);
         break;
 
       case "task":
