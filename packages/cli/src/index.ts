@@ -15,6 +15,7 @@ import os from "os";
 import path from "path";
 import { log } from "@clack/prompts";
 import { AddCommand } from "./command/AddCommand.js";
+import { RunUtility } from "./util/RunUtility.js";
 
 const systemDocumentFolder = path.join(os.homedir(), "Documents");
 
@@ -66,6 +67,13 @@ program
   .description("Add a new configuration item")
   .action((type, name, options) => {
     AddCommand.run(type, name, options);
+  });
+program
+  .command("run")
+  .argument("[file]", "Enter the File name ")
+  .description("run .berry script")
+  .action((file, options) => {
+    RunUtility.run(file);
   });
 
 program.parse();

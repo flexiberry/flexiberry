@@ -11,6 +11,7 @@
     "start": "node --no-warnings --loader ts-node/esm src/index.ts -i",
     "dev": "nodemon src/index.ts --input",
     "build": "tsc",
+    "watch": "tsc --watch",
     "clean": "rm -rf dist"
   },
   "keywords": [],

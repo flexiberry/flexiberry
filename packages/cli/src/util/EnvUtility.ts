@@ -1,8 +1,8 @@
 import { intro, isCancel, log, outro, text } from "@clack/prompts";
 import { CmdOptions } from "../command/AddCommand.js";
-import { FormatUtil } from "../berry/FormatUtil.js";
 import { FileUtility } from "./FileUtility.js";
 import { outroMessage } from "./util.js";
+import { FormatUtil } from "@flexiberry/berrycore";
 
 export class EnvUtility {
   static async add(env: string, option: CmdOptions) {
@@ -11,8 +11,11 @@ export class EnvUtility {
 
     if (!!env && env.length > 0) {
       environment = env.split(",");
-      log.message("The environment details have been successfully created ➕");
-      outro("Completed ✅");
+      const code = FormatUtil.buildEnv(environment);
+      log.step("Code generated");
+      const status = FileUtility.updateBerryCode(code);
+
+      outro(outroMessage(status));
       return;
     }
 

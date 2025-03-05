@@ -1,4 +1,3 @@
-import { FormatUtil } from "../berry/FormatUtil.js";
 import { CmdOptions } from "../command/AddCommand.js";
 import { FileUtility } from "./FileUtility.js";
 import {
@@ -13,6 +12,7 @@ import {
   text,
 } from "@clack/prompts";
 import { outroMessage } from "./util.js";
+import { FormatUtil } from "@flexiberry/berrycore";
 
 export class ApiUtility {
   static async add(name: any, arg: CmdOptions) {

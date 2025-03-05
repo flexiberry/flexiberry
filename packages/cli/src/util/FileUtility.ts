@@ -91,6 +91,15 @@ export class FileUtility {
     log.success(chalk.green("✅ File selected!"));
   }
 
+  static getPreselectedFile() {
+    const fileSelected = db.get("selectedFile");
+    if (!fileSelected || !fs.existsSync(fileSelected.path)) {
+      log.error("❌ No file selected or file does not exist");
+      return;
+    }
+    return fileSelected.path;
+  }
+
   static updateBerryCode(content: string) {
     const fileSelected = db.get("selectedFile");
 
