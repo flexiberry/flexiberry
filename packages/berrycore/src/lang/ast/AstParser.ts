@@ -13,10 +13,6 @@ export default class Parser {
       kind: NodeType.Program,
       body: new CProgramBody().build(tokens) as ProgramBody,
     };
-
-    console.dir(program, {
-      colors: true,
-    });
     return program;
   }
 }

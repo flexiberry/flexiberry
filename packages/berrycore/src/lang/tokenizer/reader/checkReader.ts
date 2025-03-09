@@ -81,8 +81,6 @@ export class CheckReader extends CReader implements Reader {
       tkns.push(Token.from("Rhs", TokenType.Rhs, lineStart, this.position));
       start = this.readOperands(tkns);
 
-      console.log(this.input[this.position]);
-
       // Check if there is a logical operator after the current operand
       hasLogicalOperator = this.hasLogicalOperator(
         hasLogicalOperator,
@@ -92,8 +90,6 @@ export class CheckReader extends CReader implements Reader {
 
       this.position++;
     } while (hasLogicalOperator);
-
-    console.log(this.input[this.position]);
 
     return tkns;
   }

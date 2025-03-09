@@ -17,13 +17,10 @@ export class FileUtils {
       const filePathPattern = /^(.+)\/([^\/]+)$/;
 
       if (urlPattern.test(filePath)) {
-        console.log("Valid URL path.");
         return InputType.URL;
       } else if (jsonPattern.test(filePath)) {
-        console.log("Valid JSON file path.");
         return InputType.JSON;
       } else if (fs.existsSync(filePath) && filePathPattern.test(filePath)) {
-        console.log("Valid file path.");
         return InputType.FilePath;
       } else {
         console.error("Invalid path.");

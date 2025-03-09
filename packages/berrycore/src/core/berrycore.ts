@@ -29,6 +29,8 @@ export class BerryCore {
 
     const content = FileUtils.loadFile(filePath);
     // Parse the content
+    
+
     return this.parseContent(content);
   }
 }

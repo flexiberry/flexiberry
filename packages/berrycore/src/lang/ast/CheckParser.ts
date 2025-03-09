@@ -16,10 +16,8 @@ export class CheckParser extends BaseParser {
       this.eat(); // Consume hyphen
       const condition = this.parseCondition();
       check.conditions.push(...condition);
-      console.log(check);
 
       checkList.push(check);
-      console.log(this.at().value);
     }
 
     return checkList;

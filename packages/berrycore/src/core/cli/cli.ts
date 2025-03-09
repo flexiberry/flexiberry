@@ -13,9 +13,7 @@ export function runLexer() {
     "/Users/rinturajc/lib_projects/Flexiberry/flexiberry/packages/berrycore/src/_fake_data/sample.fb"
   );
 
-  console.log("Running lexer on file content...");
-
-  // eval(`console.log('rintu')`); // Executes the uploaded code
+  // eval(`// Executes the uploaded code
 
   const lexer = new Lexer(fileContent);
   const tokens = lexer.tokenize();
@@ -32,11 +30,8 @@ export function runLexer() {
 
   const program = new CProgramBody().build(tokens);
 
-  console.log(JSON.stringify(program.getAst(), null, 2));
-
   const producer = new Producer();
   const pro = producer.build(program.getAst());
-  console.log(JSON.stringify(pro, null, 2));
 
   // console.dir(program);
   console.timeEnd("Time");
