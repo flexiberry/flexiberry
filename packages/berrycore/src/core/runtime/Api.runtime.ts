@@ -3,51 +3,47 @@ import { VarReader } from "../../lang/tokenizer/reader/varReader";
 import { type ApiModel } from "../builder/api.builder";
 import { VarBuilder } from "../builder/var.builder";
 import { StringUtil } from "../util/StringUtil";
+import { ApiCoreModel } from "../producer/core.model";
+import axios from "axios";
+import { InterpolationUtil } from "../util/Interpolations";
 
-export class ApiCaller {
+export class ApiTemplate {
   constructor(private apiBuilder: ApiModel) {} // Assuming apiBuilder is passed in
 
-  async callApi() {
-    const url = this.buildUrl(this.apiBuilder.url);
-    const options: RequestInit = {
-      method: this.apiBuilder.method,
-      headers: this.buildHeaders(this.apiBuilder.header),
-      body: StringUtil.interpolateString(this.apiBuilder.body) ?? undefined,
-    };
-
-    if (!url) {
-      throw new Error(`API URL is not defined`);
+  /**
+   * Calls the API with the given name and arguments
+   * @param apiName The name of the API to call
+   * @param args The arguments to pass to the API
+   * @returns The result of the API call
+   */
+  public callApi(api: ApiCoreModel) {
+    const url = InterpolationUtil.replaceInterpolation(
+      api.url,
+      api.interpolation
+    );
+    const body = InterpolationUtil.replaceInterpolation(
+      api.body,
+      api.interpolation
+    );
+    const header: Record<string, string> = {};
+    for (const key in api.header) {
+      header[key] = InterpolationUtil.replaceInterpolation(
+        api.header[key],
+        api.interpolation
+      );
     }
 
-    log(`Calling API: ${url}`);
-    log(`Options: ${JSON.stringify(options)}`);
+    // log(`Calling API: ${api.method} ${url}`);
+    // log(`Body: ${body}`);
+    // log(`Header: ${header}`);
 
-    // const response = await fetch(url, options);
-    // if (!response.ok) {
-    //   throw new Error(`API call failed: ${response.statusText}`);
-    // }
-    // return response.json();
-  }
-  buildUrl(url: string | undefined) {
-    if (!url) {
-      return undefined;
-    }
-
-    url = StringUtil.interpolateString(url);
-
-    return url;
-  }
-
-  buildHeaders(
-    header: Record<string, string> | undefined
-  ): Headers | undefined {
-    if (!header) {
-      return undefined;
-    }
-    const headers = new Headers();
-    for (const [key, value] of Object.entries(header)) {
-      headers.append(key, StringUtil.interpolateString(value));
-    }
-    return headers;
+    // Build Axios Object
+    return axios({
+      method: api.method,
+      url: url,
+      data: body,
+      headers: header,
+      params: {},
+    });
   }
 }

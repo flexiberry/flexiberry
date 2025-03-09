@@ -3,6 +3,7 @@ import { ApiUtility } from "./../util/ApiUtility.js";
 import { EnvUtility } from "./../util/EnvUtility.js";
 import { StepUtility } from "./../util/StepUtility.js";
 import { TaskUtility } from "./../util/TaskUtility.js";
+import { VarUtility } from "../util/VarUtility.js";
 
 export type CmdOptions = {
   curl?: any;
@@ -11,6 +12,8 @@ export type CmdOptions = {
   headers?: string;
   body?: any;
   bodyType: any;
+  env?: any;
+  var?: any;
 };
 
 export class AddCommand {
@@ -37,7 +40,9 @@ export class AddCommand {
         if (!name) throw new Error("Name is required for step");
         StepUtility.add(name, options);
         break;
-
+      case "var":
+        VarUtility.add(name, options);
+        break;
       default:
         console.error(`Unknown type: ${type}`);
     }

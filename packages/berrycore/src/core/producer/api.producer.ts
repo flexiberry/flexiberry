@@ -2,6 +2,7 @@ import { title } from "process";
 import { type ApiStatement, NodeType } from "../../lang/ast/Ast";
 import type { ApiCoreModel } from "./core.model";
 import { type IProducer, ProducerError } from "./producer";
+import { InterpolationUtil } from "../util/Interpolations";
 
 export class ApiProducer implements IProducer<ApiCoreModel, ApiStatement> {
   build(ast: ApiStatement): ApiCoreModel {
@@ -12,15 +13,19 @@ export class ApiProducer implements IProducer<ApiCoreModel, ApiStatement> {
 
     const interPolation: string[] = [];
     if (ast.sturct.body !== undefined) {
-      interPolation.push(...this.extractInterpolation(ast.sturct.body));
+      interPolation.push(
+        ...InterpolationUtil.extractInterpolation(ast.sturct.body)
+      );
     }
     if (ast.sturct.url !== undefined) {
-      interPolation.push(...this.extractInterpolation(ast.sturct.url));
+      interPolation.push(
+        ...InterpolationUtil.extractInterpolation(ast.sturct.url)
+      );
     }
     if (ast.sturct.header !== undefined) {
       for (const key in ast.sturct.header) {
         interPolation.push(
-          ...this.extractInterpolation(ast.sturct.header[key])
+          ...InterpolationUtil.extractInterpolation(ast.sturct.header[key])
         );
       }
     }
@@ -38,16 +43,5 @@ export class ApiProducer implements IProducer<ApiCoreModel, ApiStatement> {
     };
 
     return a;
-  }
-  extractInterpolation(input: string): string[] {
-    const regex = /{{(.*?)}}/g;
-    const keys: string[] = [];
-    let match;
-
-    while ((match = regex.exec(input)) !== null) {
-      keys.push(match[1]); // Extract the key from the match
-    }
-
-    return keys;
   }
 }

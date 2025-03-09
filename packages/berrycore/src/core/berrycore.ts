@@ -1,4 +1,3 @@
-import { Lexer } from "../lang/tokenizer/lexer";
 import Parser from "../lang/ast/AstParser";
 import { FileUtils } from "./functions/file";
 import { InputType } from "../enum/misc";
@@ -29,7 +28,6 @@ export class BerryCore {
 
     const content = FileUtils.loadFile(filePath);
     // Parse the content
-    
 
     return this.parseContent(content);
   }

@@ -64,6 +64,8 @@ program
   .option("-m, --method <method>", "HTTP method")
   .option("-h, --headers <headers>", "Request headers (comma-separated)")
   .option("-b, --body <body>", "Request body")
+  .option("-e, --env <env>", "Environment ")
+  .option("-v, --var <var>", "Variables (comma-separated)")
   .description("Add a new configuration item")
   .action((type, name, options) => {
     AddCommand.run(type, name, options);

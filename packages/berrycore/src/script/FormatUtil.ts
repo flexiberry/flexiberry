@@ -42,6 +42,11 @@ export class FormatUtil {
     return template;
   }
 
+  static buildVar(title: string, variables: string[], env: string) {
+    let code = `Var ${!!env ? "@" + env : ""} ${title} \n - ${variables.join("\n - ")}`;
+    return code;
+  }
+
   static buildEnv(env: string[]) {
     return `Env ${env
       .filter((x) => x != null)

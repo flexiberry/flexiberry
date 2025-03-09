@@ -2,7 +2,6 @@ import type { ProgramBody } from "../../lang/ast/Ast";
 import { ApiBuilder } from "../builder/api.builder";
 import { EnvBuilder } from "../builder/env.builder";
 import { VarBuilder } from "../builder/var.builder";
-import { Test } from "../cli/test";
 import { ApiProducer } from "./api.producer";
 import type { CoreModel } from "./core.model";
 import { EnvProducer } from "./env.producer";
