@@ -8,7 +8,7 @@ import { intro, log, note, outro, select, spinner } from "@clack/prompts";
 
 export class FileUtility {
   static create(file: string, template?: string, force?: boolean) {
-    intro(chalk.blue("Creating a new file... \n"));
+    intro(chalk.blue("Creating new file..."));
     const filePath = path.join(
       process.cwd(),
       file.endsWith(".berry") ? file : `${file}.berry`
@@ -17,25 +17,23 @@ export class FileUtility {
       if (fs.existsSync(filePath)) {
         if (!force) {
           log.error(
-            chalk.red(
-              "\nError: File already exists. Use -f or --force to overwrite"
-            )
+            chalk.red("File already exists. Use -f or --force to overwrite.")
           );
           return;
         } else {
-          log.warn(chalk.yellow("\nOverwriting existing file..."));
+          log.warn(chalk.yellow("Overwriting existing file..."));
           fs.unlinkSync(filePath);
         }
       }
       fs.writeFileSync(filePath, template || "");
 
-      log.success(chalk.green("\nFile created successfully! ✨"));
-      log.message(chalk.blue(`\nLocation: ${filePath}`));
+      log.success(chalk.green("File created successfully ✨"));
+      log.message(chalk.blue(`Location: ${filePath}`));
 
       if (template) {
         log.info(chalk.gray(`Template: ${template}`));
       }
-      outro("done");
+      outro("Done");
     } catch (error) {
       log.error(
         chalk.red("\nError creating file:") +
@@ -47,19 +45,19 @@ export class FileUtility {
 
   static async select(file?: string) {
     if (!!file) {
-      intro(chalk.blue(`Selecting file: ${file}... \n`));
+      intro(chalk.blue(`Selecting file: ${file}...`));
       const filePath = path.join(process.cwd(), file);
       if (!fs.existsSync(filePath)) {
-        console.log(chalk.red(`😬 Error: File not found at ${filePath}`));
+        log.error(chalk.red(`File not found at ${filePath}`));
         return;
       }
-      note(" 🥳 File found!" + chalk.blue(`Location: ${filePath}`));
-      log.success(chalk.green("✅ File selected!"));
-      outro(chalk.green("✅ File selected!"));
+      note(chalk.blue(`File found at: ${filePath}`));
+      log.success(chalk.green("File selected successfully"));
+      outro(chalk.green("File selected successfully"));
       return;
     }
 
-    log.step(chalk.blue("Selecting a file... \n"));
+    log.step(chalk.blue("Selecting file..."));
     const files = fs.readdirSync(process.cwd());
     const berryFiles = files
       .filter((x) => x.endsWith(".berry"))
@@ -67,7 +65,7 @@ export class FileUtility {
         return { value: x, label: x };
       });
     if (berryFiles.length <= 0) {
-      log.error("❌ .berry files are not found in this folder \n");
+      log.error(chalk.red("No .berry files found in current directory"));
       return;
     }
 
@@ -78,7 +76,7 @@ export class FileUtility {
     });
 
     if (!projectType) {
-      log.error("❌ No file selected");
+      log.error(chalk.red("No file selected"));
       return;
     }
     const filePath = path.join(process.cwd(), projectType.toString());
@@ -88,13 +86,13 @@ export class FileUtility {
       date: new Date().toISOString(),
     });
     log.message(chalk.blue(`Location: ${filePath}`));
-    log.success(chalk.green("✅ File selected!"));
+    log.success(chalk.green("File selected successfully"));
   }
 
   static getPreselectedFile() {
     const fileSelected = db.get("selectedFile");
     if (!fileSelected || !fs.existsSync(fileSelected.path)) {
-      log.error("❌ No file selected or file does not exist");
+      log.error(chalk.red("No file selected or file does not exist"));
       return;
     }
     return fileSelected.path;
@@ -104,15 +102,15 @@ export class FileUtility {
     const fileSelected = db.get("selectedFile");
 
     if (!fileSelected || !fs.existsSync(fileSelected.path)) {
-      log.error("❌ No file selected or file does not exist");
+      log.error(chalk.red("No file selected or file does not exist"));
       return "Error";
     }
 
-    log.message(chalk.green(" File found!"));
-    log.info("Selected File Name: " + chalk.blue(` ${fileSelected.name}`));
+    log.step(chalk.green("File found"));
+    log.info(chalk.blue(`Selected file: ${fileSelected.name}`));
 
     fs.appendFileSync(fileSelected.path, "\n\n".concat(content));
-    log.success(" File updated successfully!");
+    log.success(chalk.green("File updated successfully"));
 
     return "Success";
   }

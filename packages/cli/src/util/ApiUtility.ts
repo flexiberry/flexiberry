@@ -88,7 +88,7 @@ export class ApiUtility {
       message: "Do you want to update Header details?",
     });
     if (isCancel(hasP) || !hasP) {
-      log.step("Skipped request payload ");
+      log.step("Headers skipped");
       return;
     }
     const value = await text({
@@ -113,7 +113,7 @@ export class ApiUtility {
     if (existingBody) return existingBody;
     const hasP = await confirm({ message: "Do you have a payload?" });
     if (isCancel(hasP) || !hasP) {
-      log.step("Skipped request payload ");
+      log.step("Request payload skipped");
       return;
     }
     const body = await group(
@@ -139,7 +139,7 @@ export class ApiUtility {
       },
       {
         onCancel: ({ results }) => {
-          log.step("Body details not provided");
+          log.step("Request body skipped");
           process.exit(0);
         },
       }
@@ -150,10 +150,10 @@ export class ApiUtility {
   static addFromCurl(name: any, curl: any) {
     intro(`📦 Adding API from cURL `);
     const s = spinner();
-    s.start("Coverting cURL to Berry");
+    s.start("Converting cURL to Berry");
     const apiCode = FormatUtil.convertCurlToBerry(curl, name);
 
-    s.stop("Convertion completed successfully");
+    s.stop("Conversion completed successfully");
     const status = FileUtility.updateBerryCode(apiCode);
     outro(outroMessage(status));
   }
