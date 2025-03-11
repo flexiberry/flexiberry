@@ -24,7 +24,9 @@ export class ApiUtility {
     arg.method = await this.getMethod(arg.method);
     if (!arg.method) return;
     arg.headers = await this.getHeaders(arg.headers);
-    arg.body = await this.getBody(arg.body);
+    const body = await this.getBody(arg.body);
+    arg.body = body?.payload;
+    arg.bodyType = body?.type;
 
     const code = FormatUtil.buildApi(name, arg);
     log.step("Code generated");
@@ -142,7 +144,7 @@ export class ApiUtility {
         },
       }
     );
-    return body.payload;
+    return body;
   }
 
   static addFromCurl(name: any, curl: any) {
@@ -150,6 +152,7 @@ export class ApiUtility {
     const s = spinner();
     s.start("Coverting cURL to Berry");
     const apiCode = FormatUtil.convertCurlToBerry(curl, name);
+
     s.stop("Convertion completed successfully");
     const status = FileUtility.updateBerryCode(apiCode);
     outro(outroMessage(status));

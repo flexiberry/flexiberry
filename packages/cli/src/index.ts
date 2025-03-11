@@ -16,6 +16,7 @@ import path from "path";
 import { log } from "@clack/prompts";
 import { AddCommand } from "./command/AddCommand.js";
 import { RunUtility } from "./util/RunUtility.js";
+import chalk from "chalk";
 
 const systemDocumentFolder = path.join(os.homedir(), "Documents");
 
@@ -55,11 +56,15 @@ program
     await FileUtility.select(file);
   });
 
+let multiline = "";
 program
   .command("add")
   .argument("<type>", "Type of item to add (api, env, task, step)")
   .argument("[name]", "Name of the item")
-  .option("-c, --curl <curl>", "Import from cURL command")
+  .option("-c, --curl <curl...>", "Import from cURL command", (value) => {
+    multiline += value;
+    return value;
+  })
   .option("-u, --url <url>", "API URL")
   .option("-m, --method <method>", "HTTP method")
   .option("-h, --headers <headers>", "Request headers (comma-separated)")
@@ -68,7 +73,9 @@ program
   .option("-v, --var <var>", "Variables (comma-separated)")
   .description("Add a new configuration item")
   .action((type, name, options) => {
+    if (options.curl) options.curl = multiline;
     AddCommand.run(type, name, options);
+    multiline = "";
   });
 program
   .command("run")

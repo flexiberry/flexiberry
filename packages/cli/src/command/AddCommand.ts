@@ -12,6 +12,7 @@ export type CmdOptions = {
   headers?: string;
   body?: any;
   bodyType: any;
+  title?: any;
   env?: any;
   var?: any;
 };

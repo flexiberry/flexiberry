@@ -7,9 +7,9 @@
     {
       "type": "node",
       "request": "launch",
-      "name": "Node: Run Cli",
+      "name": "Node: Run watch",
       "runtimeExecutable": "npm",
-      "runtimeArgs": ["run", "cli"],
+      "runtimeArgs": ["run", "watch"],
       "outputCapture": "std",
       "internalConsoleOptions": "openOnSessionStart",
       "console": "integratedTerminal"
