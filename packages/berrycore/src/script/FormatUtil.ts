@@ -39,15 +39,9 @@ export class FormatUtil {
     return berryFormat;
   }
   static buildApi(name: any, cmd: any) {
-    console.log("cmd", cmd);
-
-    let template = `Api ${cmd.method} #${name}  ${!!cmd.title ? cmd.title : ""} 
-        Url ${cmd.url}
-    `;
+    let template = `Api ${cmd.method} #${name}  ${!!cmd.title ? cmd.title : ""} \n Url ${cmd.url}`;
     if (!!cmd.body) {
-      template += `Body ${!!cmd.bodyType ? cmd.bodyType.toUpperCase() : "JSON"}\n
-        \`\n${cmd.body}\n        \`
-    `;
+      template += `Body ${!!cmd.bodyType ? cmd.bodyType.toUpperCase() : "JSON"}\n\`\n${cmd.body}\n\``;
     }
     if (!!cmd.headers) {
       template += `Header\n - ${cmd.headers.split(",").join("\n  - ")}`;

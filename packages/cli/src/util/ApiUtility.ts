@@ -144,6 +144,9 @@ export class ApiUtility {
         },
       }
     );
+    if (body.type === "JSON") {
+      body.payload = this.jsonFormat(body.payload);
+    }
     return body;
   }
 
@@ -156,5 +159,13 @@ export class ApiUtility {
     s.stop("Conversion completed successfully");
     const status = FileUtility.updateBerryCode(apiCode);
     outro(outroMessage(status));
+  }
+  private static jsonFormat(jsonString: string): string {
+    try {
+      const parsed = JSON.parse(jsonString);
+      return JSON.stringify(parsed, null, 2);
+    } catch (e) {
+      return jsonString; // Return original string if parsing fails
+    }
   }
 }
