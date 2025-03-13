@@ -1,6 +1,6 @@
 import type { KV } from "./types";
 import { TokenType, TokenTypeValueOf } from "../tokenizer/tokenType";
-import { BaseParser } from "./BaseParser";
+import { BaseParser } from "./base-parser";
 
 export class KeyValueParser extends BaseParser {
   parseKeyValue(): KV {

@@ -1,6 +1,6 @@
-import { type Check, type Condition, NodeType } from "./Ast";
+import { type Check, type Condition, NodeType } from "./ast-node-type";
 import { TokenType } from "../tokenizer/tokenType";
-import { BaseParser } from "./BaseParser";
+import { BaseParser } from "./base-parser";
 
 export class CheckParser extends BaseParser {
   parseCheck(): Check[] {

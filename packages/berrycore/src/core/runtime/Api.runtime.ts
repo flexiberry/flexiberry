@@ -2,7 +2,7 @@ import { log } from "console";
 import { VarReader } from "../../lang/tokenizer/reader/varReader";
 import { type ApiModel } from "../builder/api.builder";
 import { VarBuilder } from "../builder/var.builder";
-import { StringUtil } from "../util/StringUtil";
+import { StringUtil } from "../util/string-util";
 import { ApiCoreModel } from "../producer/core.model";
 import axios from "axios";
 import { InterpolationUtil } from "../util/Interpolations";
@@ -32,10 +32,6 @@ export class ApiTemplate {
         api.interpolation
       );
     }
-
-    // log(`Calling API: ${api.method} ${url}`);
-    // log(`Body: ${body}`);
-    // log(`Header: ${header}`);
 
     // Build Axios Object
     return axios({

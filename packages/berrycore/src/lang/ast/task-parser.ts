@@ -1,7 +1,7 @@
-import { NodeType, type Task } from "./Ast";
+import { NodeType, type Task } from "./ast-node-type";
 import { TokenType } from "../tokenizer/tokenType";
-import { BaseParser } from "./BaseParser";
-import { StepParser } from "./StepParser";
+import { BaseParser } from "./base-parser";
+import { StepParser } from "./step-parser";
 
 export class TaskParser extends BaseParser {
   parseTask(): Task {

@@ -5,11 +5,11 @@ import {
   type Check,
   type Params,
   type Condition,
-} from "./Ast";
+} from "./ast-node-type";
 import { TokenType } from "../tokenizer/tokenType";
-import { BaseParser } from "./BaseParser";
-import { KeyValueParser } from "./KeyValueParser";
-import { CheckParser } from "./CheckParser";
+import { BaseParser } from "./base-parser";
+import { KeyValueParser } from "./key-value-parser";
+import { CheckParser } from "./check-parser";
 
 export class StepParser extends BaseParser {
   parseStep(): Step {

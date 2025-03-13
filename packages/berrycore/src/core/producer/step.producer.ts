@@ -1,5 +1,5 @@
-import { NodeType, type Step } from "../../lang/ast/Ast";
-import { SequenceGenerator } from "../util/SequenceGenerator";
+import { NodeType, type Step } from "../../lang/ast/ast-node-type";
+import { SequenceGenerator } from "../util/sequence-generator";
 import { CaptureProducer } from "./capture.producer";
 import { CheckProducer } from "./check.producer";
 import { type StepCoreModel } from "./core.model";

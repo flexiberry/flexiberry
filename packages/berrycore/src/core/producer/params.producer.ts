@@ -1,5 +1,5 @@
-import { NodeType, type Params } from "../../lang/ast/Ast";
-import { SequenceGenerator } from "../util/SequenceGenerator";
+import { NodeType, type Params } from "../../lang/ast/ast-node-type";
+import { SequenceGenerator } from "../util/sequence-generator";
 import type { ParamsCoreModel } from "./core.model";
 import { type IProducer, ProducerError } from "./producer";
 

@@ -7,12 +7,12 @@ import {
   type ProgramBody,
   type Task,
   type Variable,
-} from "./Ast";
-import { ApiParser } from "./ApiParser";
-import { EnvironmentParser } from "./EnvironmentParser";
-import { VariableParser } from "./VariableParser";
-import { BaseParser } from "./BaseParser";
-import { TaskParser } from "./TaskParser";
+} from "./ast-node-type";
+import { ApiParser } from "./api-parser";
+import { EnvironmentParser } from "./environment-parser";
+import { VariableParser } from "./variable-parser";
+import { BaseParser } from "./base-parser";
+import { TaskParser } from "./task-parser";
 
 export class CProgramBody extends BaseParser implements ProgramBody {
   kind: NodeType.ProgramBody = NodeType.ProgramBody;

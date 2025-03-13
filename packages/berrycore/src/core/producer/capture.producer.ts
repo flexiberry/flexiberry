@@ -1,5 +1,5 @@
-import { type Capture, NodeType } from "../../lang/ast/Ast";
-import { SequenceGenerator } from "../util/SequenceGenerator";
+import { type Capture, NodeType } from "../../lang/ast/ast-node-type";
+import { SequenceGenerator } from "../util/sequence-generator";
 import type { CaptureCoreModel } from "./core.model";
 import { type IProducer, ProducerError } from "./producer";
 

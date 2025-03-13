@@ -1,7 +1,7 @@
-import { type ApiStatement, NodeType } from "./Ast";
+import { type ApiStatement, NodeType } from "./ast-node-type";
 import { TokenType } from "../tokenizer/tokenType";
-import { BaseParser } from "./BaseParser";
-import { KeyValueParser } from "./KeyValueParser";
+import { BaseParser } from "./base-parser";
+import { KeyValueParser } from "./key-value-parser";
 
 export class ApiParser extends BaseParser {
   parseApi(): ApiStatement {

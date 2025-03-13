@@ -1,9 +1,9 @@
 import { log } from "@clack/prompts";
-import { ApiUtility } from "./../util/ApiUtility.js";
-import { EnvUtility } from "./../util/EnvUtility.js";
-import { StepUtility } from "./../util/StepUtility.js";
-import { TaskUtility } from "./../util/TaskUtility.js";
-import { VarUtility } from "../util/VarUtility.js";
+import { ApiUtility } from "./../util/api-utility.js";
+import { EnvUtility } from "./../util/env-utility.js";
+import { StepUtility } from "./../util/step-utility.js";
+import { TaskUtility } from "./../util/task-utility.js";
+import { VarUtility } from "../util/var-utility.js";
 
 export type CmdOptions = {
   curl?: any;

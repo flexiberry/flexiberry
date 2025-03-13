@@ -1,4 +1,4 @@
-import { NodeType, type Variable } from "../../lang/ast/Ast";
+import { NodeType, type Variable } from "../../lang/ast/ast-node-type";
 import type { VarCoreModel } from "./core.model";
 import { type IProducer, ProducerError } from "./producer";
 

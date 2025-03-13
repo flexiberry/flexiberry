@@ -1,6 +1,6 @@
 import { intro, isCancel, log, outro, text } from "@clack/prompts";
-import { CmdOptions } from "../command/AddCommand.js";
-import { FileUtility } from "./FileUtility.js";
+import { CmdOptions } from "../command/add-command.js";
+import { FileUtility } from "./file-utility.js";
 import { outroMessage } from "./util.js";
 import { FormatUtil } from "@flexiberry/berrycore";
 

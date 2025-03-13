@@ -1,8 +1,8 @@
 import { Lexer } from "../tokenizer/lexer";
 import { Token } from "../tokenizer/token";
 import { TokenType } from "../tokenizer/tokenType";
-import { NodeType, type Program, type ProgramBody } from "./Ast";
-import { CProgramBody } from "./AstImpl";
+import { NodeType, type Program, type ProgramBody } from "./ast-node-type";
+import { CProgramBody } from "./ast-impl";
 
 export default class Parser {
   public produce(sourceCode: string): Program {

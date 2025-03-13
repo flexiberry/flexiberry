@@ -1,6 +1,6 @@
-import { type Environment, NodeType, type Statement } from "./Ast";
+import { type Environment, NodeType, type Statement } from "./ast-node-type";
 import { TokenType } from "../tokenizer/tokenType";
-import { BaseParser } from "./BaseParser";
+import { BaseParser } from "./base-parser";
 
 export class EnvironmentParser extends BaseParser {
   parseEnv(): Statement {

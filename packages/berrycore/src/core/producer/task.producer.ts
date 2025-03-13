@@ -1,5 +1,5 @@
-import { NodeType, type Task } from "../../lang/ast/Ast";
-import { SequenceGenerator } from "../util/SequenceGenerator";
+import { NodeType, type Task } from "../../lang/ast/ast-node-type";
+import { SequenceGenerator } from "../util/sequence-generator";
 import type { TaskCoreModel } from "./core.model";
 import { type IProducer, ProducerError } from "./producer";
 import { StepProducer } from "./step.producer";

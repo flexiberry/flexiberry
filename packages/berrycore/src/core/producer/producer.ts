@@ -1,4 +1,4 @@
-import type { ProgramBody } from "../../lang/ast/Ast";
+import type { ProgramBody } from "../../lang/ast/ast-node-type";
 import { ApiBuilder } from "../builder/api.builder";
 import { EnvBuilder } from "../builder/env.builder";
 import { VarBuilder } from "../builder/var.builder";

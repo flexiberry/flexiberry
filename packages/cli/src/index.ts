@@ -8,15 +8,13 @@ const packageJson = JSON.parse(
   (await readFile(new URL("../package.json", import.meta.url))).toString()
 );
 
-import { FileUtility } from "./util/FileUtility.js";
-import { Cli } from "./util/Cli.js";
+import { FileUtility } from "./util/file-utility.js";
+import { Cli } from "./util/cli.js";
 
 import os from "os";
 import path from "path";
-import { log } from "@clack/prompts";
-import { AddCommand } from "./command/AddCommand.js";
-import { RunUtility } from "./util/RunUtility.js";
-import chalk from "chalk";
+import { AddCommand } from "./command/add-command.js";
+import { RunUtility } from "./util/run-utility.js";
 
 const systemDocumentFolder = path.join(os.homedir(), "Documents");
 

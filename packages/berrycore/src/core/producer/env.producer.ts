@@ -2,7 +2,7 @@ import {
   type Environment,
   NodeType,
   type VariableKv,
-} from "../../lang/ast/Ast";
+} from "../../lang/ast/ast-node-type";
 import type { EnvCoreModel, VarCoreModel } from "./core.model";
 import { type IProducer, ProducerError } from "./producer";
 

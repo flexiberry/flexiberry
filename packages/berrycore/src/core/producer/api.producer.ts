@@ -1,5 +1,5 @@
 import { title } from "process";
-import { type ApiStatement, NodeType } from "../../lang/ast/Ast";
+import { type ApiStatement, NodeType } from "../../lang/ast/ast-node-type";
 import type { ApiCoreModel } from "./core.model";
 import { type IProducer, ProducerError } from "./producer";
 import { InterpolationUtil } from "../util/Interpolations";

@@ -1,4 +1,4 @@
-import Parser from "../lang/ast/AstParser";
+import Parser from "../lang/ast/ast-parser";
 import { FileUtils } from "./functions/file";
 import { InputType } from "../enum/misc";
 

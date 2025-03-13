@@ -10,8 +10,8 @@ import {
 import chalk from "chalk";
 import * as fs from "fs";
 import * as path from "path";
-import { FileUtility } from "./FileUtility.js";
-import { BerryCore } from "@flexiberry/berrycore";
+import { FileUtility } from "./file-utility.js";
+import { BerryCore, BerryExecutor, RUNNER_EVENT } from "@flexiberry/berrycore";
 
 export class RunUtility {
   static async run(file: string) {
@@ -47,14 +47,24 @@ export class RunUtility {
         });
         spin.start("File is Ready..");
         spin.message("Executing...");
-        let core = new BerryCore();
-        let parse = core.parseFile(preSelectedFile.toString());
-        
-        spin.stop();
+
+        new BerryExecutor()
+          .on(RUNNER_EVENT.START, (x: any) => {
+            log.message(`${chalk.bgWhite("+") + chalk.bgBlue(x.time)} Started`);
+          })
+          .on(RUNNER_EVENT.CONSOLE, (x: any) => {
+            log.message(
+              `${chalk.bgWhite(" + ") + chalk.bgBlue(" " + x.time)}📄 ${x.info}`
+            );
+          })
+          .on(RUNNER_EVENT.COMPLETED, (x: any) => {
+            log.message(`${chalk.bgWhite(" + ")} COMPLETED`);
+            spin.stop();
+            outro("✅ Execution completed successfully.\n");
+          })
+          .run(preSelectedFile.toString());
       }
     }
-
-    outro("✅ Execution completed successfully.\n");
   }
 
   static async selectFromCurrentFolder() {

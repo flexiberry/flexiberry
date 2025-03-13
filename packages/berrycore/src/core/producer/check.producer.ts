@@ -1,5 +1,9 @@
-import { type Check, type Condition, NodeType } from "../../lang/ast/Ast";
-import { SequenceGenerator } from "../util/SequenceGenerator";
+import {
+  type Check,
+  type Condition,
+  NodeType,
+} from "../../lang/ast/ast-node-type";
+import { SequenceGenerator } from "../util/sequence-generator";
 import type { CheckCoreModel, ConditionCoreModel } from "./core.model";
 import { type IProducer, ProducerError } from "./producer";
 

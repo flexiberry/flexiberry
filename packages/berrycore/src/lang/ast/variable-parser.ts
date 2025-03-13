@@ -1,6 +1,11 @@
-import { NodeType, Scope, type Variable, type VariableKv } from "./Ast";
+import {
+  NodeType,
+  Scope,
+  type Variable,
+  type VariableKv,
+} from "./ast-node-type";
 import { TokenType } from "../tokenizer/tokenType";
-import { BaseParser } from "./BaseParser";
+import { BaseParser } from "./base-parser";
 
 export class VariableParser extends BaseParser {
   parseStore(): Variable {
