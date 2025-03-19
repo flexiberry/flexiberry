@@ -1,17 +1,42 @@
-<script>
+<script lang="ts">
   import { onMount } from "svelte";
 
   export let isVisible = false;
+  let headingVisible = false;
+  let paragraphVisible = false;
+  let sectionHeight = "100vh";
+
+  // Typewriter effect function
+  function typewriter(node: HTMLElement, { speed = 50, delay = 0 }) {
+    const text = node.textContent || "";
+    const duration = text.length * speed;
+
+    return {
+      delay,
+      duration,
+      tick: (t: number) => {
+        const i = Math.floor(text.length * t);
+        node.textContent = text.slice(0, i);
+      },
+    };
+  }
 
   onMount(() => {
     setTimeout(() => {
       isVisible = true;
+      // Start heading animation after a short delay
+      setTimeout(() => (headingVisible = true), 500);
+      // Start paragraph animation after heading
+      setTimeout(() => (paragraphVisible = true), 2000);
     }, 100);
   });
 </script>
 
 <!-- Hero Section with Animated Mesh Gradient -->
-<section class=" relative overflow-hidden">
+<section
+  class="relative overflow-hidden transition-all duration-1000 ease-in-out"
+  style="min-height: {sectionHeight};"
+>
   <!-- Animated Mesh Gradient Background -->
   <div class=" inset-0 -z-20 overflow-hidden">
     <svg
@@ -71,7 +96,7 @@
           <animate
             attributeName="cy"
             values="30%;70%;30%"
-            dur="20s"
+            dur="10s"
             repeatCount="indefinite"
           />
         </ellipse>
@@ -79,13 +104,13 @@
           <animate
             attributeName="cx"
             values="70%;30%;70%"
-            dur="23s"
+            dur="13s"
             repeatCount="indefinite"
           />
           <animate
             attributeName="cy"
             values="70%;30%;70%"
-            dur="23s"
+            dur="10s"
             repeatCount="indefinite"
           />
         </ellipse>
@@ -149,21 +174,48 @@
   </div>
 
   <div
-    class="container mx-auto px-6 py-20 pt-32 flex flex-col items-center relative z-10"
+    class="container mx-auto px-6 py-20 pt-32 flex flex-col items-center relative z-10 transition-all duration-1000 ease-in-out"
   >
     <div
-      class={`transition-opacity duration-1000 ${isVisible ? "opacity-100" : "opacity-0"}`}
+      class={`transition-all duration-1000 ease-in-out space-y-8 w-full ${
+        isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
+      }`}
     >
-      <h1
-        class="text-5xl md:text-6xl font-bold text-center leading-tight mb-6 text-white"
+      <div
+        class="min-h-[160px] transition-all duration-1000 ease-in-out transform"
       >
-        Build <span class="text-emerald-400">faster</span> with Flexiberry
-      </h1>
-      <p class="text-xl text-gray-200 text-center max-w-2xl mx-auto mb-10">
-        A lightweight, developer-friendly application framework designed for
-        modern web development.
-      </p>
-      <div class="flex flex-col sm:flex-row justify-center gap-4">
+        <h1
+          class="text-5xl md:text-6xl font-bold leading-tight text-center mb-6 text-white transition-all duration-1000 ease-in-out"
+        >
+          {#if headingVisible}
+            <span>Speed Up</span>
+            <span class="text-emerald-400 inline-block">API Testing </span>
+            <br />
+            with
+            <span in:typewriter={{ speed: 40, delay: 0 }}> Flexiberry</span>
+          {/if}
+        </h1>
+      </div>
+
+      <div
+        class="min-h-[140px] transition-all duration-1000 ease-in-out transform"
+      >
+        <p
+          class="text-xl text-gray-200 text-center text-justify max-w-2xl mx-auto mb-10"
+        >
+          <!-- {#if paragraphVisible} -->
+          <!-- <span in:typewriter={{ speed: 20 }}> -->
+          Flexiberry simplifies API testing by allowing developers to write custom
+          scripts for APIs and their test cases. No rigid structures—just full flexibility
+          to test APIs the way you need.
+          <!-- </span> -->
+          <!-- {/if} -->
+        </p>
+      </div>
+
+      <div
+        class="flex flex-col sm:flex-row justify-center gap-4 transition-all duration-1000 ease-in-out"
+      >
         <a
           href="#get-started"
           class="bg-emerald-500 hover:bg-emerald-600 text-gray-900 font-bold py-3 px-8 rounded-md transition-all duration-300 text-center shadow-lg hover:shadow-emerald-500/30"
@@ -181,7 +233,9 @@
 
     <!-- Code Preview -->
     <div
-      class={`mt-16 w-full max-w-3xl bg-gray-800/90 backdrop-blur-sm rounded-lg shadow-xl overflow-hidden transition-all duration-1000 ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"}`}
+      class={`mt-16 w-full max-w-3xl bg-gray-800/90 backdrop-blur-sm rounded-lg shadow-xl overflow-hidden transition-all duration-1000 ease-in-out transform ${
+        isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
+      }`}
     >
       <div class="flex items-center bg-gray-700/90 backdrop-blur-sm px-4 py-2">
         <div class="w-3 h-3 rounded-full bg-red-500 mr-2"></div>
@@ -197,3 +251,23 @@
     </div>
   </div>
 </section>
+
+<style>
+  /* Enhanced smooth transitions */
+  /* :global(*) {
+    transition-property: all;
+    transition-duration: 1000ms;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  } */
+
+  /* section {
+    transition: min-height 1.5s cubic-bezier(0.4, 0, 0.2, 1);
+  } */
+
+  /* .transform {
+    transition:
+      transform 1s cubic-bezier(0.4, 0, 0.2, 1),
+      opacity 1s cubic-bezier(0.4, 0, 0.2, 1),
+      min-height 1.5s cubic-bezier(0.4, 0, 0.2, 1);
+  } */
+</style>
