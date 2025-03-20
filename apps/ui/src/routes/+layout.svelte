@@ -16,6 +16,7 @@
 
   let heightDifference = 0;
   let showRightPane = true;
+  let toolbarHeight = 28; // Height of the bottom toolbar
 
   // Add version from package.json
   // @ts-ignore
@@ -33,33 +34,10 @@
   let resizeObserver;
 
   // Add these variables to track height
-  let toolbarHeight = 28; // Height of the bottom toolbar
-
-  const updateLogoVisibility = () => {
-    if (!logoContainer) return;
-    const containerWidth = logoContainer.clientWidth;
-
-    // Show only icon if width is less than 100px
-    // Show only title if width is less than 200px
-    // Show everything if width is greater than 200px
-    showOnlyIcon = containerWidth < 50;
-    showFullLogo = containerWidth >= 200;
-  };
 
   onMount(() => {
     // Create ResizeObserver to watch container size changes
-    resizeObserver = new ResizeObserver((entries) => {
-      for (const entry of entries) {
-        if (entry.target === logoContainer) {
-          updateLogoVisibility();
-        }
-      }
-    });
-
-    // Start observing the logo container
-    if (logoContainer) {
-      resizeObserver.observe(logoContainer);
-    }
+    resizeObserver = new ResizeObserver((entries) => {});
 
     const handleResize = () => {
       const headerHeight = document?.querySelector("Header")?.clientHeight || 0;
@@ -97,52 +75,7 @@
   style="height: {heightDifference}px;"
 >
   <Resizable.Pane class=" bg-opacity-10" defaultSize={25}>
-    <div
-      bind:this={logoContainer}
-      class="logo flex px-2 align-middle bg-opacity-10 bg-secondary py-2 items-center justify-between"
-    >
-      <div class="flex items-center overflow-hidden">
-        <img
-          src={berry}
-          height={"28px"}
-          class="h-[28px] flex-shrink-0 transition-transform duration-200"
-          class:scale-110={showOnlyIcon}
-          alt="FlexiBerry Logo"
-        />
-        {#if !showOnlyIcon}
-          <div
-            class="pl-3 overflow-hidden"
-            in:slide={{ duration: 200, axis: "x" }}
-            out:slide={{ duration: 200, axis: "x" }}
-          >
-            <h1
-              class="font-extrabold text-lg tracking-tight leading-none truncate"
-            >
-              FlexiBerry
-            </h1>
-            {#if showFullLogo}
-              <p
-                class="text-xs text-muted-foreground truncate"
-                in:fade={{ duration: 150, delay: 100 }}
-                out:fade={{ duration: 150 }}
-              >
-                Your flexible api testing companion
-              </p>
-            {/if}
-          </div>
-        {/if}
-      </div>
-      {#if showFullLogo}
-        <span
-          class="text-xs text-muted-foreground ml-2"
-          in:fade={{ duration: 150, delay: 100 }}
-          out:fade={{ duration: 150 }}
-        >
-          {version}
-        </span>
-      {/if}
-    </div>
-    <Separator></Separator>
+    <!-- <Separator></Separator> -->
     <div class=" px-2">
       <FolderHierarchy height={heightDifference}></FolderHierarchy>
     </div>

@@ -7,27 +7,110 @@
   import { toast } from "svelte-sonner";
   import { toggleMode } from "mode-watcher";
   import berry from "$lib/assets/berry-fotor-2024090211181.png";
+  import { onMount } from "svelte";
+  import { fade, slide } from "svelte/transition";
+
+  // Add version from package.json
+  // @ts-ignore
+  const version = "v " + APP_VERSION;
+
+  let logoContainer: Element;
+  let showFullLogo = true;
+  let showOnlyIcon = false;
+  /**
+   * @type {ResizeObserver}
+   */
+  let resizeObserver: ResizeObserver;
+
+  // Add these variables to track height
+
+  const updateLogoVisibility = () => {
+    if (!logoContainer) return;
+    const containerWidth = logoContainer.clientWidth;
+
+    // Show only icon if width is less than 100px
+    // Show only title if width is less than 200px
+    // Show everything if width is greater than 200px
+    showOnlyIcon = containerWidth < 50;
+    showFullLogo = containerWidth >= 200;
+  };
+
+  onMount(() => {
+    // Create ResizeObserver to watch container size changes
+    resizeObserver = new ResizeObserver((entries) => {
+      for (const entry of entries) {
+        if (entry.target === logoContainer) {
+          updateLogoVisibility();
+        }
+      }
+    });
+
+    // Start observing the logo container
+    if (logoContainer) {
+      resizeObserver.observe(logoContainer);
+    }
+
+    const handleResize = () => {
+      const headerHeight = document?.querySelector("Header")?.clientHeight || 0;
+      const bodyHeight = window.innerHeight || 0;
+      // heightDifference = bodyHeight - headerHeight - toolbarHeight;
+
+      // Update right pane visibility based on screen width
+      // showRightPane = window.innerWidth >= 700;
+    };
+
+    handleResize();
+    window.addEventListener("resize", handleResize);
+
+    return () => {
+      // Cleanup
+      if (resizeObserver) {
+        resizeObserver.disconnect();
+      }
+      window.removeEventListener("resize", handleResize);
+    };
+  });
 </script>
 
 <header class="border-b-2">
   <div class=" ">
     <nav class=" flex align-middle items-center">
-      <form
-        style="min-width: 20vw;"
-        class="flex max-w-sm items-center space-x-1"
+      <div
+        bind:this={logoContainer}
+        class="logo flex px-2 align-middle py-2 items-center justify-between"
       >
-        <Input
-          type="search"
-          class="m-1 focus-visible:ring-0 bg-primary bg-opacity-35 "
-          placeholder=" Search here..."
-        />
-      </form>
-      <Button class="mr-2" size="icon" variant="outline">
-        <Plus strokeWidth={1}></Plus>
-      </Button>
-      <Button class="mr-2" size="icon" variant="outline">
-        <Upload strokeWidth={1}></Upload>
-      </Button>
+        <div class="flex items-center overflow-hidden">
+          <img
+            src={berry}
+            height={"28px"}
+            class="h-[28px] flex-shrink-0 transition-transform duration-200"
+            class:scale-110={showOnlyIcon}
+            alt="FlexiBerry Logo"
+          />
+          {#if !showOnlyIcon}
+            <div
+              class="pl-3 overflow-hidden"
+              in:slide={{ duration: 200, axis: "x" }}
+              out:slide={{ duration: 200, axis: "x" }}
+            >
+              <h1
+                class="font-extrabold text-lg tracking-tight leading-none truncate"
+              >
+                FlexiBerry
+              </h1>
+              {#if showFullLogo}
+                <p
+                  class="text-xs text-muted-foreground truncate"
+                  in:fade={{ duration: 150, delay: 100 }}
+                  out:fade={{ duration: 150 }}
+                >
+                  Your flexible api testing companion
+                </p>
+              {/if}
+            </div>
+          {/if}
+        </div>
+      </div>
     </nav>
   </div>
   <div class="logo flex align-middle items-center">
@@ -35,7 +118,14 @@
     <h1 class="font-extrabold pl-3">FlexiBerry</h1> -->
   </div>
   <div>
-    <nav class=" flex align-middle">
+    <nav class=" flex align-middle items-center">
+      <span
+        class="text-lg font-thin text-muted-foreground mr-2"
+        in:fade={{ duration: 150, delay: 100 }}
+        out:fade={{ duration: 150 }}
+      >
+        {version}
+      </span>
       <Button class="mr-2" size="icon" variant="outline">
         <LifeBuoy strokeWidth={1}></LifeBuoy>
       </Button>

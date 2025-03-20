@@ -7,6 +7,7 @@
     Info,
     Plus,
     Share,
+    Upload,
   } from "lucide-svelte";
   import Button from "../../components/ui/button/button.svelte";
   import FolderItem from "./FolderItem.svelte";
@@ -19,6 +20,7 @@
   import { onMount } from "svelte";
   import { db } from "../../db/db";
   import berry from "$lib/assets/berry-fotor-2024090211181.png";
+  import Separator from "../../components/ui/separator/separator.svelte";
 
   export let height: number = 100;
 
@@ -82,16 +84,15 @@
 </script>
 
 <div style="height:{height - 40}px;" class="pb-4">
-  <div class="flex justify-between m-2">
-    <div></div>
-    <div class="grid grid-cols-2 gap-2 flex-none grow-0">
-      <div></div>
-      <Button variant="ghost" size="xs" on:click={addFolder}>
-        <Plus size={14}></Plus>
-        Folder
-      </Button>
-    </div>
+  <div class="flex justify-end m-2">
+    <Button on:click={addFolder} class="mr-2" size="icon" variant="outline">
+      <Plus strokeWidth={1}></Plus>
+    </Button>
+    <Button class="mr-2" size="icon" variant="outline">
+      <Upload strokeWidth={1}></Upload>
+    </Button>
   </div>
+  <Separator></Separator>
   <ScrollArea class=" h-full pt-2  w-full ">
     {#if folders == null || folders.length <= 0}
       <div class="flex flex-col mt-6 items-center justify-center p-4">

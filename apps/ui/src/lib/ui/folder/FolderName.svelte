@@ -70,6 +70,3 @@
     <span class="ml-2 flex-none">{folder.name}</span>
   {/if}
 </button>
-
-<style>
-</style>
