@@ -14,6 +14,7 @@
         </div>
         <span class="text-xl font-bold">Flexiberry</span>
       </div>
+
       <div class="flex space-x-6">
         <a
           href="#"

@@ -3,24 +3,21 @@
 
   let features = [
     {
-      title: "Fast & Lightweight",
-      description:
-        "Built for performance with minimal overhead and optimized rendering.",
+      title: "Custom Scripts",
+      description: "Write API tests with full control, no limitations.",
     },
     {
-      title: "Developer Friendly",
-      description:
-        "Intuitive API designed with developers in mind. Easy to learn, simple to master.",
+      title: "Automated Testing",
+      description: "Execute test cases seamlessly with real-time feedback.",
     },
     {
-      title: "Highly Customizable",
+      title: "Developer-Friendly",
       description:
         "Flexible configuration options to adapt to your specific project needs.",
     },
     {
-      title: "Well Documented",
-      description:
-        "Comprehensive documentation with examples and best practices.",
+      title: "Fast & Lightweight ",
+      description: "No bloat, just pure efficiency.",
     },
   ];
 </script>
@@ -30,7 +27,7 @@
   <div
     class={`container mx-auto px-6 transition-all duration-1000 ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"}`}
   >
-    <h2 class="text-3xl font-bold text-center mb-16">Features</h2>
+    <h2 class="text-3xl font-bold text-center mb-16">Key Features</h2>
     <div class="grid md:grid-cols-2 gap-8">
       {#each features as feature, i}
         <div
