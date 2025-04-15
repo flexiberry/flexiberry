@@ -7,28 +7,43 @@ import { db } from "../index.js";
 import { intro, log, note, outro, select, spinner } from "@clack/prompts";
 
 export class FileUtility {
-  static create(file: string, template?: string, force?: boolean) {
+  static create(
+    file: string,
+    template?: string,
+    force?: boolean,
+    secret?: any
+  ) {
     intro(chalk.blue("Creating new file..."));
+    let fileExt = ".berry";
+    if (secret) {
+      log.warn(chalk.yellow("Creating secret file..."));
+      fileExt = ".secret";
+      if (file.endsWith(".berry")) {
+        file = file.replace(".berry", "");
+      }
+    }
     const filePath = path.join(
       process.cwd(),
-      file.endsWith(".berry") ? file : `${file}.berry`
+      file.endsWith(".berry") ? file : `${file}${fileExt}`
     );
     try {
-      if (fs.existsSync(filePath)) {
+      const fileExists = fs.existsSync(filePath);
+
+      if (fileExists) {
         if (!force) {
           log.error(
             chalk.red("File already exists. Use -f or --force to overwrite.")
           );
           return;
-        } else {
-          log.warn(chalk.yellow("Overwriting existing file..."));
-          fs.unlinkSync(filePath);
         }
+        log.warn(chalk.yellow("Overwriting existing file..."));
+        fs.unlinkSync(filePath);
       }
+
       fs.writeFileSync(filePath, template || "");
 
       log.success(chalk.green("File created successfully ✨"));
-      log.message(chalk.blue(`Location: ${filePath}`));
+      log.info(chalk.blue(`Location: ${filePath}`));
 
       if (template) {
         log.info(chalk.gray(`Template: ${template}`));

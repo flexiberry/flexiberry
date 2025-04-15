@@ -19,7 +19,7 @@ import { RunUtility } from "./util/run-utility.js";
 const systemDocumentFolder = path.join(os.homedir(), "Documents");
 
 export const db = new FSDB(
-  systemDocumentFolder.concat("@flexiberry/temp.json"),
+  systemDocumentFolder.concat(".flexiberry/data.json"),
   true
 );
 const program = new Command();
@@ -40,10 +40,11 @@ program
   .argument("<file>", "File name to create")
   .argument("[template]", "Template to use")
   .option("-f, --force", "Overwrite existing file")
+  .option("-s, --secret", "Create a secret file for storing sensitive data")
   .addHelpText("after", "\nExample call: flexiberry create newfile.berry")
   .description("Create a new .berry file with specified template")
   .action((file, template, options) => {
-    FileUtility.create(file, template, options.force);
+    FileUtility.create(file, template, options.force, options.secret);
   });
 
 program
