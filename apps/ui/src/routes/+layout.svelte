@@ -74,7 +74,7 @@
   direction="horizontal"
   style="height: {heightDifference}px;"
 >
-  <Resizable.Pane class=" bg-opacity-10" defaultSize={25}>
+  <Resizable.Pane class=" bg-primary/50" defaultSize={25}>
     <!-- <Separator></Separator> -->
     <div class=" px-2">
       <FolderHierarchy height={heightDifference}></FolderHierarchy>

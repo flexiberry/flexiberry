@@ -84,15 +84,23 @@
 </script>
 
 <div style="height:{height - 40}px;" class="pb-4">
-  <div class="flex justify-end m-2">
-    <Button on:click={addFolder} class="mr-2" size="icon" variant="outline">
+  <div
+    class="flex bg-secondary/45 mt-2 drop-shadow-lg justify-end m-0.5 rounded-lg border p-2"
+  >
+    <Input placeholder="Search" class=" mr-2"></Input>
+    <Button
+      on:click={addFolder}
+      class="mr-2 flex-shrink-0"
+      size="icon"
+      variant="outline"
+    >
       <Plus strokeWidth={1}></Plus>
     </Button>
-    <Button class="mr-2" size="icon" variant="outline">
+    <Button class="mr-2 flex-shrink-0" size="icon" variant="outline">
       <Upload strokeWidth={1}></Upload>
     </Button>
   </div>
-  <Separator></Separator>
+  <!-- <Separator></Separator> -->
   <ScrollArea class=" h-full pt-2  w-full ">
     {#if folders == null || folders.length <= 0}
       <div class="flex flex-col mt-6 items-center justify-center p-4">

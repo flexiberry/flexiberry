@@ -72,7 +72,7 @@
   });
 </script>
 
-<header class="border-b-2">
+<header class="border-b-2 bg-primary/90 drop-shadow-lg">
   <div class=" ">
     <nav class=" flex align-middle items-center">
       <div
