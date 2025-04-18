@@ -2,7 +2,7 @@ import { title } from "process";
 import { type ApiStatement, NodeType } from "../../lang/ast/ast-node-type";
 import type { ApiCoreModel } from "./core.model";
 import { type IProducer, ProducerError } from "./producer";
-import { InterpolationUtil } from "../util/Interpolations";
+import { InterpolationUtil } from "../util/interpolations";
 
 export class ApiProducer implements IProducer<ApiCoreModel, ApiStatement> {
   build(ast: ApiStatement): ApiCoreModel {

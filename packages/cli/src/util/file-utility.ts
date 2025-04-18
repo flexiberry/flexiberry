@@ -5,6 +5,8 @@ import * as fs from "fs";
 import * as path from "path";
 import { db } from "../index.js";
 import { intro, log, note, outro, select, spinner } from "@clack/prompts";
+import { spawn } from "child_process";
+import * as os from "os";
 
 export class FileUtility {
   static create(
@@ -59,21 +61,33 @@ export class FileUtility {
   }
 
   static async select(file?: string) {
-    if (!!file) {
+    let directory = process.cwd();
+    if (!!file && file.includes(".berry")) {
       intro(chalk.blue(`Selecting file: ${file}...`));
-      const filePath = path.join(process.cwd(), file);
+      const filePath = path.join(directory, file);
       if (!fs.existsSync(filePath)) {
         log.error(chalk.red(`File not found at ${filePath}`));
         return;
       }
-      note(chalk.blue(`File found at: ${filePath}`));
-      log.success(chalk.green("File selected successfully"));
-      outro(chalk.green("File selected successfully"));
+      outro(chalk.green("File selected"));
       return;
     }
 
     log.step(chalk.blue("Selecting file..."));
-    const files = fs.readdirSync(process.cwd());
+    let files: string[];
+    if (file) {
+      files = fs.readdirSync(
+        path.dirname(
+          !file.endsWith("/") ? file.concat("/.") : path.join(file, ".")
+        )
+      );
+      directory = path.dirname(
+        !file.endsWith("/") ? file.concat("/.") : path.join(file, ".")
+      );
+    } else {
+      files = fs.readdirSync(process.cwd());
+    }
+
     const berryFiles = files
       .filter((x) => x.endsWith(".berry"))
       .map((x) => {
@@ -81,6 +95,7 @@ export class FileUtility {
       });
     if (berryFiles.length <= 0) {
       log.error(chalk.red("No .berry files found in current directory"));
+      log.message(chalk.magenta(files.join("\n")));
       return;
     }
 
@@ -94,13 +109,22 @@ export class FileUtility {
       log.error(chalk.red("No file selected"));
       return;
     }
-    const filePath = path.join(process.cwd(), projectType.toString());
+    const filePath = path.resolve(directory, projectType.toString());
     db.set("selectedFile", {
       path: filePath,
       name: projectType,
       date: new Date().toISOString(),
     });
-    log.message(chalk.blue(`Location: ${filePath}`));
+    log.success(
+      chalk.bgGreenBright(" Location ") +
+        chalk.bgWhite("(") +
+        chalk.blue(
+          filePath.length > 20
+            ? `${filePath.slice(0, 20)}.../${projectType.toString()}`
+            : filePath
+        ) +
+        chalk.bgWhite(")")
+    );
     log.success(chalk.green("File selected successfully"));
   }
 
@@ -128,5 +152,29 @@ export class FileUtility {
     log.success(chalk.green("File updated successfully"));
 
     return "Success";
+  }
+
+  static openEditor(filePath: string) {
+    const platform = os.platform();
+    let editor: string;
+
+    // Prefer $EDITOR if set
+    if (process.env.EDITOR) {
+      editor = process.env.EDITOR;
+    } else if (platform === "win32") {
+      editor = "notepad";
+    } else {
+      editor = "vim"; // fallback for Linux/macOS
+    }
+
+    const child = spawn(editor, [filePath], { stdio: "inherit" });
+
+    child.on("exit", (code) => {
+      if (code === 0) {
+        console.log("File edited successfully.");
+      } else {
+        console.error(`Editor exited with code ${code}`);
+      }
+    });
   }
 }

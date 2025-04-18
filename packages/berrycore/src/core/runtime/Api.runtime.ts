@@ -1,11 +1,7 @@
-import { log } from "console";
-import { VarReader } from "../../lang/tokenizer/reader/varReader";
 import { type ApiModel } from "../builder/api.builder";
-import { VarBuilder } from "../builder/var.builder";
-import { StringUtil } from "../util/string-util";
 import { ApiCoreModel } from "../producer/core.model";
 import axios from "axios";
-import { InterpolationUtil } from "../util/Interpolations";
+import { InterpolationUtil } from "../util/interpolations";
 
 export class ApiTemplate {
   constructor(private apiBuilder: ApiModel) {} // Assuming apiBuilder is passed in

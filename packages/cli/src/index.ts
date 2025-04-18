@@ -19,7 +19,7 @@ import { RunUtility } from "./util/run-utility.js";
 const systemDocumentFolder = path.join(os.homedir(), "Documents");
 
 export const db = new FSDB(
-  systemDocumentFolder.concat(".flexiberry/data.json"),
+  systemDocumentFolder.concat("flexiberry/data.json"),
   true
 );
 const program = new Command();
