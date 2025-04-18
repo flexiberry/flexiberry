@@ -25,8 +25,6 @@ export class ApiReader extends CReader implements Reader {
     if (TokenType.Body == token) start = this.extractBody(start, tkns);
     if (TokenType.Header == token) start = this.extractHeader(start, tkns);
 
-    // tkns.push(Token.from("", TokenType.ApiEnd, start, start));
-
     return tkns;
   }
   private extractBody(start: number, tkns: Token[]) {
@@ -64,13 +62,13 @@ export class ApiReader extends CReader implements Reader {
       }
       if (this.input.substring(this.position, this.position + 6) === "Header") {
         start = this.readHeader(tkns);
-        continue;
+        break;
       }
 
       this.position++; // Move to the next
     }
 
-    return this.position++;
+    return this.position;
   }
   private extractUrl(start: number, tkns: Token[]) {
     while (
@@ -94,8 +92,7 @@ export class ApiReader extends CReader implements Reader {
 
   private readHeader(tkns: Token[]): number {
     let start = this.position;
-    const value = "";
-    this.position = this.position + 6;
+    this.position += 6; // Skip 'Header'
     tkns.push(
       Token.from(
         this.input.substring(start, this.position),
@@ -106,26 +103,28 @@ export class ApiReader extends CReader implements Reader {
     );
     this.position++;
 
+    // Move to the first '-' (start of key-value pairs), skipping whitespace and newlines
     while (
       this.position < this.input.length &&
-      this.input[this.position] !== "-"
+      (isWhitespace(this.input[this.position]) ||
+        this.input[this.position] === "\n")
     ) {
-      this.position++; // Move to the next character
+      this.position++;
     }
 
-    // Parse key-value pairs until empty line
+    // Parse key-value pairs until an empty line or a non-hyphen character
     while (this.position < this.input.length) {
-      // Skip whitespace at start of line
-      const lineStart = this.position;
+      // Skip whitespace at start of line (except newlines)
       while (
         this.position < this.input.length &&
         isWhitespace(this.input[this.position]) &&
-        this.input[this.position] !== "\n"
+        this.input[this.position] !== "\n" &&
+        this.input[this.position] !== "-"
       ) {
         this.position++;
       }
 
-      // Check for empty line
+      // Stop at empty line or end of input
       if (
         this.input[this.position] === "\n" ||
         this.input[this.position] === undefined
@@ -133,21 +132,24 @@ export class ApiReader extends CReader implements Reader {
         break;
       }
 
-      // Parse key-value pair if line starts with hyphen
-      if (this.input[this.position] === "-") {
-        const kvReader = new KeyValuePair(this.input, this.position);
-        const tk = kvReader.read();
-        tkns.push(...tk);
-        this.position = kvReader.getPosition(); // Update position
+      // Stop if the next non-whitespace character is not '-'
+      if (this.input[this.position] !== "-") {
+        break;
       }
 
-      if (this.position < this.input.length) {
-        this.position++; // Move past newline
+      // Parse key-value pair
+      const kvReader = new KeyValuePair(this.input, this.position);
+      const tk = kvReader.read();
+      tkns.push(...tk);
+      this.position = kvReader.getPosition();
+
+      // Move past newline if present
+      if (this.input[this.position] === "\n") {
+        this.position++;
       }
     }
 
-    start = this.position;
-    return start;
+    return this.position;
   }
 
   private readBody(tkns: Token[]): number {
@@ -166,7 +168,7 @@ export class ApiReader extends CReader implements Reader {
       this.position < this.input.length &&
       this.input[this.position] !== "`"
     ) {
-      this.position++; // Move to the next character
+      this.position++;
       if (
         !isWhitespace(this.input[this.position]) &&
         this.input[this.position] !== "`" &&

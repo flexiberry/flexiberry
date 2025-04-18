@@ -11,7 +11,7 @@
     "dev": "pnpm -r dev",
     "test": "echo \"Error: no test specified\" && exit 1",
     "runui": "cd ./apps/ui && npm run dev ",
-    "watch": "cd ./packages/berrycore && npm run watch ",
+    "watch": "cd ./packages/berrycore && pnpm run watch ",
     "buildcore": "cd ./packages/berrycore && npm run build ",
     "lint": "eslint . --ext .ts,.tsx --fix",
     "lint:check": "eslint . --ext .ts,.tsx"

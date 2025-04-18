@@ -1,8 +1,10 @@
+import path from "node:path";
 import { InputType } from "../../enum/misc";
 import { RUNNER_EVENT } from "../../enum/runner.event";
 import Parser from "../../lang/ast/ast-parser";
 import { FileUtils } from "../functions/file";
 import { Producer } from "../producer/producer";
+import * as fs from "fs";
 
 export class BerryExecutor {
   private events: { [key: string]: Function } = {};
@@ -27,8 +29,21 @@ export class BerryExecutor {
     const parser = new Parser();
     const ast = parser.produce(content);
     await this.emit(RUNNER_EVENT.CONSOLE, { info: "AST PRODUCED" });
+    let tempFileName = `temp_ast.json`;
+    let tempFilePath = path.join(process.cwd(), "../../sample/", tempFileName);
+    if (fs.existsSync(tempFilePath)) {
+      fs.unlinkSync(tempFilePath);
+    }
+    fs.writeFileSync(tempFilePath, JSON.stringify(ast, null, 2));
     const producer = new Producer().build(ast.body);
     await this.emit(RUNNER_EVENT.CONSOLE, { info: "PRODUCED" });
+
+    tempFileName = `temp_producer.json`;
+    tempFilePath = path.join(process.cwd(), "../../sample/", tempFileName);
+    if (fs.existsSync(tempFilePath)) {
+      fs.unlinkSync(tempFilePath);
+    }
+    fs.writeFileSync(tempFilePath, JSON.stringify(producer, null, 2));
 
     await this.emit(RUNNER_EVENT.COMPLETED, { status: "COMPLETED" });
   }
