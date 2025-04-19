@@ -288,7 +288,7 @@ export class ApiReader extends CReader implements Reader {
         tkns.push(Token.from(value, TokenType.ApiMethod, start, this.position));
 
         start = this.fetchIdentifier(tkns, char, start);
-        this.position++;
+        // this.position++;
         continue;
       }
 

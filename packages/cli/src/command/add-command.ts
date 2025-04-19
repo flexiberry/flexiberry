@@ -7,6 +7,7 @@ import { VarUtility } from "../util/var-utility.js";
 
 export type CmdOptions = {
   curl?: any;
+  swagger?: any;
   url?: any;
   method?: any;
   headers?: string;
@@ -23,6 +24,8 @@ export class AddCommand {
       case "api":
         if (options.curl) {
           ApiUtility.addFromCurl(name, options.curl);
+        } else if (options.swagger) {
+          ApiUtility.addFromSwagger(name, options.swagger);
         } else {
           ApiUtility.add(name, options);
         }

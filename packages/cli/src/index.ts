@@ -64,6 +64,7 @@ program
     multiline += value;
     return value;
   })
+  .option("-s, --swagger <url>", "Import from Swagger URL")
   .option("-u, --url <url>", "API URL")
   .option("-m, --method <method>", "HTTP method")
   .option("-h, --headers <headers>", "Request headers (comma-separated)")

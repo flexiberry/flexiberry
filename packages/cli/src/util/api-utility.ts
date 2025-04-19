@@ -12,9 +12,35 @@ import {
   text,
 } from "@clack/prompts";
 import { outroMessage } from "./util.js";
-import { FormatUtil } from "@flexiberry/berrycore";
+import { FormatUtil, SwaggerUtil } from "@flexiberry/berrycore";
+import chalk from "chalk";
 
 export class ApiUtility {
+  static async addFromSwagger(name: string, swagger: any) {
+    intro(`📦 Adding API from Swagger`);
+    const s = spinner();
+    s.start("Please wait... Converting Swagger to Berry");
+    try {
+      const apiCode = await SwaggerUtil.convertFromSwaggerApi(swagger);
+      s.stop("Conversion completed successfully");
+      const status = FileUtility.updateBerryCode(apiCode);
+      outro(outroMessage(status));
+    } catch (error: any) {
+      log.error(error);
+      s.stop("Conversion failed");
+      outro(chalk.red("Error"));
+    }
+  }
+  static addFromCurl(name: any, curl: any) {
+    intro(`📦 Adding API from cURL `);
+    const s = spinner();
+    s.start("Converting cURL to Berry");
+    const apiCode = FormatUtil.convertCurlToBerry(curl, name);
+
+    s.stop("Conversion completed successfully");
+    const status = FileUtility.updateBerryCode(apiCode);
+    outro(outroMessage(status));
+  }
   static async add(name: any, arg: CmdOptions) {
     intro(`📦 Building API`);
     name = await this.getInput("What is the name of API?", "Api Name", name);
@@ -150,16 +176,6 @@ export class ApiUtility {
     return body;
   }
 
-  static addFromCurl(name: any, curl: any) {
-    intro(`📦 Adding API from cURL `);
-    const s = spinner();
-    s.start("Converting cURL to Berry");
-    const apiCode = FormatUtil.convertCurlToBerry(curl, name);
-
-    s.stop("Conversion completed successfully");
-    const status = FileUtility.updateBerryCode(apiCode);
-    outro(outroMessage(status));
-  }
   private static jsonFormat(jsonString: string): string {
     try {
       const parsed = JSON.parse(jsonString);

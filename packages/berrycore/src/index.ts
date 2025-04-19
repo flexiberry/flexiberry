@@ -4,7 +4,16 @@ import { RUNNER_EVENT } from "./enum/runner.event";
 import Parser from "./lang/ast/ast-parser";
 import { Lexer } from "./lang/tokenizer/lexer";
 import { FormatUtil } from "./script/format-util";
+import { SwaggerUtil } from "./script/swagger.util";
 
 //
 
-export { Lexer, Parser, FormatUtil, BerryCore, BerryExecutor, RUNNER_EVENT };
+export {
+  Lexer,
+  Parser,
+  FormatUtil,
+  SwaggerUtil,
+  BerryCore,
+  BerryExecutor,
+  RUNNER_EVENT,
+};

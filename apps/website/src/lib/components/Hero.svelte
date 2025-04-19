@@ -21,11 +21,11 @@
     mouse.y = -1000;
   }
   const words = [
-    "program",
-    "code",
-    "function",
-    "async",
-    "const",
+    "Api",
+    "Env",
+    "@",
+    "Task",
+    "Params ",
     "let",
     "var",
     "return",
@@ -59,16 +59,7 @@
     hoverTick: number;
     deflectTick: number;
   }> = [];
-  const colors = [
-    "#0fffc3",
-    "#5eead4",
-    "#22d3ee",
-    "#818cf8",
-    "#f472b6",
-    "#facc15",
-    "#38bdf8",
-    "#f87171",
-  ];
+  const colors = ["#0fffc3"];
   function randomWord() {
     return words[Math.floor(Math.random() * words.length)];
   }
@@ -94,39 +85,8 @@
       deflectTick: 0,
     };
   }
-  // --- Typing code animation for code preview ---
-  const codeBlocks = [
-    `Api GET #exAPi2 \nUrl http://localhost:8080/api/order/createPaymentOrder\nBody JSON  {\namount: 10.24,\nfirstName: Rintu,\nlastName: Raj,\nphone: 9400848033, \nemail: rinturajc@gmail.com,\nstreet: cheeranhouse,\ncity: kkm,\nstate: IN,\ncountry: KW,\npostalCode: 560024,\ntransactionId: Order1234\n} \nHeader\n- Content-Type: 'application/json'`,
-    `Api POST #CliApi   \nUrl http://localhost:8080/api/order/createPaymentOrder\nBody JSON {\"amount\": \"10.24\",\"firstName\": \"Rintu\",\"lastName\": \"Raj\",\"phone\": \"9400848033\", \"email\": \"rinturajc@gmail.com\",\"street\": \"cheeran house\",\"city\": \"kkm\",\"state\": \"IN\",\"country\": \"KW\",\"postalCode\": \"560024\",\"transactionId\": \"Order1234\"} \nHeader\n - Content-Type: application/json`,
-  ];
-  let previewBlock = 0;
-  let previewChar = 0;
-  let previewPause = 0;
-  let previewTyped = "";
-  let previewEl: HTMLPreElement;
-  // Auto-scroll code preview to bottom
-  $: if (previewEl && previewTyped) {
-    previewEl.scrollTop = previewEl.scrollHeight;
-  }
-  // Animate code preview typing
-  function animateCodePreview() {
-    if (previewPause > 0) {
-      previewPause--;
-    } else {
-      if (previewChar < codeBlocks[previewBlock].length) {
-        previewChar++;
-        previewTyped = codeBlocks[previewBlock].slice(0, previewChar);
-      } else {
-        previewPause = 60; // pause before next block
-        previewBlock = (previewBlock + 1) % codeBlocks.length;
-        previewChar = 0;
-        previewTyped = "";
-      }
-    }
-    requestAnimationFrame(animateCodePreview);
-  }
+  // (Code typing animation removed)
   onMount(() => {
-    animateCodePreview();
     // Mouse listeners for flying code
     // Use setTimeout to ensure canvas is in DOM
     setTimeout(() => {
@@ -355,12 +315,11 @@
           height="20"
           patternUnits="userSpaceOnUse"
         >
-          <!-- Diagonal line: top-left to bottom-right -->
           <line
             x1="0"
             y1="0"
             x2="20"
-            y2="20"
+            y2="0"
             stroke="#0d9488"
             stroke-width="1"
             stroke-opacity="0.3"
@@ -372,12 +331,11 @@
               repeatCount="indefinite"
             />
           </line>
-          <!-- Diagonal line: bottom-left to top-right -->
           <line
             x1="0"
-            y1="20"
-            x2="20"
-            y2="0"
+            y1="0"
+            x2="0"
+            y2="20"
             stroke="#0d9488"
             stroke-width="1"
             stroke-opacity="0.3"
@@ -451,25 +409,6 @@
           Read Docs
         </a>
       </div>
-    </div>
-
-    <!-- Code Preview -->
-    <div
-      class={`mt-16 w-full  max-w-3xl bg-gray-800/90 backdrop-blur-sm rounded-lg shadow-xl overflow-hidden transition-all duration-1000 ease-in-out transform ${
-        isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
-      }`}
-    >
-      <div class="flex items-center bg-gray-700/90 backdrop-blur-sm px-4 py-2">
-        <div class="w-3 h-3 rounded-full bg-red-500 mr-2"></div>
-        <div class="w-3 h-3 rounded-full bg-yellow-500 mr-2"></div>
-        <div class="w-3 h-3 rounded-full bg-green-500 mr-2"></div>
-        <span class="text-gray-400 text-sm">example.js</span>
-      </div>
-      <pre
-        class="p-4 text-sm max-h-[100px] h-[100px] overflow-x-auto"
-        bind:this={previewEl}>
-        <code>{previewTyped}</code>
-      </pre>
     </div>
   </div>
 </section>
