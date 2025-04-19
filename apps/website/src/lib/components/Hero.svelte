@@ -6,6 +6,227 @@
   let paragraphVisible = false;
   let sectionHeight = "100vh";
 
+  // --- Canvas background animation variables ---
+  let bgCanvas: HTMLCanvasElement;
+  let ctx: CanvasRenderingContext2D | null = null;
+  // Mouse tracking for flying code words
+  let mouse = { x: -1000, y: -1000 }; // off-canvas by default
+  function handleMouseMove(event: MouseEvent) {
+    const rect = bgCanvas.getBoundingClientRect();
+    mouse.x = event.clientX - rect.left;
+    mouse.y = event.clientY - rect.top;
+  }
+  function handleMouseLeave() {
+    mouse.x = -1000;
+    mouse.y = -1000;
+  }
+  const words = [
+    "program",
+    "code",
+    "function",
+    "async",
+    "const",
+    "let",
+    "var",
+    "return",
+    "if",
+    "else",
+    "while",
+    "for",
+    "class",
+    "import",
+    "export",
+    "try",
+    "catch",
+    "await",
+    "promise",
+    "lambda",
+    "yield",
+  ];
+  const flyingWords: Array<{
+    text: string;
+    x: number;
+    y: number;
+    vx: number;
+    vy: number;
+    size: number;
+    baseSize: number;
+    scale: number;
+    color: string;
+    alpha: number;
+    rotate: number;
+    rotateSpeed: number;
+    hoverTick: number;
+    deflectTick: number;
+  }> = [];
+  const colors = [
+    "#0fffc3",
+    "#5eead4",
+    "#22d3ee",
+    "#818cf8",
+    "#f472b6",
+    "#facc15",
+    "#38bdf8",
+    "#f87171",
+  ];
+  function randomWord() {
+    return words[Math.floor(Math.random() * words.length)];
+  }
+  function randomColor() {
+    return colors[Math.floor(Math.random() * colors.length)];
+  }
+  function spawnWord(width: number, height: number) {
+    const size = 18 + Math.random() * 18;
+    return {
+      text: randomWord(),
+      x: Math.random() * width,
+      y: Math.random() * height,
+      vx: -0.2 + Math.random() * 0.4,
+      vy: -0.1 + Math.random() * 0.2,
+      size,
+      baseSize: size,
+      scale: 1,
+      color: randomColor(),
+      alpha: 0.5 + Math.random() * 0.4,
+      rotate: Math.random() * Math.PI * 2,
+      rotateSpeed: -0.005 + Math.random() * 0.01,
+      hoverTick: 0,
+      deflectTick: 0,
+    };
+  }
+  // --- Typing code animation for code preview ---
+  const codeBlocks = [
+    `Api GET #exAPi2 \nUrl http://localhost:8080/api/order/createPaymentOrder\nBody JSON  {\namount: 10.24,\nfirstName: Rintu,\nlastName: Raj,\nphone: 9400848033, \nemail: rinturajc@gmail.com,\nstreet: cheeranhouse,\ncity: kkm,\nstate: IN,\ncountry: KW,\npostalCode: 560024,\ntransactionId: Order1234\n} \nHeader\n- Content-Type: 'application/json'`,
+    `Api POST #CliApi   \nUrl http://localhost:8080/api/order/createPaymentOrder\nBody JSON {\"amount\": \"10.24\",\"firstName\": \"Rintu\",\"lastName\": \"Raj\",\"phone\": \"9400848033\", \"email\": \"rinturajc@gmail.com\",\"street\": \"cheeran house\",\"city\": \"kkm\",\"state\": \"IN\",\"country\": \"KW\",\"postalCode\": \"560024\",\"transactionId\": \"Order1234\"} \nHeader\n - Content-Type: application/json`,
+  ];
+  let previewBlock = 0;
+  let previewChar = 0;
+  let previewPause = 0;
+  let previewTyped = "";
+  let previewEl: HTMLPreElement;
+  // Auto-scroll code preview to bottom
+  $: if (previewEl && previewTyped) {
+    previewEl.scrollTop = previewEl.scrollHeight;
+  }
+  // Animate code preview typing
+  function animateCodePreview() {
+    if (previewPause > 0) {
+      previewPause--;
+    } else {
+      if (previewChar < codeBlocks[previewBlock].length) {
+        previewChar++;
+        previewTyped = codeBlocks[previewBlock].slice(0, previewChar);
+      } else {
+        previewPause = 60; // pause before next block
+        previewBlock = (previewBlock + 1) % codeBlocks.length;
+        previewChar = 0;
+        previewTyped = "";
+      }
+    }
+    requestAnimationFrame(animateCodePreview);
+  }
+  onMount(() => {
+    animateCodePreview();
+    // Mouse listeners for flying code
+    // Use setTimeout to ensure canvas is in DOM
+    setTimeout(() => {
+      if (bgCanvas) {
+        bgCanvas.addEventListener("mousemove", handleMouseMove);
+        bgCanvas.addEventListener("mouseleave", handleMouseLeave);
+      }
+    }, 0);
+  });
+  // --- Canvas flying words only ---
+  function animateWords() {
+    if (!bgCanvas || !ctx) return;
+    // Always set canvas size to match display size
+    const width = (bgCanvas.width = bgCanvas.offsetWidth);
+    const height = (bgCanvas.height = bgCanvas.offsetHeight);
+    ctx.clearRect(0, 0, width, height);
+    // Add more words if needed
+    while (flyingWords.length < 18) {
+      flyingWords.push(spawnWord(width, height));
+    }
+    for (let i = 0; i < flyingWords.length; i++) {
+      const w = flyingWords[i];
+      // --- Hover/deflect logic ---
+      ctx.save();
+      ctx.font = `${w.size}px 'Fira Mono', 'Menlo', 'monospace'`;
+      const textWidth = ctx.measureText(w.text).width;
+      ctx.restore();
+      const dx = mouse.x - w.x;
+      const dy = mouse.y - w.y;
+      const dist = Math.sqrt(dx * dx + dy * dy);
+      const hitRadius = Math.max(w.size, textWidth) * 0.7;
+      if (dist < hitRadius) {
+        // Hovering: scale up and deflect
+        w.scale += (1.4 - w.scale) * 0.25;
+        w.hoverTick = 8;
+        if (w.deflectTick === 0) {
+          // Deflect velocity away from mouse
+          const angle = Math.atan2(dy, dx) + Math.PI;
+          w.vx += Math.cos(angle) * 0.6;
+          w.vy += Math.sin(angle) * 0.6;
+          w.deflectTick = 12;
+        }
+      } else {
+        w.scale += (1 - w.scale) * 0.08;
+        if (w.hoverTick > 0) w.hoverTick--;
+        if (w.deflectTick > 0) w.deflectTick--;
+      }
+      // --- Drawing ---
+      ctx.save();
+      ctx.globalAlpha = w.alpha;
+      ctx.font = `${w.baseSize * w.scale}px 'Fira Mono', 'Menlo', 'monospace'`;
+      ctx.fillStyle = w.color;
+      ctx.translate(w.x, w.y);
+      ctx.rotate(w.rotate);
+      ctx.scale(w.scale, w.scale);
+      ctx.fillText(w.text, 0, 0);
+      ctx.restore();
+      w.x += w.vx;
+      w.y += w.vy;
+      w.rotate += w.rotateSpeed;
+      // Friction to slow deflected words
+      w.vx *= 0.97;
+      w.vy *= 0.97;
+      // If out of bounds, respawn
+      if (w.x < -100 || w.x > width + 100 || w.y < -40 || w.y > height + 40) {
+        flyingWords[i] = spawnWord(width, height);
+      }
+    }
+    // Debug: draw mouse circle
+    // ctx.save();
+    // ctx.beginPath();
+    // ctx.arc(mouse.x, mouse.y, 8, 0, 2 * Math.PI);
+    // ctx.strokeStyle = '#fff';
+    // ctx.lineWidth = 2;
+    // ctx.stroke();
+    // ctx.restore();
+    requestAnimationFrame(animateWords);
+  }
+  onMount(() => {
+    setTimeout(() => {
+      isVisible = true;
+      setTimeout(() => (headingVisible = true), 500);
+      setTimeout(() => (paragraphVisible = true), 2000);
+    }, 100);
+    // Setup canvas
+    if (bgCanvas) {
+      ctx = bgCanvas.getContext("2d");
+      animateWords();
+    }
+    // Responsive: re-trigger on resize
+    const handleResize = () => {
+      if (bgCanvas && ctx) {
+        bgCanvas.width = bgCanvas.offsetWidth;
+        bgCanvas.height = bgCanvas.offsetHeight;
+      }
+    };
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  });
+
   // Typewriter effect function
   function typewriter(node: HTMLElement, { speed = 50, delay = 0 }) {
     const text = node.textContent || "";
@@ -37,10 +258,11 @@
   class="relative overflow-hidden transition-all duration-1000 ease-in-out"
   style="min-height: {sectionHeight};"
 >
-  <!-- Animated Mesh Gradient Background -->
-  <div class=" inset-0 -z-20 overflow-hidden">
+  <div class="w-full h-full opacity-55 inset-0 -z-10 overflow-hidden">
+    <canvas bind:this={bgCanvas} class="absolute w-full h-full block z-10"
+    ></canvas>
     <svg
-      class=" absolute opacity-50 h-full w-full"
+      class="absolute opacity-50 h-full w-full z-0"
       xmlns="http://www.w3.org/2000/svg"
     >
       <defs>
@@ -119,7 +341,7 @@
   </div>
 
   <!-- Grid Pattern Overlay -->
-  <div class=" inset-0 -z-10">
+  <div class="  inset-0 -z-10">
     <svg
       class="w-full opacity-50 absolute h-full"
       xmlns="http://www.w3.org/2000/svg"
@@ -133,12 +355,12 @@
           height="20"
           patternUnits="userSpaceOnUse"
         >
-          <!-- Horizontal lines -->
+          <!-- Diagonal line: top-left to bottom-right -->
           <line
             x1="0"
             y1="0"
             x2="20"
-            y2="0"
+            y2="20"
             stroke="#0d9488"
             stroke-width="1"
             stroke-opacity="0.3"
@@ -150,12 +372,12 @@
               repeatCount="indefinite"
             />
           </line>
-          <!-- Vertical lines -->
+          <!-- Diagonal line: bottom-left to top-right -->
           <line
             x1="0"
-            y1="0"
-            x2="0"
-            y2="20"
+            y1="20"
+            x2="20"
+            y2="0"
             stroke="#0d9488"
             stroke-width="1"
             stroke-opacity="0.3"
@@ -233,7 +455,7 @@
 
     <!-- Code Preview -->
     <div
-      class={`mt-16 w-full max-w-3xl bg-gray-800/90 backdrop-blur-sm rounded-lg shadow-xl overflow-hidden transition-all duration-1000 ease-in-out transform ${
+      class={`mt-16 w-full  max-w-3xl bg-gray-800/90 backdrop-blur-sm rounded-lg shadow-xl overflow-hidden transition-all duration-1000 ease-in-out transform ${
         isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
       }`}
     >
@@ -243,10 +465,10 @@
         <div class="w-3 h-3 rounded-full bg-green-500 mr-2"></div>
         <span class="text-gray-400 text-sm">example.js</span>
       </div>
-      <pre class="p-4 text-sm overflow-x-auto">
-        <code>
-          <!-- Add your code preview content here -->
-        </code>
+      <pre
+        class="p-4 text-sm max-h-[100px] h-[100px] overflow-x-auto"
+        bind:this={previewEl}>
+        <code>{previewTyped}</code>
       </pre>
     </div>
   </div>
