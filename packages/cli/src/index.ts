@@ -65,6 +65,7 @@ program
     return value;
   })
   .option("-s, --swagger <url>", "Import from Swagger URL")
+  .option("-p, --postman <filePath>", "Import from Postman collection")
   .option("-u, --url <url>", "API URL")
   .option("-m, --method <method>", "HTTP method")
   .option("-h, --headers <headers>", "Request headers (comma-separated)")

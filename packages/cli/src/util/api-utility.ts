@@ -12,10 +12,25 @@ import {
   text,
 } from "@clack/prompts";
 import { outroMessage } from "./util.js";
-import { FormatUtil, SwaggerUtil } from "@flexiberry/berrycore";
+import { FormatUtil, PostmanUtil, SwaggerUtil } from "@flexiberry/berrycore";
 import chalk from "chalk";
 
 export class ApiUtility {
+  static addFromPostman(name: string, postman: any) {
+    intro(`📦 Adding API from Postman Collection`);
+    const s = spinner();
+    s.start("Please wait... Converting Postman Collection to Berry");
+    try {
+      const apiCode = PostmanUtil.convertFromPostmanFile(postman);
+      s.stop("Conversion completed successfully");
+      const status = FileUtility.updateBerryCode(apiCode);
+      outro(outroMessage(status));
+    } catch (error: any) {
+      log.error(error);
+      s.stop("Conversion failed");
+      outro(chalk.red("Error"));
+    }
+  }
   static async addFromSwagger(name: string, swagger: any) {
     intro(`📦 Adding API from Swagger`);
     const s = spinner();

@@ -102,7 +102,16 @@ export class SwaggerUtil {
               );
             }
             if (bodyExample) {
-              result += `Body ${ctype.includes("xml") ? "XML" : "JSON"} \` ${typeof bodyExample === "string" ? bodyExample : JSON.stringify(bodyExample, null, 2)}\n\``;
+              // Determine bodyType from content-type
+              let bodyType = "RAW";
+              if (ctype.includes("json")) bodyType = "JSON";
+              else if (ctype.includes("xml")) bodyType = "XML";
+              else if (ctype.includes("form")) bodyType = "FORM";
+              else if (ctype.includes("x-www-form-urlencoded"))
+                bodyType = "FORM";
+              else if (ctype.includes("octet-stream")) bodyType = "BINARY";
+              else bodyType = ctype.toUpperCase();
+              result += `Body ${bodyType} \`${typeof bodyExample === "string" ? bodyExample : JSON.stringify(bodyExample, null, 2)}\`\n`;
               bodyHandled = true;
               break;
             }

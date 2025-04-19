@@ -10,6 +10,7 @@ export type CmdOptions = {
   swagger?: any;
   url?: any;
   method?: any;
+  postman?: any;
   headers?: string;
   body?: any;
   bodyType: any;
@@ -26,6 +27,8 @@ export class AddCommand {
           ApiUtility.addFromCurl(name, options.curl);
         } else if (options.swagger) {
           ApiUtility.addFromSwagger(name, options.swagger);
+        } else if (options.postman) {
+          ApiUtility.addFromPostman(name, options.postman);
         } else {
           ApiUtility.add(name, options);
         }

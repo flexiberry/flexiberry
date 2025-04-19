@@ -31,7 +31,7 @@ export class RunUtility {
       const fileSelected = await this.selectFromCurrentFolder();
       if (!fileSelected) {
         const hasP = await confirm({
-          message: "Would you like to proceed with the pre-selected file?",
+          message: `Would you like to proceed with the pre-selected file? (y/n) ${chalk.bgBlue(FileUtility.getPreselectedFileName())}`,
         });
         if (isCancel(hasP) || !hasP) {
           log.step("⚠️ Operation skipped.");
