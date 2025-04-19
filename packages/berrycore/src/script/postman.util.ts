@@ -47,18 +47,30 @@ export class PostmanUtil {
         .map((h: any) => `${h.key}: '${h.value}'`);
     }
 
-    // Helper: Abbreviation (sound chars)
-    function abbreviation(name: string): string {
-      return name
-        .split(/\s+/)
-        .filter(Boolean)
-        .map((word: string) => {
-          const chars = word[0] + word.slice(1).replace(/[aeiou]/gi, "");
-          return chars.toUpperCase();
-        })
-        .join("_");
-    }
+    function abbreviation(title: string): string {
+      const stopWords = new Set([
+        "a",
+        "in",
+        "the",
+        "with",
+        "and",
+        "of",
+        "to",
+        "for",
+        "on",
+        "at",
+        "by",
+      ]);
 
+      return title
+        .toLowerCase()
+        .split(" ")
+        .filter((word) => !stopWords.has(word))
+        .map((word, index) =>
+          index === 0 ? word : word[0].toUpperCase() + word.slice(1)
+        )
+        .join("");
+    }
     // Helper: Extract body content
     function extractBody(req: any): string {
       if (!req.body || !req.body.mode) return "";
