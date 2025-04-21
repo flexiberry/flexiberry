@@ -1,0 +1,54 @@
+{
+  "name": "vscode-berry-extension",
+  "version": "1.0.0",
+  "description": "",
+  "main": "./out/extension.js",
+  "scripts": {
+    "compile": "tsc -p .",
+    "watch": "tsc -watch -p .",
+    "package": "vsce package",
+    "test": "pnpm run compile && node ./out/test/runTest.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "engines": {
+    "vscode": ">=1.50.0"
+  },
+  "contributes": {
+    "languages": [
+      {
+        "id": "berry",
+        "aliases": [
+          "Berry",
+          "berry"
+        ],
+        "extensions": [
+          ".berry"
+        ],
+        "configuration": "./language-configuration.json"
+      }
+    ],
+    "grammars": [
+      {
+        "language": "berry",
+        "scopeName": "source.berry",
+        "path": "./syntaxes/berry.tmLanguage.json"
+      }
+    ],
+    "themes": [
+      {
+        "label": "Berry Theme",
+        "uiTheme": "vs-dark",
+        "path": "./themes/berry-color-theme.json"
+      }
+    ]
+  },
+  "devDependencies": {
+    "@types/node": "^22.14.1",
+    "@vscode/test-electron": "^2.5.2",
+    "typescript": "^5.8.3",
+    "vsce": "^2.15.0",
+    "vscode": "^1.1.37"
+  }
+}

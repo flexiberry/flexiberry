@@ -1,0 +1,41 @@
+{
+  "scopeName": "source.berry",
+  "patterns": [
+    {
+      "name": "comment.line.double-hash.berry",
+      "match": "^##.*$"
+    },
+    {
+      "name": "meta.api.berry",
+      "match": "^(Api)\\s+(POST|PUT|GET|DELETE|PATCH)\\s+(#[a-zA-Z0-9_]+)\\s+(.*)$",
+      "captures": {
+        "1": { "name": "keywords.berry" },
+        "2": { "name": "api.http.method.berry" },
+        "3": { "name": "api.identifier.berry" },
+        "4": { "name": "api.title.berry" }
+      }
+    },
+    {
+      "name": "meta.url.berry",
+      "match": "^(Url)\\s+(.+)$",
+      "captures": {
+        "1": { "name": "keywords.berry" },
+        "2": { "name": "url.link.berry" }
+      }
+    },
+    {
+      "name": "meta.body.berry",
+      "match": "^(Body)\\s+\\(w+)\\s+(.+)$",
+      "captures": {
+        "1": { "name": "body.berry" },
+        "2": { "name": "body.type.berry" },
+        "3": { "name": "body.start.berry" },
+        "4": { "name": "body.scalar.berry" },
+        "5": { "name": "body.end.berry" }
+      }
+    }
+  ],
+  "repository": {},
+  "fileTypes": ["berry"],
+  "firstLineMatch": "^#!.*\\bberry\\b"
+}

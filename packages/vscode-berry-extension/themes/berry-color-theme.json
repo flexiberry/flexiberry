@@ -1,0 +1,59 @@
+{
+  "name": "Berry Theme",
+  "type": "dark",
+  "colors": {},
+  "tokenColors": [
+    {
+      "scope": "comment.line.double-hash.berry",
+      "settings": { "foreground": "#62ac62", "fontStyle": "bold" }
+    },
+    {
+      "scope": "keywords.berry",
+      "settings": { "foreground": "#FF8800", "fontStyle": "bold" }
+    },
+    // api section
+    {
+      "scope": "api.berry",
+      "settings": { "foreground": "#FF8800", "fontStyle": "bold" }
+    },
+    {
+      "scope": "api.http.method.berry",
+      "settings": { "foreground": "#00BBFF" }
+    },
+    {
+      "scope": "api.identifier.berry",
+      "settings": { "foreground": "#0aecd2" }
+    },
+    {
+      "scope": "api.title.berry",
+      "settings": { "foreground": "#8d9a8d" }
+    },
+    // body section
+    {
+      "scope": "body.berry",
+      "settings": { "foreground": "#FF8800", "fontStyle": "bold" }
+    },
+    {
+      "scope": "body.type.berry",
+      "settings": { "foreground": "#00BBFF", "fontStyle": "bold" }
+    },
+    {
+      "scope": "body.scalar.berry",
+      "settings": { "foreground": "#d3c467", "fontStyle": "" }
+    },
+    {
+      "scope": "body.start.berry",
+      "settings": { "foreground": "#636963", "fontStyle": "bold" }
+    },
+    {
+      "scope": "body.end.berry",
+      "settings": { "foreground": "#636963", "fontStyle": "bold" }
+    },
+
+    //url section
+    {
+      "scope": "url.link.berry",
+      "settings": { "foreground": "#d3c467", "fontStyle": "bold" }
+    }
+  ]
+}
