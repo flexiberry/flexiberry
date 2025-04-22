@@ -1,121 +1,60 @@
 # Flexiberry Documentation
 
-## Overview
+Welcome to the Flexiberry Documentation!
 
-Flexiberry is a modern web application developed using **Svelte** and **Tailwind CSS**, designed to provide a seamless and dynamic user experience. The application leverages Svelte’s reactivity and Tailwind’s utility-first styling approach to deliver high performance and maintainability.
+<style>
+@media (max-width: 700px) {
+  .fb-grid {
+    grid-template-columns: 1fr !important;
+  }
+}
+.fb-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 2rem;
+  margin-top: 2rem;
+}
+.fb-card {
+  border: 1px solid #eaeaea;
+  border-radius: 12px;
+  padding: 2rem;
+  /* background: #fafbfc; */
+  box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+}
+.fb-link {
+  /* color: #0070f3; */
+  text-decoration: underline;
+}
+</style>
 
-## Features
+<div class="fb-grid">
 
-- 🚀 **High Performance:** Lightweight and fast, thanks to Svelte’s compiled output.
-- 🎨 **Modern UI:** Styled with Tailwind CSS for a clean and responsive design.
-- 🔄 **Reactivity:** Real-time updates with Svelte’s reactive stores.
-- 🔌 **Modular Architecture:** Easy to extend and maintain.
-- 📡 **API Integration:** Fetch and display data dynamically.
+<!-- Quick Start Card -->
+<div class="fb-card">
+  <h3>🚀 Quick Start</h3>
+  <p>Get up and running with Flexiberry in minutes. Follow our simple guide to start building amazing things!</p>
+  <a href="/quick-start" class="fb-link">Read Quick Start →</a>
+</div>
 
-## Installation
+<!-- Berry Documentation CLI Card -->
+<div class="fb-card">
+  <h3>🧰 CLI Documentation </h3>
+  <p>Discover how to use the Berry CLI to generate, manage, and maintain your documentation efficiently.</p>
+  <a href="/cli" class="fb-link">CLI Documentation →</a>
+</div>
 
-### Prerequisites
+<!-- App Configuration Card -->
+<div class="fb-card">
+  <h3>⚙️ App Configuration</h3>
+  <p>Learn how to configure your Flexiberry app for different environments and use cases.</p>
+  <a href="/configuration" class="fb-link">App Configuration →</a>
+</div>
 
-Ensure you have the following installed:
+<!-- (Optional) Placeholder for 4th Card -->
+<div class="fb-card">
+  <h3>.berry Language Documentation</h3>
+  <p>Learn how to use the .berry language to write testcases.</p>
+  <a href="/berry-language" class="fb-link">.berry Language →</a>
+</div>
 
-- [Node.js](https://nodejs.org/) (LTS recommended)
-- npm or pnpm (recommended for dependency management)
-
-### Clone the Repository
-
-```sh
-git clone https://github.com/yourusername/flexiberry.git
-cd flexiberry
-```
-
-### Install Dependencies
-
-```sh
-npm install  # or pnpm install
-```
-
-### Start the Development Server
-
-```sh
-npm run dev  # or pnpm run dev
-```
-
-The application will be available at `http://localhost:5173/`.
-
-## Project Structure
-
-```
-flexiberry/
-├── src/
-│   ├── components/   # Reusable UI components
-│   ├── routes/       # Page-level Svelte components
-│   ├── stores/       # State management
-│   ├── styles/       # Custom Tailwind styles
-│   ├── main.ts       # Entry point
-│   └── app.svelte    # Root component
-├── static/           # Static assets
-├── package.json      # Dependencies and scripts
-├── tailwind.config.cjs  # Tailwind configuration
-└── svelte.config.js  # Svelte configuration
-```
-
-## Usage
-
-### Creating a New Component
-
-1. Navigate to the `src/components` directory.
-2. Create a new Svelte file (e.g., `Button.svelte`).
-3. Define the component structure:
-
-```svelte
-<script>
-  export let label = "Click me";
-</script>
-
-<button class="bg-blue-500 text-white p-2 rounded">{label}</button>
-```
-
-4. Import and use it in a page:
-
-```svelte
-<script>
-  import Button from '../components/Button.svelte';
-</script>
-
-<Button label="Submit" />
-```
-
-## Deployment
-
-### Build for Production
-
-```sh
-npm run build  # or pnpm run build
-```
-
-The optimized output will be in the `dist/` directory.
-
-### Deploy to Vercel
-
-1. Install Vercel CLI:
-   ```sh
-   npm install -g vercel
-   ```
-2. Run the deployment command:
-   ```sh
-   vercel
-   ```
-
-## Contribution Guidelines
-
-- Fork the repository and create a feature branch.
-- Follow the project’s coding standards.
-- Submit a pull request with a clear description.
-
-## License
-
-Flexiberry is licensed under the MIT License.
-
-## Contact
-
-For any questions or issues, feel free to open an issue on GitHub or reach out to [your-email@example.com](mailto:your-email@example.com).
+</div>

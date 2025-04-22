@@ -1,0 +1,12 @@
+/* Light gradient background for the entire documentation site */
+body {
+  /* background: linear-gradient(135deg, #f8fafc 0%, #e0ecff 100%); */
+  /* min-height: 100vh; */
+}
+
+@media (prefers-color-scheme: dark) {
+  body {
+    /* background: linear-gradient(135deg, #232946 0%, #181f2a 100%); */
+    /* min-height: 100vh; */
+  }
+}
