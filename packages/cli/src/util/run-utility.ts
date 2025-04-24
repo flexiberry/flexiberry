@@ -12,6 +12,8 @@ import * as fs from "fs";
 import * as path from "path";
 import { FileUtility } from "./file-utility.js";
 import { BerryCore, BerryExecutor, RUNNER_EVENT } from "@flexiberry/berrycore";
+import { UI } from "../ui/ui.js";
+import { runDemo } from "../ui/demo-ui.js";
 
 export class RunUtility {
   static async run(file: string) {
@@ -61,6 +63,7 @@ export class RunUtility {
             log.message(`${chalk.bgWhite(" + ")} COMPLETED`);
             spin.stop();
             outro("✅ Execution completed successfully.\n");
+            runDemo();
           })
           .run(preSelectedFile.toString());
       }
