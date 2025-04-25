@@ -18,14 +18,15 @@ export function runDemo() {
         { name: "Send request", status: "pending", timeElapsed: 0 },
         { name: "Validate schema", status: "pending", timeElapsed: 0 },
         { name: "Check DB", status: "pending", timeElapsed: 0 },
-        { name: "Check dd", status: "pending", timeElapsed: 0 },
+        { name: "Check dd", status: "failed", timeElapsed: 0 },
       ],
     },
   ];
 
   const ui = new UI();
-  ui.initializeTable(testCases);
+  ui.printJobDetails();
 
+  ui.initializeTable(testCases);
   // Spinner animation: refresh the table every 1 second
   const spinnerInterval = setInterval(() => {
     ui.render();
@@ -37,17 +38,18 @@ export function runDemo() {
   }, 500);
   setTimeout(() => {
     ui.updateTestStep("case1", 0, "passed", 120);
-    ui.updateTestStep("case1", 1, "running", 10);
+    ui.updateTestStep("case1", 1, "passed", 10);
     // ui.log("User Profile API > Send request failed: 401 Unauthorized", "error");
     // ui.log("Retrying request...", "info");
   }, 1500);
   setTimeout(() => {
-    ui.updateTestStep("case1", 1, "passed", 44);
-    ui.updateTestStep("case2", 0, "running", 30);
+    ui.updateTestStep("case2", 1, "passed", 44);
+    ui.updateTestStep("case2", 2, "passed", 55);
+    ui.updateTestStep("case2", 0, "passed", 30);
   }, 2500);
   setTimeout(() => {
-    ui.updateTestStep("case2", 0, "failed", 80);
-    ui.updateTestStep("case2", 1, "pending", 0);
+    ui.updateTestStep("case2", 3, "passed", 80);
+    ui.updateTestStep("case2", 1, "passed", 0);
     // ui.log("Retrying request...", "info");
   }, 3500);
   // After all updates, exit after a short delay

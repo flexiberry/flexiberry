@@ -78,6 +78,7 @@ interface TestCase {
   name: string;
   steps: TestStep[];
   status?: TestStepStatus;
+  startTime?: string;
   endTime?: string;
 }
 
@@ -196,6 +197,13 @@ export class UI {
   private tableAnchored: boolean = false;
   private spinnerFrames: string[] = ["◐", "◓", "◑", "◒"];
   private spinnerIndex: number = 0;
+  private fileName?: string;
+  private environment?: string;
+
+  setSummaryContext(fileName: string, environment: string) {
+    this.fileName = fileName;
+    this.environment = environment;
+  }
 
   constructor() {
     this.terminalWidth = process.stdout.columns || 80;
@@ -259,6 +267,90 @@ export class UI {
     process.stdin.setRawMode(false);
     process.stdin.pause();
     this.rl.close();
+    this.printFinalSummary();
+  }
+  printJobDetails(): void {
+    const fileName = this.fileName || "Unknown File";
+    const environment = this.environment || "Local";
+    let startTime = "-";
+    if (this.testCases.length > 0) {
+      const allStartTimes = this.testCases
+        .map((tc) => tc.startTime)
+        .filter(Boolean)
+        .sort();
+      if (allStartTimes.length) startTime = allStartTimes[0] || "-";
+    }
+    const line = chalk.cyan(ANSI.boxHorizontal.repeat(this.terminalWidth));
+    console.log(
+      `${chalk.bold.cyan("📝 FLEXIBERRY TEST JOB  ")} \n` +
+        `${chalk.bold("📄 File:")} ${chalk.yellowBright(fileName)}` +
+        `  ${chalk.bold("🌐 Env:")} ${chalk.magentaBright(environment)}` +
+        `  ${chalk.bold("⏱️  Start:")} ${chalk.whiteBright(startTime)}` +
+        `\n${line}\n`
+    );
+  }
+
+  printFinalSummary(): void {
+    const { passed, failed, pending } = getStepCounts(this.testCases);
+    const total = passed + failed + pending;
+    const percent = (n: number) =>
+      total ? `${Math.round((n / total) * 100)}%` : "0%";
+    const width = this.terminalWidth;
+    const barChar = "│";
+    const passedLen = Math.round((passed / total) * width);
+    const failedLen = Math.round((failed / total) * width);
+    const pendingLen = width - passedLen - failedLen;
+    const bar =
+      chalk.green(barChar.repeat(passedLen)) +
+      chalk.red(barChar.repeat(failedLen)) +
+      chalk.yellow(barChar.repeat(pendingLen));
+
+    const fileName = this.fileName || "Unknown File";
+    const environment = this.environment || "Local";
+
+    let start = Infinity,
+      end = -Infinity;
+    for (const tc of this.testCases) {
+      if (tc.startTime) start = Math.min(start, Date.parse(tc.startTime));
+      if (tc.endTime) end = Math.max(end, Date.parse(tc.endTime));
+    }
+    const startTime = start < Infinity ? new Date(start).toISOString() : "-";
+    const endTime = end > -Infinity ? new Date(end).toISOString() : "-";
+    const duration = start < end ? `${Math.round((end - start) / 1000)}s` : "-";
+
+    const statusLine =
+      failed === 0 && pending === 0
+        ? chalk.green.bold("✨ ALL TESTS PASSED! ✨ 🚀 Great Job! 🚀")
+        : failed > 0
+          ? chalk.red.bold("❌ SOME TESTS FAILED")
+          : chalk.yellow.bold("⏳ TESTS PENDING");
+
+    const centerText = (text: string) => {
+      const pad = Math.floor((width - stripAnsi(text).length) / 2);
+      return " ".repeat(pad) + text;
+    };
+
+    const title = "FINAL SUMMARY";
+    const padLen = width - title.length;
+    const header =
+      ANSI.boxHorizontal.repeat(Math.floor(padLen / 2)) +
+      chalk.bold.blueBright(title) +
+      ANSI.boxHorizontal.repeat(Math.ceil(padLen / 2));
+
+    const lines = [
+      "",
+      header,
+      "",
+      `${chalk.bold("File:")} ${chalk.yellow(fileName)}   ${chalk.bold("Env:")} ${chalk.magenta(environment)}`,
+      `${chalk.bold("Start:")} ${chalk.white(startTime)}   ${chalk.bold("End:")} ${chalk.white(endTime)}   ${chalk.bold("Duration:")} ${chalk.white(duration)}`,
+      "",
+      `${chalk.green(`${passed} Passed (${percent(passed)})`)}   ${chalk.red(`${failed} Failed (${percent(failed)})`)}   ${chalk.yellow(`${pending} Pending (${percent(pending)})`)}`,
+      bar,
+      "",
+      centerText(statusLine),
+      "",
+    ];
+    process.stdout.write(lines.join("\n") + "\n");
   }
 
   printTestDetails(details: TestDetails): void {
