@@ -11,9 +11,9 @@ import chalk from "chalk";
 import * as fs from "fs";
 import * as path from "path";
 import { FileUtility } from "./file-utility.js";
-import { BerryCore, BerryExecutor, RUNNER_EVENT } from "@flexiberry/berrycore";
-import { UI } from "../ui/ui.js";
+import { BerryExecutor, RUNNER_EVENT } from "@flexiberry/berrycore";
 import { runDemo } from "../ui/demo-ui.js";
+import { apiCliCall } from "../ui/api.cli.js";
 
 export class RunUtility {
   static async run(file: string) {
@@ -63,7 +63,14 @@ export class RunUtility {
             log.message(`${chalk.bgWhite(" + ")} COMPLETED`);
             spin.stop();
             outro("✅ Execution completed successfully.\n");
-            runDemo();
+            // runDemo();
+            apiCliCall({
+              url: "https://jsonplaceholder.typicode.com/posts/1",
+              method: "GET",
+              headers: {
+                "Content-Type": "application/json",
+              },
+            });
           })
           .run(preSelectedFile.toString());
       }

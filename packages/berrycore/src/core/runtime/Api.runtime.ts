@@ -6,12 +6,6 @@ import { InterpolationUtil } from "../util/interpolations";
 export class ApiTemplate {
   constructor(private apiBuilder: ApiModel) {} // Assuming apiBuilder is passed in
 
-  /**
-   * Calls the API with the given name and arguments
-   * @param apiName The name of the API to call
-   * @param args The arguments to pass to the API
-   * @returns The result of the API call
-   */
   public callApi(api: ApiCoreModel) {
     const url = InterpolationUtil.replaceInterpolation(
       api.url,
