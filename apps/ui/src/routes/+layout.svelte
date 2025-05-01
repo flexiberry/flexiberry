@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
   import BottomToolBar from "../lib/ui/shared/BottomToolBar.svelte";
 
   import { Toaster } from "svelte-sonner";
@@ -13,30 +13,20 @@
   import { Button } from "$lib/components/ui/button";
   import FolderHierarchy from "../lib/ui/folder/FolderHierarchy.svelte";
   import BerryConsole from "../lib/ui/console/BerryConsole.svelte";
+  import { Folder, Plus, Search } from "lucide-svelte";
+  import type { PaneAPI } from "paneforge";
 
   let heightDifference = 0;
   let showRightPane = true;
   let toolbarHeight = 28; // Height of the bottom toolbar
-
-  // Add version from package.json
-  // @ts-ignore
-  const version = "v" + APP_VERSION;
-
-  /**
-   * @type {HTMLDivElement}
-   */
-  let logoContainer;
-  let showFullLogo = true;
-  let showOnlyIcon = false;
-  /**
-   * @type {ResizeObserver}
-   */
-  let resizeObserver;
-
+  let paneOne: PaneAPI;
+  let resizeObserver: ResizeObserver;
+  let collapsed = false;
   // Add these variables to track height
 
   onMount(() => {
     // Create ResizeObserver to watch container size changes
+
     resizeObserver = new ResizeObserver((entries) => {});
 
     const handleResize = () => {
@@ -59,6 +49,11 @@
       window.removeEventListener("resize", handleResize);
     };
   });
+
+  function expandPane() {
+    paneOne.expand();
+    paneOne.resize(25);
+  }
 </script>
 
 <!-- <SplashScreen duration={3000} /> -->
@@ -74,11 +69,35 @@
   direction="horizontal"
   style="height: {heightDifference}px;"
 >
-  <Resizable.Pane class=" bg-primary/50" defaultSize={25}>
+  <Resizable.Pane
+    class=" bg-primary/50 dark:bg-primary-foreground/20"
+    defaultSize={25}
+    bind:pane={paneOne}
+    minSize={15}
+    maxSize={30}
+    collapsible={true}
+    collapsedSize={4}
+    onCollapse={() => (collapsed = true)}
+    onExpand={() => (collapsed = false)}
+  >
     <!-- <Separator></Separator> -->
-    <div class=" px-2">
-      <FolderHierarchy height={heightDifference}></FolderHierarchy>
-    </div>
+    {#if !collapsed}
+      <div class="px-2">
+        <FolderHierarchy height={heightDifference} />
+      </div>
+    {:else}
+      <div class="flex flex-col items-center py-4 gap-4 min-h-full">
+        <Button on:click={expandPane} size="icon" variant="ghost"
+          ><Search size={20} /></Button
+        >
+        <Button on:click={expandPane} size="icon" variant="ghost"
+          ><Plus size={20} /></Button
+        >
+        <Button on:click={expandPane} size="icon" variant="ghost"
+          ><Folder size={20} /></Button
+        >
+      </div>
+    {/if}
   </Resizable.Pane>
   <Resizable.Handle withHandle />
   <Resizable.Pane class="bg-muted" defaultSize={showRightPane ? 50 : 75}>
@@ -86,7 +105,13 @@
   </Resizable.Pane>
   {#if showRightPane}
     <Resizable.Handle withHandle />
-    <Resizable.Pane defaultSize={25}>
+    <Resizable.Pane
+      minSize={15}
+      maxSize={30}
+      defaultSize={25}
+      collapsible={true}
+      collapsedSize={4}
+    >
       <BerryConsole></BerryConsole>
     </Resizable.Pane>
   {/if}

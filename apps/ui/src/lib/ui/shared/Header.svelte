@@ -72,7 +72,7 @@
   });
 </script>
 
-<header class="border-b-2 bg-primary/90 drop-shadow-lg">
+<header class="border-b-2 bg-primary/90 dark:bg-primary/10 drop-shadow-lg">
   <div class=" ">
     <nav class=" flex align-middle items-center">
       <div
@@ -143,8 +143,7 @@
       </Button>
       <div class=" border-l-2 border-opacity-15 mr-1 h-100"></div>
       <Button
-        class="mr-4"
-        color="primary"
+        class="mr-4 bg-secondary dark:bg-primary"
         on:click={() => toast("Hello world")}
         variant="default">Login</Button
       >

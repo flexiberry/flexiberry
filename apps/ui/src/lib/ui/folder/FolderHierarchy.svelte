@@ -100,7 +100,6 @@
       <Upload strokeWidth={1}></Upload>
     </Button>
   </div>
-  <!-- <Separator></Separator> -->
   <ScrollArea class=" h-full pt-2  w-full ">
     {#if folders == null || folders.length <= 0}
       <div class="flex flex-col mt-6 items-center justify-center p-4">

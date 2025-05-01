@@ -83,7 +83,7 @@ export async function apiCliCall(options: ApiCallOptions) {
   const { url, method = "GET", headers = {}, body } = options;
 
   // Attractive banner before spinner
-  console.log(chalk.magentaBright("\n Making Api Call Please Wait....\n"));
+  console.log(chalk.magentaBright("\nContacting API, please wait...\n"));
   const spinner = startSpinner(chalk.blueBright(`Calling ${method} ${url}`));
   const start = Date.now();
 
@@ -121,6 +121,7 @@ export async function apiCliCall(options: ApiCallOptions) {
           );
           const contentType = res.headers["content-type"] || "";
           printImportantHeaders(res.headers);
+          printRequest(contentType, options.body);
           printResponse(contentType, raw);
 
           // Highlight status
@@ -145,4 +146,15 @@ export async function apiCliCall(options: ApiCallOptions) {
       resolve(null);
     }
   });
+}
+function printRequest(contentType: string, raw: string) {
+  if (!raw) {
+    return;
+  }
+
+  if (contentType === "application/json") {
+    console.log("\nRequest (JSON): ", JSON.stringify(raw, null, 2));
+  } else {
+    console.log("\nRequest (Raw): ", raw);
+  }
 }
