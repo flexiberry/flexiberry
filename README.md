@@ -2,7 +2,12 @@
 
 **🌟 FlexiBerry** is a comprehensive API testing framework that supports a wide range of testing scenarios, including functional, load, security, data comparison, response validation, unit, and end-to-end testing.
 
-![Project Logo](./assets/favicon/android-icon-192x192.png)
+<div class="flex justify-center">
+<img src="./assets/favicon/android-icon-192x192.png" 
+height="100"
+width="100"
+alt="Project Logo">
+</div>
 
 ## ✨ Features
 
