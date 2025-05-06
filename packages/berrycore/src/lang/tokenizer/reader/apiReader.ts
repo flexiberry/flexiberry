@@ -91,7 +91,7 @@ export class ApiReader extends CReader implements Reader {
   }
 
   private readHeader(tkns: Token[]): number {
-    let start = this.position;
+    const start = this.position;
     this.position += 6; // Skip 'Header'
     tkns.push(
       Token.from(

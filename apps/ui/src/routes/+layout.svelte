@@ -4,12 +4,9 @@
   import { Toaster } from "svelte-sonner";
   import "../app.css";
   import { ModeWatcher } from "mode-watcher";
-  import { onMount, afterUpdate } from "svelte";
+  import { onMount } from "svelte";
   import * as Resizable from "$lib/components/ui/resizable/index";
   import Header from "../lib/ui/shared/Header.svelte";
-  import berry from "$lib/assets/berry-fotor-2024090211181.png";
-  import Separator from "../lib/components/ui/separator/separator.svelte";
-  import { fade, slide } from "svelte/transition";
   import { Button } from "$lib/components/ui/button";
   import FolderHierarchy from "../lib/ui/folder/FolderHierarchy.svelte";
   import BerryConsole from "../lib/ui/console/BerryConsole.svelte";

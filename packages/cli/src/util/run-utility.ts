@@ -19,7 +19,7 @@ export class RunUtility {
   static async run(file: string) {
     intro(`🏎️ Starting FlexiBerry Execution`);
 
-    if (!!file) {
+    if (file) {
       const filePath = path.join(process.cwd(), file);
       if (!fs.existsSync(filePath)) {
         log.error(

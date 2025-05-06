@@ -6,10 +6,9 @@
   import { Github } from "lucide-svelte";
   import { toast } from "svelte-sonner";
   import { toggleMode } from "mode-watcher";
-  import berry from "$lib/assets/berry-fotor-2024090211181.png";
   import { onMount } from "svelte";
   import { fade, slide } from "svelte/transition";
-
+  import berry from "$lib/assets/berry.png";
   // Add version from package.json
   // @ts-ignore
   const version = "v " + APP_VERSION;
@@ -82,8 +81,8 @@
         <div class="flex items-center overflow-hidden">
           <img
             src={berry}
-            height={"28px"}
-            class="h-[28px] flex-shrink-0 transition-transform duration-200"
+            height={"38px"}
+            class="h-[38px] flex-shrink-0 transition-transform duration-200"
             class:scale-110={showOnlyIcon}
             alt="FlexiBerry Logo"
           />

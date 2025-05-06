@@ -23,7 +23,7 @@ export class InterpolationUtil {
     }
     const regex = /{{(.*?)}}/g;
     let match;
-    let result = input;
+    const result = input;
     // while ((match = regex.exec(input)) !== null) {
     //   const key = match[1];
     //   if (values[key]) {

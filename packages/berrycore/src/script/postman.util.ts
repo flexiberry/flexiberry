@@ -95,7 +95,7 @@ export class PostmanUtil {
     // Helper: Detect body type
     function detectBodyType(headers: string[], req: any): string {
       let bodyType = "JSON";
-      let contentTypeHeader = headers.find((h) =>
+      const contentTypeHeader = headers.find((h) =>
         h.toLowerCase().startsWith("content-type")
       );
       if (contentTypeHeader) {
@@ -140,11 +140,11 @@ export class PostmanUtil {
         let url = buildUrl(req);
         url = url.replace(/\/:([a-zA-Z0-9_]+)/g, "/{{$1}}");
         // ID
-        let apiId = abbreviation(name);
+        const apiId = abbreviation(name);
         result += `Api ${method.toUpperCase()} #${apiId} ${name}\n`;
         result += `Url ${url}\n`;
         // Headers
-        let headers = extractHeaders(req);
+        const headers = extractHeaders(req);
         if (headers.length > 0) {
           result += "Header\n";
           for (const h of headers) {

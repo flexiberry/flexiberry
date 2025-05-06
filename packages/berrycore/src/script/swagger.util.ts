@@ -51,7 +51,7 @@ export class SwaggerUtil {
     params: any[]
   ): { modPath: string; queryParams: string[] } {
     let modPath = path;
-    let queryParams: string[] = [];
+    const queryParams: string[] = [];
     if (params) {
       for (const param of params) {
         if (param.in === "path") {
@@ -91,7 +91,7 @@ export class SwaggerUtil {
   }
 
   static extractHeaders(details: any): string[] {
-    let headers: string[] = [];
+    const headers: string[] = [];
     if (details.consumes) {
       headers.push(`Content-Type: '${details.consumes[0]}'`);
     } else if (details.requestBody && details.requestBody.content) {
@@ -116,7 +116,7 @@ export class SwaggerUtil {
 
   static generateBody(details: any, definitions?: any): string {
     let bodyExample = "";
-    let bodyHandled = false;
+    const bodyHandled = false;
     // OpenAPI 3: requestBody
     if (details.requestBody && details.requestBody.content) {
       const content = details.requestBody.content;

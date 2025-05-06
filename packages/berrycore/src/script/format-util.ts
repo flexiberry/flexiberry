@@ -28,7 +28,7 @@ export class FormatUtil {
     // Construct the Berry format string
     let berryFormat = `Api ${method} #${id} \n`;
     berryFormat += `Url ${url}\n`;
-    if (!!body) berryFormat += `Body JSON  \`${body.replaceAll("\n", "")}\`\n`;
+    if (body) berryFormat += `Body JSON  \`${body.replaceAll("\n", "")}\`\n`;
     if (!!headers && Object.entries(headers).length > 0) {
       berryFormat += `Header\n`;
       for (const [key, value] of Object.entries(headers)) {
@@ -39,18 +39,18 @@ export class FormatUtil {
     return berryFormat;
   }
   static buildApi(name: any, cmd: any) {
-    let template = `Api ${cmd.method} #${name}  ${!!cmd.title ? cmd.title : ""} \n Url ${cmd.url}`;
-    if (!!cmd.body) {
-      template += `Body ${!!cmd.bodyType ? cmd.bodyType.toUpperCase() : "JSON"}\n\`\n${cmd.body}\n\``;
+    let template = `Api ${cmd.method} #${name}  ${cmd.title ? cmd.title : ""} \n Url ${cmd.url}`;
+    if (cmd.body) {
+      template += `Body ${cmd.bodyType ? cmd.bodyType.toUpperCase() : "JSON"}\n\`\n${cmd.body}\n\``;
     }
-    if (!!cmd.headers) {
+    if (cmd.headers) {
       template += `Header\n - ${cmd.headers.split(",").join("\n  - ")}`;
     }
     return template;
   }
 
   static buildVar(title: string, variables: string[], env: string) {
-    let code = `Var ${!!env ? "@" + env : ""} ${title} \n - ${variables.join("\n - ")}`;
+    const code = `Var ${env ? "@" + env : ""} ${title} \n - ${variables.join("\n - ")}`;
     return code;
   }
 

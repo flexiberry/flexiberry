@@ -19,8 +19,6 @@
   import { ScrollArea } from "$lib/components/ui/scroll-area/index.js";
   import { onMount } from "svelte";
   import { db } from "../../db/db";
-  import berry from "$lib/assets/berry-fotor-2024090211181.png";
-  import Separator from "../../components/ui/separator/separator.svelte";
 
   export let height: number = 100;
 
