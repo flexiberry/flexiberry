@@ -1,9 +1,7 @@
 import figlet from "figlet";
-import chalkAnimation from "chalk-animation";
 import chalk from "chalk";
 import { intro, isCancel, log, outro, select, text } from "@clack/prompts";
 import { FileUtility } from "./file-utility.js";
-import { db } from "../index.js";
 
 export class Cli {
   public static async main(version: string): Promise<void> {
@@ -69,21 +67,15 @@ export class Cli {
   private static banner(version: string) {
     const text =
       "\n\n" +
-      figlet.textSync("FlexiBerry", {
-        horizontalLayout: "universal smushing",
-        whitespaceBreak: true,
-        font: "Isometric3",
-        showHardBlanks: true,
+      figlet.textSync("Flexiberry", {
+        font: "Pagga",
       });
 
-    const rainbow = chalkAnimation.rainbow(text);
-    rainbow.render(); // Animation starts
+    console.log(chalk.green(text));
+    console.log(chalk.green("Welcome to"), chalk.bgGreen(" FlexiBerry CLI! "));
     console.log(chalk.gray("Version: ") + chalk.green(version));
-    console.log("Welcome to", chalk.bgBlue(" FlexiBerry CLI! "));
+
     console.log("\n");
-    setTimeout(() => {
-      rainbow.stop(); // Stop the animation after a delay
-    }, 1000);
   }
 }
 
