@@ -17,8 +17,8 @@ export class StepParser extends BaseParser {
       kind: NodeType.Step,
       identifier: "",
       title: "",
-      action: "",
-      target: "",
+      action: "Call",
+      target: "Api",
       functionId: "",
       capture: [],
       check: [],
@@ -36,11 +36,10 @@ export class StepParser extends BaseParser {
         "Expected step identifier"
       ).value;
     }
-    step.action = this.expect(TokenType.Call, "Expected Action ").value;
-    step.target = this.expect(
-      TokenType.Api,
-      "Expected target function type "
-    ).value;
+    step.action = this.expect(TokenType.Call, "Expected Action ")
+      .value as "Call";
+    step.target = this.expect(TokenType.Api, "Expected target function type ")
+      .value as "Api";
     step.functionId = this.expect(
       TokenType.Identifier,
       "Expected target function identifier"

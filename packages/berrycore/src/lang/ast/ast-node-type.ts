@@ -88,8 +88,8 @@ export interface Step extends Statement {
   kind: NodeType.Step;
   identifier: string;
   title: string;
-  action: string;
-  target: string;
+  action: "Call";
+  target: "Api";
   functionId: string;
   capture: Capture[];
   check: Check[];

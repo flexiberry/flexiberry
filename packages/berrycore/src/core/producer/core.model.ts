@@ -18,7 +18,6 @@ export type VarCoreModel = {
 export type ApiCoreModel = {
   url: string | undefined;
   header?: Record<string, string>;
-  params?: Record<string, string>;
   method: string;
   body: any;
   bodyType: string | undefined;

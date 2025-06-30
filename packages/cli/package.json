@@ -9,7 +9,7 @@
     "flexiberry": "./dist/index.js"
   },
   "scripts": {
-    "dev": "tsx src/index.ts ",
+    "dev": "tsx src/index.ts run",
     "build": "tsc",
     "clean": "rm -rf dist",
     "prepare": "npm run clean && npm run build",

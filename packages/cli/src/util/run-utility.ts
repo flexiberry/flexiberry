@@ -51,26 +51,27 @@ export class RunUtility {
         spin.message("Executing...");
 
         new BerryExecutor()
+          .on(RUNNER_EVENT.ERROR, (x: any) => {
+            log.error(chalk.red(`❌ Error: ${x.info}`));
+          })
           .on(RUNNER_EVENT.START, (x: any) => {
-            log.message(`${chalk.bgWhite("+") + chalk.bgBlue(x.time)} Started`);
+            log.message(`Started`);
           })
           .on(RUNNER_EVENT.CONSOLE, (x: any) => {
-            log.message(
-              `${chalk.bgWhite(" + ") + chalk.bgBlue(" " + x.time)}📄 ${x.info}`
-            );
+            log.message(`${x.info}`);
           })
           .on(RUNNER_EVENT.COMPLETED, (x: any) => {
-            log.message(`${chalk.bgWhite(" + ")} COMPLETED`);
+            log.message(`COMPLETED`);
             spin.stop();
             outro("✅ Execution completed successfully.\n");
             // runDemo();
-            apiCliCall({
-              url: "https://jsonplaceholder.typicode.com/posts/1",
-              method: "GET",
-              headers: {
-                "Content-Type": "application/json",
-              },
-            });
+            // apiCliCall({
+            //   url: "https://jsonplaceholder.typicode.com/posts/1",
+            //   method: "GET",
+            //   headers: {
+            //     "Content-Type": "application/json",
+            //   },
+            // });
           })
           .run(preSelectedFile.toString());
       }

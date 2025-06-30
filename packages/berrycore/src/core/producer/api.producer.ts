@@ -1,4 +1,3 @@
-import { title } from "process";
 import { type ApiStatement, NodeType } from "../../lang/ast/ast-node-type";
 import type { ApiCoreModel } from "./core.model";
 import { type IProducer, ProducerError } from "./producer";
@@ -36,7 +35,6 @@ export class ApiProducer implements IProducer<ApiCoreModel, ApiStatement> {
       url: ast.sturct.url,
       header: ast.sturct.header,
       method: ast.method,
-      params: undefined,
       interpolation: interPolation,
       id: ast.identifier,
       title: ast.title,

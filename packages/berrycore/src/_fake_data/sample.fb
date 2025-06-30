@@ -47,7 +47,7 @@ Api POST #API Fetch user information
  
 Task testing the application user information api  **tesing comments
        
-        Step  Call Api ApiOne   **testing comments
+        Step  Call Api ApiOne   
 
                 Capture **capture the token and status
                 - token: response.body.token

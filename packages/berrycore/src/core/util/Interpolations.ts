@@ -13,7 +13,8 @@ export class InterpolationUtil {
 
   public static replaceInterpolation(
     input: string | undefined,
-    values: string[] | undefined
+    keys: string[] | undefined,
+    values: { [key: string]: string } | undefined
   ): string {
     if (!input) {
       return "";
@@ -23,13 +24,13 @@ export class InterpolationUtil {
     }
     const regex = /{{(.*?)}}/g;
     let match;
-    const result = input;
-    // while ((match = regex.exec(input)) !== null) {
-    //   const key = match[1];
-    //   if (values[key]) {
-    //     result = result.replace(`{{${key}}}`, values[key]);
-    //   }
-    // }
+    let result = input;
+    while ((match = regex.exec(input)) !== null) {
+      const key = match[1];
+      if (keys?.includes(key)) {
+        result = result.replace(`{{${key}}}`, values[key]);
+      }
+    }
     return result;
   }
 }

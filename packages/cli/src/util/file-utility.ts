@@ -4,7 +4,7 @@ import chalk from "chalk";
 import * as fs from "fs";
 import * as path from "path";
 import { db } from "../index.js";
-import { intro, log, note, outro, select, spinner } from "@clack/prompts";
+import { intro, log, outro, select } from "@clack/prompts";
 import { spawn } from "child_process";
 import * as os from "os";
 

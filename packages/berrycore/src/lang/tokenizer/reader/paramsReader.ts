@@ -13,12 +13,19 @@ export class ParamsReader extends CReader implements Reader {
     const tkns: Token[] = [];
 
     tkns.push(this.readParams());
-    const start = this.position;
     // Handle any trailing comments
     while (
       this.position < this.input.length &&
       this.input[this.position] !== "\n"
     ) {
+      if (
+        !isComment(this.input, this.position) ||
+        this.input[this.position] !== "\n" ||
+        !isWhitespace(this.input[this.position])
+      ) {
+        throw new Error("Invalid params reader");
+      }
+
       if (isWhitespace(this.input[this.position])) {
         this.position++;
         continue;
@@ -32,11 +39,11 @@ export class ParamsReader extends CReader implements Reader {
         break;
       }
     }
+
     this.position++;
-    // Parse key-value pairs until empty line
+
     while (this.position < this.input.length) {
       // Skip whitespace at start of line
-      const lineStart = this.position;
       while (
         this.position < this.input.length &&
         isWhitespace(this.input[this.position]) &&
@@ -53,21 +60,12 @@ export class ParamsReader extends CReader implements Reader {
         break;
       }
 
-      // Parse key-value pair if line starts with hyphen
       if (this.input[this.position] === "-") {
         const kvReader = new KeyValuePair(this.input, this.position);
         const tk = kvReader.read();
         tkns.push(...tk);
         this.position = kvReader.getPosition(); // Update position
       }
-
-      // Move to next line
-      // while (
-      //   this.position < this.input.length &&
-      //   this.input[this.position] !== "\n"
-      // ) {
-      //   this.position++;
-      // }
 
       if (this.position < this.input.length) {
         this.position++; // Move past newline
