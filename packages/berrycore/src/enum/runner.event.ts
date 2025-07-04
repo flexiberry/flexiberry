@@ -13,4 +13,5 @@ export enum RUNNER_EVENT {
   SCENARIO_BEGIN = "scenario_begin",
   PARSED = "PARSED",
   CONSOLE = "CONSOLE",
+  TASK_OVERVIEW = "TASK_OVERVIEW",
 }

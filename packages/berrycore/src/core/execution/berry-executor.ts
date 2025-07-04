@@ -24,7 +24,6 @@ export class BerryExecutor {
     if (fileType === InputType.Invalid) {
       throw new RuntimeError("Invalid file path");
     }
-
     const content = FileUtils.loadFile(filePath);
     await this.emit(RUNNER_EVENT.CONSOLE, { info: "parsed" });
     const parser = new Parser();
@@ -32,6 +31,9 @@ export class BerryExecutor {
     await this.emit(RUNNER_EVENT.CONSOLE, { info: "AST PRODUCED" });
     const producer = new Producer().build(ast.body);
     await this.emit(RUNNER_EVENT.CONSOLE, { info: "PRODUCED" });
+
+    console.dir(producer);
+
     await new Runtime(producer, this.events).execute();
     await this.emit(RUNNER_EVENT.COMPLETED, { status: "COMPLETED" });
   }

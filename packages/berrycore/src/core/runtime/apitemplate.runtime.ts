@@ -8,36 +8,65 @@ import axios from "axios";
 import { InterpolationUtil } from "../util/interpolations";
 
 export class ApiTemplate {
-  p: Record<string, string> | undefined = {};
+  constructor(private storedValue: { [key: string]: string }) {}
 
-  constructor(
-    private varModel?: VarCoreModel[],
-    private params?: ParamsCoreModel[]
+  /*
+   * Process params - Combine storedValue and localStore
+   * @param params - ParamsCoreModel[] | undefined
+   * @param localStore - { [key: string]: any }
+   * @returns { [key: string]: any }
+   */
+  private processParams(
+    params: ParamsCoreModel[] | undefined,
+    localStore: { [key: string]: any }
+  ): { [key: string]: any } {
+    const combineStore = { ...this.storedValue, ...localStore };
+
+    if (!params?.length) {
+      return { ...combineStore };
+    }
+
+    const paramsStore = params.reduce<Record<string, any>>(
+      (acc, { type, key, value }) => {
+        acc[key] = type === "Literal" ? value : combineStore[value];
+        return acc;
+      },
+      {}
+    );
+
+    return { ...paramsStore, ...combineStore };
+  }
+
+  /*
+   * Call API
+   * @param api - ApiCoreModel
+   * @param localStore - { [key: string]: any }
+   * @param params - ParamsCoreModel[] | undefined
+   * @returns Promise<any>
+   */
+  public callApi(
+    api: ApiCoreModel,
+    localStore: { [key: string]: any },
+    params?: ParamsCoreModel[] | undefined
   ) {
-    this.p = this.params
-      ? Object.fromEntries(this.params.map((v) => [v.key, v.value]))
-      : undefined;
-  } // Assuming apiBuilder is passed in
-
-  public callApi(api: ApiCoreModel) {
-    console.log(this.varModel);
+    const paramsStore = this.processParams(params, localStore);
 
     const url = InterpolationUtil.replaceInterpolation(
       api.url,
       api.interpolation,
-      this.p
+      paramsStore
     );
     const body = InterpolationUtil.replaceInterpolation(
       api.body,
       api.interpolation,
-      this.p
+      paramsStore
     );
     const header: Record<string, string> = {};
     for (const key in api.header) {
       header[key] = InterpolationUtil.replaceInterpolation(
         api.header[key],
         api.interpolation,
-        this.p
+        paramsStore
       );
     }
 
@@ -47,7 +76,6 @@ export class ApiTemplate {
       url: url,
       data: body,
       headers: header,
-      params: this.params,
     });
   }
 }

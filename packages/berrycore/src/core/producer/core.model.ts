@@ -58,11 +58,17 @@ export type StepCoreModel = {
   capture?: CaptureCoreModel[];
   check?: CheckCoreModel[];
   params?: ParamsCoreModel[];
+  status?: string;
+  comments?: string;
+  error?: string;
 };
 export type TaskCoreModel = {
   title: string;
   id: string;
   steps?: StepCoreModel[];
+  status?: string;
+  comments?: string;
+  error?: string;
 };
 export type CoreModel = {
   environments?: EnvCoreModel[];

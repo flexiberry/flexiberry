@@ -52,8 +52,13 @@ export class RunUtility {
 
         new BerryExecutor()
           .on(RUNNER_EVENT.ERROR, (x: any) => {
-            log.error(chalk.red(`❌ Error: ${x.info}`));
+            log.error(x);
           })
+
+          .on(RUNNER_EVENT.TASK_OVERVIEW, (x: any) => {
+            console.dir(x);
+          })
+
           .on(RUNNER_EVENT.START, (x: any) => {
             log.message(`Started`);
           })
