@@ -117,7 +117,9 @@ export interface Check extends Statement {
 
 export interface Condition extends Statement {
   operator?: string; // Optional operator for conditions (e.g., "AND", "OR")
-  leftOperand?: string; // Optional left operand for complex conditions
-  rightOperand?: string; // Optional right operand for complex conditions
+  leftOperand?: any; // Optional left operand for complex conditions
+  leftOperandType?: "LITERAL" | "IDENTIFIER";
+  rightOperand?: any; // Optional right operand for complex conditions
+  rightOperandType?: "LITERAL" | "IDENTIFIER";
   logicalOperator?: string;
 }

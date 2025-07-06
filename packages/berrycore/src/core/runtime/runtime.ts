@@ -1,4 +1,5 @@
 import { Producer } from "../producer/producer";
+import { CheckValidator } from "./check-validator";
 import type { ProgramBody } from "../../lang/ast/ast-node-type";
 import {
   CoreModel,
@@ -11,6 +12,7 @@ import { emitEvent } from "../util/event-utils";
 import { ApiTemplate } from "./apitemplate.runtime";
 import { title } from "node:process";
 import { StringUtil } from "../util/string-util";
+import { AxiosResponse } from "axios";
 
 export class Runtime {
   /**
@@ -98,35 +100,51 @@ export class Runtime {
       const apiTemplate = new ApiTemplate(this.dataStore);
       const response = await apiTemplate.callApi(api, localStore, step.params);
 
-      if (step.capture)
-        for (const c of step.capture) {
-          localStore[`Step.${step.id}.${c.key}`] = StringUtil.getValueByPath(
-            response.data,
-            c.value
-          );
-        }
+      this.capture(step, localStore, response);
 
-      if (step.check)
-        for (const c of step.check) {
-          c.conditions.forEach((x) => {
-            x.logicalOperator;
-            x.leftOperand;
-            x.rightOperand;
-            x.operator;
-          });
-        }
-
-      // for (const c of step?.check) {
-      //   c.conditions.forEach(x=>{
-      //     x.logicalOperator
-      //     x.leftOperand
-      //     x.rightOperand
-      //     x.operator
-      //   })
-      // }
+      const checkResult = this.checkValidator(step, localStore, response);
+      step.status = checkResult ? "PASSED" : "FAILED";
+      // step.response = response.data;
+      step.comments = checkResult ? "" : "Check failed";
     }
 
     await this.emitStepDone(step);
+  }
+
+  private checkValidator(
+    step: StepCoreModel,
+    localStore: { [key: string]: any },
+    response: AxiosResponse<any, any>
+  ) {
+    if (!!step.check) {
+      const checkValidator = new CheckValidator(this);
+      const overallCheckResult = checkValidator.validate(
+        step.check,
+        step.id,
+        localStore
+      );
+      console.log("overallCheckResult", overallCheckResult);
+      return overallCheckResult;
+    } else {
+      return CheckValidator.validateResponseStatus(response.status);
+    }
+  }
+
+  private capture(
+    step: StepCoreModel,
+    localStore: { [key: string]: any },
+    response: AxiosResponse<any, any>
+  ) {
+    if (!!step.capture) {
+      for (const c of step.capture) {
+        localStore[`Step.${step.id}.${c.key}`] = StringUtil.getValueByPath(
+          response.data,
+          c.value
+        );
+      }
+    }
+    localStore[`$.body`] = response.data || null;
+    localStore[`$.status`] = response.status;
   }
 
   private resolveDataStore() {
@@ -157,8 +175,8 @@ export class Runtime {
     await emitEvent(this.events, eventName, payload);
   }
 
-  private async emitRuntimeError(message: string) {
-    await this.emit(RUNNER_EVENT.ERROR, { info: message });
+  public emitRuntimeError(message: string) {
+    this.emit(RUNNER_EVENT.ERROR, new RuntimeError(message));
   }
 
   private async emitTaskOverview(model: CoreModel) {
@@ -206,10 +224,12 @@ export class Runtime {
       title: step.title,
     });
   }
-  private async emitStepDone(step: { id: string; title: string }) {
+  private async emitStepDone(step: StepCoreModel) {
     await this.emit(RUNNER_EVENT.STEP_DONE, {
       info: "step End",
       id: step.id,
+      status: step.status,
+      comments: step.comments,
     });
   }
 

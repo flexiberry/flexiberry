@@ -55,9 +55,7 @@ export class RunUtility {
             log.error(x);
           })
 
-          .on(RUNNER_EVENT.TASK_OVERVIEW, (x: any) => {
-            console.dir(x);
-          })
+          .on(RUNNER_EVENT.TASK_OVERVIEW, (x: any) => {})
 
           .on(RUNNER_EVENT.START, (x: any) => {
             log.message(`Started`);

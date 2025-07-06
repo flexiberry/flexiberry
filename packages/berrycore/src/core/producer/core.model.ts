@@ -45,8 +45,10 @@ export type CheckCoreModel = {
 };
 export type ConditionCoreModel = {
   operator?: string; // Optional operator for conditions (e.g., "AND", "OR")
-  leftOperand?: string;
-  rightOperand?: string;
+  leftOperand?: any;
+  leftOperandType: "LITERAL" | "IDENTIFIER";
+  rightOperand?: any;
+  rightOperandType: "LITERAL" | "IDENTIFIER";
   logicalOperator?: string;
 };
 export type StepCoreModel = {

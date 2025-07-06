@@ -32,8 +32,6 @@ export class BerryExecutor {
     const producer = new Producer().build(ast.body);
     await this.emit(RUNNER_EVENT.CONSOLE, { info: "PRODUCED" });
 
-    console.dir(producer);
-
     await new Runtime(producer, this.events).execute();
     await this.emit(RUNNER_EVENT.COMPLETED, { status: "COMPLETED" });
   }

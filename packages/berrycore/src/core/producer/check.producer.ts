@@ -16,7 +16,7 @@ export class CheckProducer implements IProducer<CheckCoreModel, Check> {
 
     const c: CheckCoreModel = {
       id: SequenceGenerator.getNext("CHECK").toString(),
-      conditions: ast.conditions.map((x) => x),
+      conditions: ast.conditions.map((x) => new CondotionsProducer().build(x)),
     };
     return c;
   }
@@ -34,7 +34,9 @@ export class CondotionsProducer
     const c: ConditionCoreModel = {
       operator: ast.operator,
       leftOperand: ast.leftOperand,
+      leftOperandType: ast.leftOperandType || "LITERAL",
       rightOperand: ast.rightOperand,
+      rightOperandType: ast.rightOperandType || "LITERAL",
       logicalOperator: ast.logicalOperator,
     };
     return c;

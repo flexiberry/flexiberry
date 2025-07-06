@@ -6,6 +6,7 @@ import { CReader, type Reader } from "./reader";
 import { isWhitespace, isComment } from "../../util";
 import { Token } from "../token";
 import { TokenType } from "../tokenType";
+import { isNumberObject } from "util/types";
 
 export class CheckReader extends CReader implements Reader {
   private readonly operandsScalar = ["'", "`"];
@@ -50,6 +51,7 @@ export class CheckReader extends CReader implements Reader {
 
       if (this.input[this.position] === "-") {
         // this.position++;
+
         tkns.push(...this.readExpression());
         continue;
       }
@@ -69,9 +71,9 @@ export class CheckReader extends CReader implements Reader {
     const tkns: Token[] = [];
     const lineStart = this.position;
     tkns.push(Token.from("-", TokenType.Hyphen, lineStart, this.position));
-    this.position++;
     let hasLogicalOperator: boolean = false;
     do {
+      this.position++;
       // Read left hand side (identifier)
       tkns.push(Token.from("Lhs", TokenType.Lhs, lineStart, this.position));
       let start = this.readOperands(tkns);
@@ -81,13 +83,14 @@ export class CheckReader extends CReader implements Reader {
       tkns.push(Token.from("Rhs", TokenType.Rhs, lineStart, this.position));
       start = this.readOperands(tkns);
 
+      // if (this.input[this.position] == "-") break;
+
       // Check if there is a logical operator after the current operand
       hasLogicalOperator = this.hasLogicalOperator(
         hasLogicalOperator,
         start,
         tkns
       );
-
       this.position++;
     } while (hasLogicalOperator);
 
@@ -178,9 +181,16 @@ export class CheckReader extends CReader implements Reader {
         this.position++;
       }
     }
-    const value = this.input.substring(start, this.position);
 
-    tkns.push(Token.from(value, tokenType, start, this.position));
+    const value: any = this.input.substring(start, this.position);
+    const numbValue = Number.parseFloat(value);
+    const isNumber = !Number.isNaN(numbValue) || isNumberObject(numbValue);
+    if (isNumber) {
+      tokenType = TokenType.OperandsScalar;
+      tkns.push(Token.from(numbValue, tokenType, start, this.position));
+    } else {
+      tkns.push(Token.from(value, tokenType, start, this.position));
+    }
     while (
       this.position < this.input.length &&
       isWhitespace(this.input[this.position])

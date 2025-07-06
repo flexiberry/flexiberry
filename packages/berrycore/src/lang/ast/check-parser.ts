@@ -41,12 +41,14 @@ export class CheckParser extends BaseParser {
         this.eat(); // Consume Lhs token
         if (this.at().type === TokenType.OperandsScalar) {
           condition.leftOperand = this.at().value;
+          condition.leftOperandType = "LITERAL";
           this.eat();
         } else {
           condition.leftOperand = this.expect(
             TokenType.Operands,
             "Expected left operand"
           ).value;
+          condition.leftOperandType = "IDENTIFIER";
         }
       }
 
@@ -60,12 +62,14 @@ export class CheckParser extends BaseParser {
         this.eat(); // Consume Rhs token
         if (this.at().type === TokenType.OperandsScalar) {
           condition.rightOperand = this.at().value;
+          condition.rightOperandType = "LITERAL";
           this.eat();
         } else {
           condition.rightOperand = this.expect(
             TokenType.Operands,
             "Expected right operand"
           ).value;
+          condition.rightOperandType = "IDENTIFIER";
         }
       }
 
