@@ -1,17 +1,14 @@
 export enum RUNNER_EVENT {
-  START = "start",
-  COMPLETED = "completed",
-  ERROR = "error",
+  START = "START",
+  COMPLETED = "COMPLETED",
+  ERROR = "ERROR",
 
-  STEP_DONE = "step_done",
-  STEP_BEGIN = "step_begin",
+  STEP_DONE = "STEP_DONE",
+  STEP_BEGIN = "STEP_DONE",
 
-  TEST_DONE = "test_done",
-  TEST_BEGIN = "test_begin",
-
-  SCENARIO_DONE = "scenario_done",
-  SCENARIO_BEGIN = "scenario_begin",
   PARSED = "PARSED",
   CONSOLE = "CONSOLE",
   TASK_OVERVIEW = "TASK_OVERVIEW",
+  TASK_BEGIN = "TASK_BEGIN",
+  TASK_DONE = "TASK_DONE",
 }

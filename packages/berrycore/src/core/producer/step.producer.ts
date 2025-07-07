@@ -16,7 +16,7 @@ export class StepProducer implements IProducer<StepCoreModel, Step> {
       throw new ProducerError(
         "Invalid Node. expected node is " + NodeType[NodeType.Step]
       );
-
+    SequenceGenerator.reset("CHECK");
     const s: StepCoreModel = {
       action: ast.action,
       target: ast.target,

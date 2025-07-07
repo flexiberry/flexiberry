@@ -1,6 +1,11 @@
 import { version } from "os";
 import chalk from "chalk";
 import { createInterface, Interface as ReadlineInterface } from "readline";
+import {
+  RuntimeJobOverview,
+  RuntimeStep,
+  RuntimeTask,
+} from "@flexiberry/berrycore";
 
 // ANSI escape codes for terminal control
 const ANSI = {
@@ -65,53 +70,22 @@ const ANSI = {
 
 // --- TypeScript interfaces and types ---
 
-type TestStepStatus = "pending" | "running" | "passed" | "failed";
-
-interface TestStep {
-  name: string;
-  status: TestStepStatus;
-  timeElapsed: number; // ms
-}
-
-interface TestCase {
-  id: string;
-  name: string;
-  steps: TestStep[];
-  status?: TestStepStatus;
-  startTime?: string;
-  endTime?: string;
-}
-
-type TestItemType = "suite" | "test" | "separator";
-
-interface TestDetails {
-  title: string;
-  version: string;
-  startTime: string;
-  endTime: string;
-  duration: string;
-  status: string;
-  apiCount: number;
-  flexiberry: string;
-  stepCounts?: { passed: number; failed: number; pending: number };
-}
-
-function getStepCounts(testCases: TestCase[]): {
+function getStepCounts(tasks: RuntimeTask[]): {
   passed: number;
   failed: number;
   pending: number;
 } {
   const counts = { passed: 0, failed: 0, pending: 0 };
-  for (const testCase of testCases) {
-    for (const step of testCase.steps) {
+  for (const task of tasks) {
+    for (const step of task.steps || []) {
       switch (step.status) {
-        case "passed":
+        case "PASS":
           counts.passed++;
           break;
-        case "failed":
+        case "FAILED":
           counts.failed++;
           break;
-        case "pending":
+        case "PENDING":
           counts.pending++;
           break;
       }
@@ -130,16 +104,16 @@ function printTableHeader(): void {
   );
 }
 
-function printTableRow(testCase: TestCase, showCaseName = true): void {
+function printTableRow(testCase: RuntimeTask, showCaseName = true): void {
   const colWidths = [30, 30, 12, 12];
   let isFirstStep = true;
-  for (const step of testCase.steps) {
+  for (const step of testCase.steps || []) {
     const statusColor =
-      step.status === "passed"
+      step.status === "PASS"
         ? ANSI.green
-        : step.status === "failed"
+        : step.status === "FAILED"
           ? ANSI.red
-          : step.status === "running"
+          : step.status === "RUNNING"
             ? ANSI.yellow
             : ANSI.dim;
     let statusDisplay = step.status.padEnd(colWidths[2]);
@@ -148,7 +122,7 @@ function printTableRow(testCase: TestCase, showCaseName = true): void {
       statusDisplay = `${spinner} ${step.status}`.padEnd(colWidths[2]);
     }
     process.stdout.write(
-      `${isFirstStep && showCaseName ? testCase.name.padEnd(colWidths[0]) : "".padEnd(colWidths[0])}  ${step.name.padEnd(colWidths[1])}  ${statusColor}${statusDisplay}${ANSI.reset}  ${String(step.timeElapsed).padEnd(colWidths[3])}\n`
+      `${isFirstStep && showCaseName ? testCase.title.padEnd(colWidths[0]) : "".padEnd(colWidths[0])}  ${step.title.padEnd(colWidths[1])}  ${statusColor}${statusDisplay}${ANSI.reset}  ${String(step.duration).padEnd(colWidths[3])}\n`
     );
     isFirstStep = false;
   }
@@ -164,20 +138,20 @@ function printBar(stepCounts: {
   const barLength = 30;
   const passedLen = Math.round((stepCounts.passed / total) * barLength);
   const failedLen = Math.round((stepCounts.failed / total) * barLength);
-  const pendingLen = barLength - passedLen - failedLen;
+  let pendingLen = barLength - passedLen - failedLen;
+  if (pendingLen < 0) pendingLen = 0;
+
   const bar =
-    chalk.green("█".repeat(passedLen)) +
-    chalk.red("█".repeat(failedLen)) +
-    chalk.yellow("█".repeat(pendingLen));
+    chalk.green("█".repeat(passedLen || 0)) +
+    chalk.red("█".repeat(failedLen || 0)) +
+    chalk.yellow("█".repeat(pendingLen || 0));
   const percent = (n: number) => (total ? ((n / total) * 100).toFixed(0) : "0");
   process.stdout.write(
     `\n${chalk.bold("Test Results:")}  ${bar}  ` +
       chalk.green(
-        `${stepCounts.passed} Passed (${percent(stepCounts.passed)}%) `
+        `${stepCounts.passed} pass (${percent(stepCounts.passed)}%) `
       ) +
-      chalk.red(
-        `${stepCounts.failed} Failed (${percent(stepCounts.failed)}%) `
-      ) +
+      chalk.red(`${stepCounts.failed} Fail (${percent(stepCounts.failed)}%) `) +
       chalk.yellow(
         `${stepCounts.pending} Pending (${percent(stepCounts.pending)}%)\n\n`
       )
@@ -192,7 +166,7 @@ export class UI {
   private terminalWidth: number;
   private terminalHeight: number;
   private rl: ReadlineInterface;
-  private testCases: TestCase[] = [];
+  private testCases: RuntimeTask[] = [];
   private tableLineCount: number = 0;
   private tableAnchored: boolean = false;
   private spinnerFrames: string[] = ["◐", "◓", "◑", "◒"];
@@ -214,29 +188,33 @@ export class UI {
     });
   }
 
-  initializeTable(testCases: TestCase[]): void {
+  initializeTable(testCases: RuntimeTask[]): void {
     this.testCases = testCases;
     this.render();
   }
 
-  updateTestStep(
-    testCaseId: string,
-    stepIndex: number,
-    status: TestStepStatus,
-    timeElapsed: number
-  ): void {
-    const testCase = this.testCases.find((tc) => tc.id === testCaseId);
-    if (!testCase || !testCase.steps[stepIndex]) return;
-    testCase.steps[stepIndex].status = status;
-    testCase.steps[stepIndex].timeElapsed = timeElapsed;
+  updateTestStep(status: RuntimeStep): void {
+    const testCase = this.testCases.find((tc) => tc.id === status.taskId);
+    const stepIndex = testCase?.steps?.findIndex((s) => s.id === status.id);
+    if (stepIndex === undefined) return;
+    if (!testCase || !testCase.steps || !testCase.steps[stepIndex]) return;
+    testCase.steps[stepIndex].status = status.status;
+    if (
+      !!testCase.steps[stepIndex].endTime &&
+      !!testCase.steps[stepIndex].startTime
+    )
+      testCase.steps[stepIndex].duration =
+        testCase.steps[stepIndex].endTime.getTime() -
+        testCase.steps[stepIndex].startTime.getTime() +
+        "ms";
     this.render();
   }
 
-  updateTestCaseResult(testCaseId: string, status: TestStepStatus): void {
-    const testCase = this.testCases.find((tc) => tc.id === testCaseId);
+  updateTaskResult(status: RuntimeTask): void {
+    const testCase = this.testCases.find((tc) => tc.id === status.id);
     if (!testCase) return;
-    testCase.status = status;
-    testCase.endTime = new Date().toISOString();
+    // testCase. = status;
+    testCase.duration = new Date().toISOString();
     this.render();
   }
 
@@ -251,7 +229,7 @@ export class UI {
     linesPrinted += 2;
     // Table rows
     for (const testCase of this.testCases) {
-      linesPrinted += testCase.steps.length + 1; // +1 for the extra newline after each test case
+      linesPrinted += (testCase?.steps?.length || 0) + 1; // +1 for the extra newline after each test case
       printTableRow(testCase, true);
     }
     // Results bar
@@ -269,16 +247,17 @@ export class UI {
     this.rl.close();
     this.printFinalSummary();
   }
-  printJobDetails(): void {
-    const fileName = this.fileName || "Unknown File";
-    const environment = this.environment || "Local";
+  printJobDetails(fileName: string, environment: string): void {
+    this.fileName = fileName || "Unknown File";
+    this.environment = environment || "Local";
     let startTime = "-";
     if (this.testCases.length > 0) {
       const allStartTimes = this.testCases
         .map((tc) => tc.startTime)
         .filter(Boolean)
         .sort();
-      if (allStartTimes.length) startTime = allStartTimes[0] || "-";
+      if (allStartTimes.length)
+        startTime = allStartTimes[0].toDateString() || "-";
     }
     const line = chalk.cyan(ANSI.boxHorizontal.repeat(this.terminalWidth));
     console.log(
@@ -301,9 +280,9 @@ export class UI {
     const failedLen = Math.round((failed / total) * width);
     const pendingLen = width - passedLen - failedLen;
     const bar =
-      chalk.green(barChar.repeat(passedLen)) +
-      chalk.red(barChar.repeat(failedLen)) +
-      chalk.yellow(barChar.repeat(pendingLen));
+      chalk.green(barChar.repeat(passedLen || 0)) +
+      chalk.red(barChar.repeat(failedLen || 0)) +
+      chalk.yellow(barChar.repeat(pendingLen || 0));
 
     const fileName = this.fileName || "Unknown File";
     const environment = this.environment || "Local";
@@ -311,8 +290,9 @@ export class UI {
     let start = Infinity,
       end = -Infinity;
     for (const tc of this.testCases) {
-      if (tc.startTime) start = Math.min(start, Date.parse(tc.startTime));
-      if (tc.endTime) end = Math.max(end, Date.parse(tc.endTime));
+      if (tc.startTime)
+        start = Math.min(start, new Date(tc.startTime).getTime());
+      if (tc.endTime) end = Math.max(end, new Date(tc.endTime).getTime());
     }
     const startTime = start < Infinity ? new Date(start).toISOString() : "-";
     const endTime = end > -Infinity ? new Date(end).toISOString() : "-";
@@ -353,22 +333,22 @@ export class UI {
     process.stdout.write(lines.join("\n") + "\n");
   }
 
-  printTestDetails(details: TestDetails): void {
+  printTestDetails(details: RuntimeJobOverview): void {
     const leftCol = [
       chalk.bold("   🚀  Test Execution Details"),
       chalk.cyan("─────────────────────────────"),
-      `📝  ${chalk.bold("Title:")}         ${details.title}`,
-      `🔖  ${chalk.bold("Version:")}       ${details.version}`,
+      `📝  ${chalk.bold("Title:")}         ${details.fileName}`,
+      `🔖  ${chalk.bold("Version:")}       ${details.activeEnv}`,
       `⏱️  ${chalk.bold("Start Time:")}    ${details.startTime}`,
       `⏳  ${chalk.bold("End Time:")}      ${details.endTime}`,
       `⏲️  ${chalk.bold("Duration:")}      ${details.duration}`,
-      `📋  ${chalk.bold("Status:")}        ${chalk.yellow(details.status)}`,
+      ``,
     ];
     const rightCol = [
       chalk.bold("   🌐  Environment Overview"),
       chalk.cyan("─────────────────────────────"),
-      `🔢  ${chalk.bold("API Count:")}     ${details.apiCount}`,
-      `🍓  ${chalk.bold("Flexiberry:")}    ${details.flexiberry}`,
+      `🔢  ${chalk.bold("API Count:")}     ${details.apis}`,
+      `🍓  ${chalk.bold("Flexiberry:")}    ${details.fileName}`,
       "",
       "",
       "",

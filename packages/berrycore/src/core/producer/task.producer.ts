@@ -12,7 +12,7 @@ export class TaskProducer implements IProducer<TaskCoreModel, Task> {
       throw new ProducerError(
         "Invalid Node. expected node is " + NodeType[NodeType.Task]
       );
-
+    SequenceGenerator.reset("STEP");
     const t: TaskCoreModel = {
       title: ast.title,
       steps: ast.steps.map((x) => this.stepProducer.build(x)),

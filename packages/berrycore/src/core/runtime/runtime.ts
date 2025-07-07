@@ -13,6 +13,7 @@ import { ApiTemplate } from "./apitemplate.runtime";
 import { title } from "node:process";
 import { StringUtil } from "../util/string-util";
 import { AxiosResponse } from "axios";
+import { RuntimeJobOverview, RuntimeStep, RuntimeTask } from "./runtime.types";
 
 export class Runtime {
   /**
@@ -73,42 +74,51 @@ export class Runtime {
     let localStore: { [key: string]: any } = {};
 
     for (const step of task.steps) {
-      await this.runStep(step, localStore);
+      await this.runStep(step, localStore, task.id);
     }
 
-    await this.emit(RUNNER_EVENT.TEST_DONE, {
-      info: "task end",
+    await this.emit(RUNNER_EVENT.TASK_DONE, {
       id: task.id,
-    });
+      endTime: new Date(),
+    } as Partial<RuntimeTask>);
   }
 
   private async runStep(
     step: StepCoreModel,
-    localStore: { [key: string]: any }
+    localStore: { [key: string]: any },
+    taskId: string
   ) {
-    await this.emitStepBegin(step);
-    await this.emitStepAction(step);
-
+    await this.emitStepBegin(step, taskId);
     if (step.action == "Call" && step.target == "Api") {
       const api = this.model?.apis.find((x) => x.id == step.functionId);
 
       if (!api) {
         await this.emitRuntimeError("No api found with id " + step.functionId);
+        step.status = "FAILED";
+        step.comments = "No api found with id : " + step.functionId;
         return;
       }
 
-      const apiTemplate = new ApiTemplate(this.dataStore);
-      const response = await apiTemplate.callApi(api, localStore, step.params);
-
-      this.capture(step, localStore, response);
-
-      const checkResult = this.checkValidator(step, localStore, response);
-      step.status = checkResult ? "PASSED" : "FAILED";
-      // step.response = response.data;
-      step.comments = checkResult ? "" : "Check failed";
+      try {
+        const apiTemplate = new ApiTemplate(this.dataStore);
+        const response = await apiTemplate.callApi(
+          api,
+          localStore,
+          step.params
+        );
+        this.capture(step, localStore, response);
+        const checkResult = this.checkValidator(step, localStore, response);
+        step.status = checkResult ? "PASS" : "FAILED";
+        step.comments = checkResult ? "" : "Check failed";
+      } catch (e: any) {
+        this.capture(step, localStore, e.response);
+        const checkResult = this.checkValidator(step, localStore, e.response);
+        step.status = checkResult ? "PASS" : "FAILED";
+        step.comments = checkResult ? "PASS" : e.message;
+      }
     }
 
-    await this.emitStepDone(step);
+    await this.emitStepDone(step, taskId);
   }
 
   private checkValidator(
@@ -123,7 +133,6 @@ export class Runtime {
         step.id,
         localStore
       );
-      console.log("overallCheckResult", overallCheckResult);
       return overallCheckResult;
     } else {
       return CheckValidator.validateResponseStatus(response.status);
@@ -180,16 +189,19 @@ export class Runtime {
   }
 
   private async emitTaskOverview(model: CoreModel) {
-    let p = {
+    let p: RuntimeJobOverview = {
       apis: model.apis.length,
-      tasks: model.tasks?.length || 0,
+      activeEnv: "",
+      startTime: new Date(),
+      duration: "",
+      payload: "",
+      fileName: "",
       variables: model.variables?.length || 0,
       environments: model.environments?.length || 0,
-      overview: {
-        tasks: this.model?.tasks?.map((x) => {
+      tasks:
+        this.model?.tasks?.map((x) => {
           return {
             id: x.id,
-            stepsCount: x.steps?.length,
             title: x.title || x.id,
             steps: x.steps?.map((y) => {
               return {
@@ -199,38 +211,46 @@ export class Runtime {
                 target: y.target,
                 functionId: y.functionId,
                 status: "PENDING",
-              };
+                taskId: x.id,
+              } as RuntimeStep;
             }),
-          };
-        }),
-      },
+          } as RuntimeTask;
+        }) || [],
     };
 
     await this.emit(RUNNER_EVENT.TASK_OVERVIEW, p);
   }
 
   private async emitTaskBegin(task: { id: string; title: string }) {
-    await this.emit(RUNNER_EVENT.TEST_BEGIN, {
+    await this.emit(RUNNER_EVENT.TASK_BEGIN, {
       info: "task begin",
       id: task.id,
       title: task.title,
-    });
+      startTime: new Date(),
+    } as Partial<RuntimeTask>);
   }
 
-  private async emitStepBegin(step: { id: string; title: string }) {
+  private async emitStepBegin(
+    step: { id: string; title: string },
+    taskId: string
+  ) {
     await this.emit(RUNNER_EVENT.STEP_BEGIN, {
-      info: "step begin",
+      taskId: taskId,
       id: step.id,
       title: step.title,
-    });
+      status: "RUNNING",
+      comments: "",
+      startTime: new Date(),
+    } as Partial<RuntimeStep>);
   }
-  private async emitStepDone(step: StepCoreModel) {
+  private async emitStepDone(step: StepCoreModel, taskId: string) {
     await this.emit(RUNNER_EVENT.STEP_DONE, {
-      info: "step End",
       id: step.id,
       status: step.status,
       comments: step.comments,
-    });
+      taskId: taskId,
+      endTime: new Date(),
+    } as Partial<RuntimeStep>);
   }
 
   private async emitStepAction(step: {

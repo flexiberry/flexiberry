@@ -44,7 +44,9 @@ export class StepParser extends BaseParser {
       TokenType.Identifier,
       "Expected target function identifier"
     ).value;
-
+    if (this.at().type === TokenType.Title)
+      step.title = this.expect(TokenType.Title, "Expected step title").value;
+    else step.title = step.action + " " + step.target + " " + step.functionId;
     // Parse until next step, task, or EOF
     while (
       this.not_eof() &&

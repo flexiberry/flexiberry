@@ -1,9 +1,4 @@
-import { type ApiModel } from "../builder/api.builder";
-import {
-  ApiCoreModel,
-  ParamsCoreModel,
-  VarCoreModel,
-} from "../producer/core.model";
+import { ApiCoreModel, ParamsCoreModel } from "../producer/core.model";
 import axios from "axios";
 import { InterpolationUtil } from "../util/interpolations";
 
@@ -69,7 +64,6 @@ export class ApiTemplate {
         paramsStore
       );
     }
-
     // Build Axios Object
     return axios({
       method: api.method,

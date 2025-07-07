@@ -14,13 +14,12 @@ export class TaskParser extends BaseParser {
 
     // Expect and consume Task token
     this.expect(TokenType.Task, "Expected task keyword");
-    this.eat();
+    //this.eat();
     // Parse title
     if (this.at().type === TokenType.Title) {
       task.title = this.at().value;
-      this.eat();
     }
-
+    this.eat();
     // Parse steps until next task or EOF
     const stepParser = new StepParser();
     while (this.not_eof() && this.at().type !== TokenType.Task) {

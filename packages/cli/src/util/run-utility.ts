@@ -11,9 +11,15 @@ import chalk from "chalk";
 import * as fs from "fs";
 import * as path from "path";
 import { FileUtility } from "./file-utility.js";
-import { BerryExecutor, RUNNER_EVENT } from "@flexiberry/berrycore";
-import { runDemo } from "../ui/demo-ui.js";
+import {
+  BerryExecutor,
+  RUNNER_EVENT,
+  RuntimeStep,
+  RuntimeTask,
+} from "@flexiberry/berrycore";
+// import { runDemo } from "../ui/demo-ui.js";
 import { apiCliCall } from "../ui/api.cli.js";
+import { UI } from "../ui/ui.js";
 
 export class RunUtility {
   static async run(file: string) {
@@ -48,38 +54,70 @@ export class RunUtility {
           indicator: "dots",
         });
         spin.start("File is Ready..");
-        spin.message("Executing...");
+        spin.message("Preparing to execute...");
+        spin.stop();
+        outro("CLI UI is Loaded...");
 
+        const ui = new UI();
+        ui.printJobDetails(FileUtility.getPreselectedFileName(), "Local");
         new BerryExecutor()
           .on(RUNNER_EVENT.ERROR, (x: any) => {
-            log.error(x);
+            console.log(x);
           })
-
-          .on(RUNNER_EVENT.TASK_OVERVIEW, (x: any) => {})
-
-          .on(RUNNER_EVENT.START, (x: any) => {
-            log.message(`Started`);
-          })
-          .on(RUNNER_EVENT.CONSOLE, (x: any) => {
-            log.message(`${x.info}`);
+          .on(RUNNER_EVENT.PARSED, (x: any) => {
+            console.log("Parsed");
           })
           .on(RUNNER_EVENT.COMPLETED, (x: any) => {
-            log.message(`COMPLETED`);
-            spin.stop();
-            outro("✅ Execution completed successfully.\n");
+            console.log("Parsed");
+            ui.exit();
+          })
+          .on(RUNNER_EVENT.START, (x: any) => {
             // runDemo();
-            // apiCliCall({
-            //   url: "https://jsonplaceholder.typicode.com/posts/1",
-            //   method: "GET",
-            //   headers: {
-            //     "Content-Type": "application/json",
-            //   },
-            // });
+          })
+          .on(RUNNER_EVENT.TASK_OVERVIEW, (x: any) => {
+            ui.initializeTable(
+              x.tasks.map((y: any) => {
+                return {
+                  id: y.id,
+                  title: y.title,
+                  // startTime: ,
+                  steps: y.steps.map((z: any) => {
+                    return {
+                      id: z.id,
+                      title: z.title,
+                      action: z.action,
+                      target: z.target,
+                      functionId: z.functionId,
+                      status: "PENDING",
+                      startTime: z.startTime,
+                      endTime: z.endTime,
+                      duration: z.duration,
+                      comments: z.comments,
+                    } as RuntimeStep;
+                  }),
+                } as RuntimeTask;
+              })
+            );
+          })
+          .on(RUNNER_EVENT.STEP_DONE, (x: any) => {
+            ui.updateTestStep(x);
+          })
+          .on(RUNNER_EVENT.STEP_BEGIN, (x: any) => {
+            ui.updateTestStep(x);
           })
           .run(preSelectedFile.toString());
       }
     }
   }
+
+  // runDemo();
+  // apiCliCall({
+  //   url: "https://jsonplaceholder.typicode.com/posts/1",
+  //   method: "GET",
+  //   headers: {
+  //     "Content-Type": "application/json",
+  //   },
+  // });
 
   static async selectFromCurrentFolder() {
     log.step(chalk.blue("🔍 Scanning for available files... \n"));
