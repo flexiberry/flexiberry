@@ -97,7 +97,7 @@ function getStepCounts(tasks: RuntimeTask[]): {
 function printTableHeader(): void {
   const colWidths = [30, 30, 12, 12];
   process.stdout.write(
-    `${ANSI.bold}${"Test Case".padEnd(colWidths[0])}  ${"Step".padEnd(colWidths[1])}  ${"Status".padEnd(colWidths[2])}  ${"Time (ms)".padEnd(colWidths[3])}${ANSI.reset}\n`
+    `${ANSI.bold}${ANSI.blue}${"Task".padEnd(colWidths[0])}  ${"Step".padEnd(colWidths[1])}  ${"Status".padEnd(colWidths[2])}  ${"Time (ms)".padEnd(colWidths[3])}${ANSI.reset}\n`
   );
   process.stdout.write(
     `${ANSI.boxHorizontal.repeat(colWidths[0])}  ${ANSI.boxHorizontal.repeat(colWidths[1])}  ${ANSI.boxHorizontal.repeat(colWidths[2])}  ${ANSI.boxHorizontal.repeat(colWidths[3])}\n`
@@ -117,12 +117,12 @@ function printTableRow(testCase: RuntimeTask, showCaseName = true): void {
             ? ANSI.yellow
             : ANSI.dim;
     let statusDisplay = step.status.padEnd(colWidths[2]);
-    if (step.status === "pending") {
+    if (step.status === "RUNNING") {
       const spinner = "◐◓◑◒"[Math.floor(Date.now() / 250) % 4];
       statusDisplay = `${spinner} ${step.status}`.padEnd(colWidths[2]);
     }
     process.stdout.write(
-      `${isFirstStep && showCaseName ? testCase.title.padEnd(colWidths[0]) : "".padEnd(colWidths[0])}  ${step.title.padEnd(colWidths[1])}  ${statusColor}${statusDisplay}${ANSI.reset}  ${String(step.duration).padEnd(colWidths[3])}\n`
+      `${isFirstStep && showCaseName ? testCase.title.padEnd(colWidths[0]) : "".padEnd(colWidths[0])}  ${step.title.padEnd(colWidths[1])}  ${statusColor}${statusDisplay}${ANSI.reset}  ${chalk.gray(String(step.duration).padEnd(colWidths[3]))}  ${chalk.yellow(step.comments || "")}\n`
     );
     isFirstStep = false;
   }
@@ -147,7 +147,7 @@ function printBar(stepCounts: {
     chalk.yellow("█".repeat(pendingLen || 0));
   const percent = (n: number) => (total ? ((n / total) * 100).toFixed(0) : "0");
   process.stdout.write(
-    `\n${chalk.bold("Test Results:")}  ${bar}  ` +
+    `\n${chalk.bold(" Results:")}  ${bar}  ` +
       chalk.green(
         `${stepCounts.passed} pass (${percent(stepCounts.passed)}%) `
       ) +
@@ -193,20 +193,33 @@ export class UI {
     this.render();
   }
 
+  updateTask(x: any) {
+    const testCase = this.testCases.findIndex((tc) => tc.id === x.id);
+    if (!!testCase) return;
+    this.testCases[testCase] = {
+      ...this.testCases[testCase],
+      ...x,
+    };
+  }
+
   updateTestStep(status: RuntimeStep): void {
     const testCase = this.testCases.find((tc) => tc.id === status.taskId);
     const stepIndex = testCase?.steps?.findIndex((s) => s.id === status.id);
     if (stepIndex === undefined) return;
     if (!testCase || !testCase.steps || !testCase.steps[stepIndex]) return;
-    testCase.steps[stepIndex].status = status.status;
+    testCase.steps[stepIndex] = {
+      ...testCase.steps[stepIndex],
+      ...status,
+    };
     if (
       !!testCase.steps[stepIndex].endTime &&
       !!testCase.steps[stepIndex].startTime
-    )
-      testCase.steps[stepIndex].duration =
+    ) {
+      const duration =
         testCase.steps[stepIndex].endTime.getTime() -
-        testCase.steps[stepIndex].startTime.getTime() +
-        "ms";
+          testCase.steps[stepIndex].startTime.getTime() || 0;
+      testCase.steps[stepIndex].duration = duration + "ms";
+    }
     this.render();
   }
 
@@ -250,7 +263,7 @@ export class UI {
   printJobDetails(fileName: string, environment: string): void {
     this.fileName = fileName || "Unknown File";
     this.environment = environment || "Local";
-    let startTime = "-";
+    let startTime = new Date().toLocaleString() || "-";
     if (this.testCases.length > 0) {
       const allStartTimes = this.testCases
         .map((tc) => tc.startTime)
@@ -259,12 +272,12 @@ export class UI {
       if (allStartTimes.length)
         startTime = allStartTimes[0].toDateString() || "-";
     }
-    const line = chalk.cyan(ANSI.boxHorizontal.repeat(this.terminalWidth));
+    const line = chalk.gray(ANSI.boxHorizontal.repeat(this.terminalWidth));
     console.log(
-      `${chalk.bold.cyan("📝 FLEXIBERRY TEST JOB  ")} \n` +
+      `${chalk.bold.cyan("📝 FLEXIBERRY JOB  ")} \n` +
         `${chalk.bold("📄 File:")} ${chalk.yellowBright(fileName)}` +
         `  ${chalk.bold("🌐 Env:")} ${chalk.magentaBright(environment)}` +
-        `  ${chalk.bold("⏱️  Start:")} ${chalk.whiteBright(startTime)}` +
+        `  ${chalk.bold("⏱️  Start:")} ${chalk.blueBright(startTime)}` +
         `\n${line}\n`
     );
   }
@@ -275,14 +288,10 @@ export class UI {
     const percent = (n: number) =>
       total ? `${Math.round((n / total) * 100)}%` : "0%";
     const width = this.terminalWidth;
-    const barChar = "│";
     const passedLen = Math.round((passed / total) * width);
     const failedLen = Math.round((failed / total) * width);
-    const pendingLen = width - passedLen - failedLen;
-    const bar =
-      chalk.green(barChar.repeat(passedLen || 0)) +
-      chalk.red(barChar.repeat(failedLen || 0)) +
-      chalk.yellow(barChar.repeat(pendingLen || 0));
+    let pendingLen = width - passedLen - failedLen;
+    if (pendingLen < 0) pendingLen = 0;
 
     const fileName = this.fileName || "Unknown File";
     const environment = this.environment || "Local";
@@ -294,26 +303,15 @@ export class UI {
         start = Math.min(start, new Date(tc.startTime).getTime());
       if (tc.endTime) end = Math.max(end, new Date(tc.endTime).getTime());
     }
-    const startTime = start < Infinity ? new Date(start).toISOString() : "-";
-    const endTime = end > -Infinity ? new Date(end).toISOString() : "-";
-    const duration = start < end ? `${Math.round((end - start) / 1000)}s` : "-";
+    const startTime = start < Infinity ? new Date(start).toLocaleString() : "-";
+    const endTime = end > -Infinity ? new Date(end).toLocaleString() : "-";
+    const duration =
+      start < end ? `${((end - start) / 1000).toFixed(2)}s` : "-";
 
-    const statusLine =
-      failed === 0 && pending === 0
-        ? chalk.green.bold("✨ ALL TESTS PASSED! ✨ 🚀 Great Job! 🚀")
-        : failed > 0
-          ? chalk.red.bold("❌ SOME TESTS FAILED")
-          : chalk.yellow.bold("⏳ TESTS PENDING");
-
-    const centerText = (text: string) => {
-      const pad = Math.floor((width - stripAnsi(text).length) / 2);
-      return " ".repeat(pad) + text;
-    };
-
-    const title = "FINAL SUMMARY";
+    const title = " FINAL SUMMARY ";
     const padLen = width - title.length;
     const header =
-      ANSI.boxHorizontal.repeat(Math.floor(padLen / 2)) +
+      ANSI.boxHorizontal.repeat(title.length) +
       chalk.bold.blueBright(title) +
       ANSI.boxHorizontal.repeat(Math.ceil(padLen / 2));
 
@@ -321,13 +319,13 @@ export class UI {
       "",
       header,
       "",
-      `${chalk.bold("File:")} ${chalk.yellow(fileName)}   ${chalk.bold("Env:")} ${chalk.magenta(environment)}`,
-      `${chalk.bold("Start:")} ${chalk.white(startTime)}   ${chalk.bold("End:")} ${chalk.white(endTime)}   ${chalk.bold("Duration:")} ${chalk.white(duration)}`,
+      // `${chalk.bold("File:")} ${chalk.yellow(fileName)}   ${chalk.bold("Env:")} ${chalk.magenta(environment)}`,
+      `${chalk.gray("Start:")} ${chalk.white(startTime)}   ${chalk.gray("End:")} ${chalk.white(endTime)}   ${chalk.gray("Duration:")} ${chalk.white(duration)}`,
       "",
       `${chalk.green(`${passed} Passed (${percent(passed)})`)}   ${chalk.red(`${failed} Failed (${percent(failed)})`)}   ${chalk.yellow(`${pending} Pending (${percent(pending)})`)}`,
-      bar,
+      // bar,
       "",
-      centerText(statusLine),
+      // centerText(statusLine),
       "",
     ];
     process.stdout.write(lines.join("\n") + "\n");

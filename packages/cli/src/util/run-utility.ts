@@ -49,30 +49,15 @@ export class RunUtility {
         if (!preSelectedFile) {
           return;
         }
-        log.step(`🔄 Preparing to execute script using: ${preSelectedFile}`);
-        const spin = spinner({
-          indicator: "dots",
-        });
-        spin.start("File is Ready..");
-        spin.message("Preparing to execute...");
-        spin.stop();
-        outro("CLI UI is Loaded...");
+        log.step(`🔄 Preparing to execute script : ${preSelectedFile}`);
+
+        outro("UI is ready");
 
         const ui = new UI();
         ui.printJobDetails(FileUtility.getPreselectedFileName(), "Local");
         new BerryExecutor()
-          .on(RUNNER_EVENT.ERROR, (x: any) => {
-            console.log(x);
-          })
-          .on(RUNNER_EVENT.PARSED, (x: any) => {
-            console.log("Parsed");
-          })
           .on(RUNNER_EVENT.COMPLETED, (x: any) => {
-            console.log("Parsed");
             ui.exit();
-          })
-          .on(RUNNER_EVENT.START, (x: any) => {
-            // runDemo();
           })
           .on(RUNNER_EVENT.TASK_OVERVIEW, (x: any) => {
             ui.initializeTable(
@@ -91,13 +76,19 @@ export class RunUtility {
                       status: "PENDING",
                       startTime: z.startTime,
                       endTime: z.endTime,
-                      duration: z.duration,
+                      duration: z.duration || "",
                       comments: z.comments,
                     } as RuntimeStep;
                   }),
                 } as RuntimeTask;
               })
             );
+          })
+          .on(RUNNER_EVENT.TASK_BEGIN, (x: any) => {
+            ui.updateTask(x);
+          })
+          .on(RUNNER_EVENT.TASK_DONE, (x: any) => {
+            ui.updateTask(x);
           })
           .on(RUNNER_EVENT.STEP_DONE, (x: any) => {
             ui.updateTestStep(x);
