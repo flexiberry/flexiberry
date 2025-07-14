@@ -13,6 +13,8 @@ import * as path from "path";
 import { FileUtility } from "./file-utility.js";
 import {
   BerryExecutor,
+  Lexer,
+  LexerEngine,
   RUNNER_EVENT,
   RuntimeStep,
   RuntimeTask,
@@ -52,53 +54,72 @@ export class RunUtility {
         log.step(`🔄 Preparing to execute script : ${preSelectedFile}`);
 
         outro("UI is ready");
-
-        const ui = new UI();
-        ui.printJobDetails(FileUtility.getPreselectedFileName(), "Local");
-        new BerryExecutor()
-          .on(RUNNER_EVENT.COMPLETED, (x: any) => {
-            ui.exit();
-          })
-          .on(RUNNER_EVENT.TASK_OVERVIEW, (x: any) => {
-            ui.initializeTable(
-              x.tasks.map((y: any) => {
-                return {
-                  id: y.id,
-                  title: y.title,
-                  // startTime: ,
-                  steps: y.steps.map((z: any) => {
-                    return {
-                      id: z.id,
-                      title: z.title,
-                      action: z.action,
-                      target: z.target,
-                      functionId: z.functionId,
-                      status: "PENDING",
-                      startTime: z.startTime,
-                      endTime: z.endTime,
-                      duration: z.duration || "",
-                      comments: z.comments,
-                    } as RuntimeStep;
-                  }),
-                } as RuntimeTask;
-              })
-            );
-          })
-          .on(RUNNER_EVENT.TASK_BEGIN, (x: any) => {
-            ui.updateTask(x);
-          })
-          .on(RUNNER_EVENT.TASK_DONE, (x: any) => {
-            ui.updateTask(x);
-          })
-          .on(RUNNER_EVENT.STEP_DONE, (x: any) => {
-            ui.updateTestStep(x);
-          })
-          .on(RUNNER_EVENT.STEP_BEGIN, (x: any) => {
-            ui.updateTestStep(x);
-          })
-          .run(preSelectedFile.toString());
+        RunUtility.testingNewlexer(preSelectedFile);
+        //RunUtility.berryExecutor(preSelectedFile);
       }
     }
+  }
+
+  private static testingNewlexer(preSelectedFile: any) {
+    const fileContents = fs.readFileSync(preSelectedFile, "utf8");
+    console.time("New Tokenize");
+    let token = new LexerEngine(fileContents).tokenize();
+    console.timeEnd("New Tokenize");
+
+    // console.dir(token);
+    console.time("old Tokenize");
+    let oldTkn = new Lexer(fileContents).tokenize();
+    console.timeEnd("old Tokenize");
+
+    console.dir("New Tokenize: ", token.length);
+    console.log("Old Tokenize: ", oldTkn.length);
+  }
+
+  private static berryExecutor(preSelectedFile: any) {
+    const ui = new UI();
+    ui.printJobDetails(FileUtility.getPreselectedFileName(), "Local");
+    new BerryExecutor()
+      .on(RUNNER_EVENT.COMPLETED, (x: any) => {
+        ui.exit();
+      })
+      .on(RUNNER_EVENT.TASK_OVERVIEW, (x: any) => {
+        ui.initializeTable(
+          x.tasks.map((y: any) => {
+            return {
+              id: y.id,
+              title: y.title,
+              // startTime: ,
+              steps: y.steps.map((z: any) => {
+                return {
+                  id: z.id,
+                  title: z.title,
+                  action: z.action,
+                  target: z.target,
+                  functionId: z.functionId,
+                  status: "PENDING",
+                  startTime: z.startTime,
+                  endTime: z.endTime,
+                  duration: z.duration || "",
+                  comments: z.comments,
+                } as RuntimeStep;
+              }),
+            } as RuntimeTask;
+          })
+        );
+      })
+      .on(RUNNER_EVENT.TASK_BEGIN, (x: any) => {
+        ui.updateTask(x);
+      })
+      .on(RUNNER_EVENT.TASK_DONE, (x: any) => {
+        ui.updateTask(x);
+      })
+      .on(RUNNER_EVENT.STEP_DONE, (x: any) => {
+        ui.updateTestStep(x);
+      })
+      .on(RUNNER_EVENT.STEP_BEGIN, (x: any) => {
+        ui.updateTestStep(x);
+      })
+      .run(preSelectedFile.toString());
   }
 
   // runDemo();

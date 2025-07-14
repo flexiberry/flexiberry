@@ -3,6 +3,7 @@ import { TokenType } from "./tokenType";
 export type Position = {
   start: number;
   end: number;
+  line?: number;
 };
 
 export class Token {
@@ -12,7 +13,13 @@ export class Token {
     public position: Position
   ) {}
 
-  static from(value: any, type: TokenType, start: number, end: number): Token {
-    return new Token(value, type, { start: start, end: end });
+  static from(
+    value: any,
+    type: TokenType,
+    start: number,
+    end: number,
+    line?: number
+  ): Token {
+    return new Token(value, type, { start: start, end: end, line: line });
   }
 }
