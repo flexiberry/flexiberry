@@ -35,43 +35,29 @@ export class CheckParser extends BaseParser {
         rightOperand: undefined,
         logicalOperator: undefined,
       };
-
-      // Parse left operand if present
       if (this.at().type === TokenType.Lhs) {
-        this.eat(); // Consume Lhs token
-        if (this.at().type === TokenType.OperandsScalar) {
-          condition.leftOperand = this.at().value;
-          condition.leftOperandType = "LITERAL";
-          this.eat();
-        } else {
-          condition.leftOperand = this.expect(
-            TokenType.Operands,
-            "Expected left operand"
-          ).value;
-          condition.leftOperandType = "IDENTIFIER";
-        }
+        const lhs = this.at();
+        condition.leftOperand = lhs.value;
+        condition.leftOperandType = lhs.value.match(
+          /\s*([a-zA-Z_\.\-][a-zA-Z0-9_\.\-]*)/
+        )
+          ? "IDENTIFIER"
+          : "LITERAL";
       }
-
+      this.eat();
       // Parse operator
       if (this.at().type === TokenType.Operator) {
         condition.operator = this.eat().value;
       }
 
       // Parse right operand
-      if (this.at().type === TokenType.Rhs) {
-        this.eat(); // Consume Rhs token
-        if (this.at().type === TokenType.OperandsScalar) {
-          condition.rightOperand = this.at().value;
-          condition.rightOperandType = "LITERAL";
-          this.eat();
-        } else {
-          condition.rightOperand = this.expect(
-            TokenType.Operands,
-            "Expected right operand"
-          ).value;
-          condition.rightOperandType = "IDENTIFIER";
-        }
-      }
+      const rhs = this.expect(TokenType.Rhs, "Expected right operand");
+      condition.rightOperand = rhs.value;
+      condition.rightOperandType = rhs.value.match(
+        /\s*([a-zA-Z_\.\-][a-zA-Z0-9_\.\-]*)/
+      )
+        ? "IDENTIFIER"
+        : "LITERAL";
 
       // Parse logical operator if present (AND/OR)
       if (this.at().type === TokenType.And || this.at().type === TokenType.Or) {

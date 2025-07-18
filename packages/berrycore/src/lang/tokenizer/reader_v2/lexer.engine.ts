@@ -59,14 +59,6 @@ export class LexerEngine {
    * Optimized for readability and performance.
    */
   private processGrammer(grammar: LexerGrammer): boolean {
-    if (grammar.name == "conditionsOr") {
-      console.log(this.currentLine);
-    }
-
-    // if (/^\s*$/.test(this.currentLine)) {
-    //   this.currentLine = this.next();
-    // }
-
     // Handle multi-line grammar start/end
     if (grammar.start && grammar.end && grammar.start.test(this.currentLine)) {
       this.currentLine = this.mergeLinesUntilEnd(grammar, this.currentLine);

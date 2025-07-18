@@ -3,10 +3,11 @@ import { Token } from "../tokenizer/token";
 import { TokenType } from "../tokenizer/tokenType";
 import { NodeType, type Program, type ProgramBody } from "./ast-node-type";
 import { CProgramBody } from "./ast-impl";
+import { LexerEngine } from "../tokenizer/reader_v2/lexer.engine";
 
 export default class Parser {
   public produce(sourceCode: string): Program {
-    const lexer = new Lexer(sourceCode);
+    const lexer = new LexerEngine(sourceCode);
     const tokens = lexer.tokenize();
 
     const program: Program = {

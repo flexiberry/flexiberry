@@ -54,8 +54,8 @@ export class RunUtility {
         log.step(`🔄 Preparing to execute script : ${preSelectedFile}`);
 
         outro("UI is ready");
-        RunUtility.testingNewlexer(preSelectedFile);
-        //RunUtility.berryExecutor(preSelectedFile);
+        // RunUtility.testingNewlexer(preSelectedFile);
+        RunUtility.berryExecutor(preSelectedFile);
       }
     }
   }

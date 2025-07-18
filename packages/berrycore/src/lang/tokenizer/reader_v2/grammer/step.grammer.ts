@@ -19,7 +19,7 @@ export const stepGrammer: LexerGrammer = {
       index: 3,
     },
     {
-      tokenType: TokenType.Pointer,
+      tokenType: TokenType.Identifier,
       index: 4,
     },
   ],

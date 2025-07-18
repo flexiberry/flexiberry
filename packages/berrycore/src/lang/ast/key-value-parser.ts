@@ -6,19 +6,36 @@ export class KeyValueParser extends BaseParser {
   parseKeyValue(): KV {
     // Expect and consume the hyphen token
     this.expect(TokenType.Hyphen, "Expected hyphen at start of key-value pair");
+    let key: string;
+    let keytype: string;
+    // Handle quoted values
+    if (this.at().type === TokenType.Quote) {
+      this.eat(); // Consume opening quote
+      key = this.expect(TokenType.Scalar, "Expected scalar value").value;
+      this.expect(TokenType.Quote, "Expected closing quote");
+      keytype = TokenTypeValueOf(TokenType.Scalar);
+    }
+    // Handle backtick values
+    else if (this.at().type === TokenType.Backtick) {
+      this.eat(); // Consume opening backtick
+      key = this.expect(TokenType.Scalar, "Expected scalar value").value;
+      this.expect(TokenType.Backtick, "Expected closing backtick");
+      keytype = TokenTypeValueOf(TokenType.Scalar);
+    }
 
-    // Parse the key (identifier)
-    const key = this.expect(
-      TokenType.Identifier,
-      "Expected key identifier"
-    ).value;
+    // Handle plain scalar values
+    else {
+      key = this.expect(
+        TokenType.Identifier,
+        "Expected Identifier value"
+      ).value;
+      keytype = TokenTypeValueOf(TokenType.Identifier);
+    }
 
     // Expect and consume the colon
     this.expect(TokenType.Colon, "Expected colon after key");
-
     let value: string;
     let type: string;
-
     // Handle quoted values
     if (this.at().type === TokenType.Quote) {
       this.eat(); // Consume opening quote
@@ -36,12 +53,13 @@ export class KeyValueParser extends BaseParser {
 
     // Handle plain scalar values
     else {
-      value = this.expect(TokenType.Scalar, "Expected scalar value").value;
+      value = this.expect(TokenType.Identifier, "Expected scalar value").value;
       type = TokenTypeValueOf(TokenType.Identifier);
     }
 
     return {
       key,
+      keytype,
       value,
       type,
       hasLiterals: false,
