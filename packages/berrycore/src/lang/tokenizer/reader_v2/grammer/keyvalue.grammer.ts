@@ -3,16 +3,17 @@ import { LexerGrammer } from "../lexer.types";
 
 export const keyValueGrammer: LexerGrammer = {
   name: "keyValue",
-  regex: /^\s*-\s*/, // Matches the leading dash and optional spaces
+  regex: /^\s*(-)\s*['"a-zA-Z\-]*\s*:/, // Matches the leading dash and optional spaces
   groups: [
     {
       tokenType: TokenType.Hyphen,
+      index: 1,
     },
   ],
   next: [
     {
       name: "quotedKey",
-      regex: /(['"`])(.*?)(\1)\s*(:)/, // Matches 'key' or "key" followed by colon
+      regex: /^-\s*(['"`])(.*?)(\1)\s*(:)/, // Matches 'key' or "key" followed by colon
       groups: [
         {
           tokenType: TokenType.Quote,
@@ -35,7 +36,6 @@ export const keyValueGrammer: LexerGrammer = {
         {
           name: "value",
           regex: /(['"])(.*?)(\1)/,
-          isOptional: true,
           groups: [
             {
               tokenType: TokenType.Quote,
@@ -50,23 +50,33 @@ export const keyValueGrammer: LexerGrammer = {
               index: 3,
             },
           ],
+          isOptional: true,
         },
         {
-          name: "valuebacktick",
-          regex: /`([\s\S]*?)`/,
+          name: "multilineValue",
+          regex: /(`)([\s\S]*?)(`)/,
           isOptional: true,
           groups: [
             {
-              tokenType: TokenType.Quote,
+              tokenType: TokenType.Backtick,
               index: 1,
             },
+            {
+              tokenType: TokenType.Scalar,
+              index: 2,
+            },
+            {
+              tokenType: TokenType.Backtick,
+              index: 3,
+            },
           ],
-          loopUntil: /`/,
+          start: /(`)([\s\S]*?)/,
+          end: /(`)([\s\S]*?)(`)/,
           mergeLines: true,
         },
         {
           name: "unquotedValue",
-          regex: /([a-zA-Z_.][a-zA-Z0-9_.]*)/,
+          regex: /(?<!['"])([a-zA-Z_.\-][a-zA-Z0-9_.\-]*)(?!['"])/,
           groups: [
             {
               tokenType: TokenType.Identifier,
@@ -79,7 +89,7 @@ export const keyValueGrammer: LexerGrammer = {
     },
     {
       name: "unquotedKey",
-      regex: /\s*([a-zA-Z_.][a-zA-Z0-9_.]*)\s*(:)/, // Matches name:
+      regex: /\s*([a-zA-Z_.\-][a-zA-Z0-9_.\-]*)\s*(:)/, // Matches name:
       groups: [
         {
           tokenType: TokenType.Identifier,
@@ -134,7 +144,7 @@ export const keyValueGrammer: LexerGrammer = {
         },
         {
           name: "unquotedValue",
-          regex: /(?<!['"])([a-zA-Z_.][a-zA-Z0-9_.]*)(?!['"])/,
+          regex: /\s*([a-zA-Z_\.\-][a-zA-Z0-9_\.\-]*)/,
           groups: [
             {
               tokenType: TokenType.Identifier,
@@ -148,6 +158,7 @@ export const keyValueGrammer: LexerGrammer = {
       isOptional: true,
     },
   ],
-  loopUntil: /^\s*-\s*$/,
+  loopUntil: /^\s*(-)\s*['"a-zA-Z\-]*\s*:/,
   isMultiline: false,
+  moveNextLine: true,
 };

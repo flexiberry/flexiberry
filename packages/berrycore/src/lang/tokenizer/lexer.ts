@@ -25,6 +25,10 @@ import { VarReader } from "./reader/varReader";
 import { Token } from "./token";
 import { TokenType } from "./tokenType";
 
+/**
+ * @deprecated use `import { LexerEngine } from "@berrycore/tokenizer/reader_v2"` instead.
+ * Lexer is a class that tokenizes the input string into tokens.
+ */
 export class Lexer {
   private input: string;
   private position: number = 0;

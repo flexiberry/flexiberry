@@ -66,13 +66,13 @@ export class RunUtility {
     let token = new LexerEngine(fileContents).tokenize();
     console.timeEnd("New Tokenize");
 
-    // console.dir(token);
-    console.time("old Tokenize");
-    let oldTkn = new Lexer(fileContents).tokenize();
-    console.timeEnd("old Tokenize");
+    console.debug(token);
+    // console.time("old Tokenize");
+    // let oldTkn = new Lexer(fileContents).tokenize();
+    // console.timeEnd("old Tokenize");
 
-    console.dir("New Tokenize: ", token.length);
-    console.log("Old Tokenize: ", oldTkn.length);
+    // console.dir("New Tokenize: ", token.length);
+    // console.log("Old Tokenize: ", oldTkn.length);
   }
 
   private static berryExecutor(preSelectedFile: any) {
