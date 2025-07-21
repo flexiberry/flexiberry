@@ -1,5 +1,9 @@
 Env UAT,SIT,TAS
 
+Vault url https://vault.example.com
+Vault username admin
+Vault password admin
+
 Var without Pointer 
         - userid: 'rintu'
         - age: 30
@@ -8,7 +12,7 @@ Var without Pointer
 Var @UAT #test  variables for uat env
         - name: 'rintu'
         - age: 30
-        - importdVar: Import.userName ?? 
+        - importdVar: Import.userName  
 
 
 Var @SIT variables

@@ -7,7 +7,7 @@
     "compile": "tsc -p .",
     "watch": "tsc -watch -p .",
     "package": "vsce package",
-    "test": "pnpm run compile && node ./out/test/runTest.js"
+    "test": "pnpm run compile && node ./out/extension.js"
   },
   "keywords": [],
   "author": "",
@@ -15,6 +15,9 @@
   "engines": {
     "vscode": ">=1.50.0"
   },
+  "activationEvents": [
+    "onCommand:berry.start"
+  ],
   "contributes": {
     "languages": [
       {
@@ -46,9 +49,7 @@
   },
   "devDependencies": {
     "@types/node": "^22.14.1",
-    "@vscode/test-electron": "^2.5.2",
     "typescript": "^5.8.3",
-    "vsce": "^2.15.0",
-    "vscode": "^1.1.37"
+    "@types/vscode": "^1.50.0"
   }
 }
