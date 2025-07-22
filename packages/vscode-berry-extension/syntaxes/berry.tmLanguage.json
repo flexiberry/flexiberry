@@ -1,41 +1,113 @@
 {
+  "$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
+  "name": "Berry",
   "scopeName": "source.berry",
+  "fileTypes": ["berry", "be"],
   "patterns": [
-    {
-      "name": "comment.line.double-hash.berry",
-      "match": "^##.*$"
-    },
-    {
-      "name": "meta.api.berry",
-      "match": "^(Api)\\s+(POST|PUT|GET|DELETE|PATCH)\\s+(#[a-zA-Z0-9_]+)\\s+(.*)$",
-      "captures": {
-        "1": { "name": "keywords.berry" },
-        "2": { "name": "api.http.method.berry" },
-        "3": { "name": "api.identifier.berry" },
-        "4": { "name": "api.title.berry" }
-      }
-    },
-    {
-      "name": "meta.url.berry",
-      "match": "^(Url)\\s+(.+)$",
-      "captures": {
-        "1": { "name": "keywords.berry" },
-        "2": { "name": "url.link.berry" }
-      }
-    },
-    {
-      "name": "meta.body.berry",
-      "match": "^(Body)\\s+\\(w+)\\s+(.+)$",
-      "captures": {
-        "1": { "name": "body.berry" },
-        "2": { "name": "body.type.berry" },
-        "3": { "name": "body.start.berry" },
-        "4": { "name": "body.scalar.berry" },
-        "5": { "name": "body.end.berry" }
-      }
-    }
+    { "include": "#comments" },
+    { "include": "#api-definitions" },
+    { "include": "#scalar-types" },
+    { "include": "#keyvalue-pairs" }
   ],
-  "repository": {},
-  "fileTypes": ["berry"],
+  "repository": {
+    "comments": {
+      "patterns": [
+        {
+          "name": "comment.line.double-hash.berry",
+          "match": "^##.*$"
+        }
+      ]
+    },
+    "keyvalue-pairs": {
+      "patterns": [
+        {
+          "name": "meta.keyvalue-pairs",
+          "match": "^\\s*(-)\\s*(['\"a-zA-Z\\-]*)\\s*(:)\\s*(?:\\s*(.*))?$",
+          "captures": {
+            "1": { "name": "keyvalue-pairs.hash" },
+            "2": { "name": "keyvalue-pairs.key" },
+            "3": { "name": "keyvalue-pairs.separator" },
+            "4": { "name": "keyvalue-pairs.value" }
+          }
+        }
+      ]
+    },
+    "scalar-types": {
+      "patterns": [
+        {
+          "name": "meta.scalar.singlequote",
+          "begin": "'|\"",
+          "beginCaptures": {
+            "0": { "name": "scalar.start" }
+          },
+          "end": "'|\"",
+          "endCaptures": {
+            "0": { "name": "scalar.end" }
+          },
+          "patterns": [
+            {
+              "name": "scalar.content",
+              "match": "[^('|\")]+"
+            }
+          ]
+        },
+        {
+          "name": "meta.scalar.multiline",
+          "begin": "`",
+          "beginCaptures": {
+            "0": { "name": "scalar.multiline.start" }
+          },
+          "end": "`",
+          "endCaptures": {
+            "0": { "name": "scalar.multiline.end" }
+          },
+          "patterns": [
+            {
+              "name": "scalar.multiline.content",
+              "match": "[^`]+"
+            }
+          ]
+        }
+      ]
+    },
+    "api-definitions": {
+      "patterns": [
+        {
+          "name": "meta.api",
+          "match": "^\\s*(Api)(?:\\s+(GET|POST|PUT|DELETE|PATCH))?\\s+((#)(\\S+))(?:\\s+(.*))?$",
+          "captures": {
+            "1": { "name": "keyword.api" },
+            "2": { "name": "keyword.api.method" },
+            "4": { "name": "api.identifier" },
+            "5": { "name": "api.identifier" },
+            "6": { "name": "api.title" }
+          }
+        },
+        {
+          "name": "meta.api.url",
+          "match": "^(Url)\\s+(.+)$",
+          "captures": {
+            "1": { "name": "keyword.url" },
+            "2": { "name": "string.url" }
+          }
+        },
+        {
+          "name": "meta.api.body",
+          "match": "^\\s*(Body)\\s(\\w+)\\s*",
+          "captures": {
+            "1": { "name": "keyword.api.body" },
+            "2": { "name": "type.api.body" }
+          }
+        },
+        {
+          "name": "meta.api.header",
+          "match": "^\\s*(Header)\\s*",
+          "captures": {
+            "1": { "name": "keyword.api.header" }
+          }
+        }
+      ]
+    }
+  },
   "firstLineMatch": "^#!.*\\bberry\\b"
 }
