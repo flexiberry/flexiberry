@@ -36,19 +36,21 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.activate = activate;
 exports.deactivate = deactivate;
 const vscode = __importStar(require("vscode"));
+const formatter_1 = require("./formatter");
 // This method is called when your extension is activated
 function activate(context) {
-    // No activation code needed for syntax highlighting only
+    // Register the formatter
+    (0, formatter_1.registerFormatter)(context);
     // Register an event listener for when a text document is opened
     const disposable = vscode.workspace.onDidOpenTextDocument((document) => {
         if (document.languageId === "berry") {
-            vscode.window.showInformationMessage("Berry file detected! Syntax highlighting should be active.");
+            vscode.window.showInformationMessage("Berry file detected! Syntax highlighting and formatting are available.");
         }
     });
     // Also check the currently open editor when the extension is activated
     const activeEditor = vscode.window.activeTextEditor;
     if (activeEditor && activeEditor.document.languageId === "berry") {
-        vscode.window.showInformationMessage("Berry file detected! Syntax highlighting should be active.");
+        vscode.window.showInformationMessage("Berry file detected! Syntax highlighting and formatting are available.");
     }
     context.subscriptions.push(disposable);
 }

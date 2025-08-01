@@ -45,7 +45,22 @@
         "uiTheme": "vs-dark",
         "path": "./themes/berry-color-theme.json"
       }
-    ]
+    ],
+    "configuration": {
+      "title": "Berry Formatting",
+      "properties": {
+        "berry.format.enable": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable/disable Berry formatting"
+        },
+        "berry.format.enableFormatOnSave": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable/disable format on save for Berry files"
+        }
+      }
+    }
   },
   "devDependencies": {
     "@types/node": "^22.14.1",
