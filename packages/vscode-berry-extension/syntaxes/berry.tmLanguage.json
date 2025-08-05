@@ -4,12 +4,56 @@
   "scopeName": "source.berry",
   "fileTypes": ["berry", "be"],
   "patterns": [
+    { "include": "#surroundingPairs" },
     { "include": "#comments" },
+    { "include": "#task-definition" },
     { "include": "#api-definitions" },
     { "include": "#scalar-types" },
-    { "include": "#keyvalue-pairs" }
+    { "include": "#keyvalue-pairs" },
+    { "include": "#variables-definitions" },
+    { "include": "#step-definitions" },
+    { "include": "#operators" }
   ],
   "repository": {
+    "operators": {
+      "patterns": [
+        {
+          "name": "keyword.operator.arithmetic.berry",
+          "match": "[+\\-*/%]|\\*\\*"
+        },
+        {
+          "name": "keyword.operator.comparison.berry",
+          "match": "==|!=|<=|>=|<|>"
+        },
+        {
+          "name": "keyword.operator.logical.berry",
+          "match": "!|&&|\\|\\||Or|OR|AND|And"
+        },
+        {
+          "name": "keyword.operator.assignment.berry",
+          "match": "[+\\-*/%]?="
+        },
+        {
+          "name": "keyword.operator.bitwise.berry",
+          "match": "&|\\||\\^|~|<<|>>"
+        },
+        {
+          "name": "keyword.operator.misc.berry",
+          "match": "\\?|:|\\.{2,3}|=>"
+        }
+      ]
+    },
+    "task-definition": {
+      "patterns": [
+        {
+          "name": "keyword.task",
+          "match": "^Task\\s+(.+)$",
+          "captures": {
+            "1": { "name": "task.title" }
+          }
+        }
+      ]
+    },
     "comments": {
       "patterns": [
         {
@@ -18,8 +62,30 @@
         }
       ]
     },
+
+    "surroundingPairs": {
+      "patterns": [
+        {
+          "name": "meta.interpolation",
+          "match": "(\\{\\{)([^}]*)(\\}\\})",
+
+          "captures": {
+            "1": { "name": "keyword.interpolation-open" },
+            "2": { "name": "variable.other.interpolation" },
+            "3": { "name": "keyword.interpolation-close" }
+          }
+        }
+      ]
+    },
     "keyvalue-pairs": {
       "patterns": [
+        {
+          "name": "meta.keyvalue.header",
+          "match": "^\\s*(Header|Check|Capture|Params)\\s*",
+          "captures": {
+            "1": { "name": "keyword.keyvalue.header" }
+          }
+        },
         {
           "name": "meta.keyvalue-pairs",
           "match": "^\\s*(-)\\s*(['\"a-zA-Z\\-]*)\\s*(:)\\s*(?:\\s*(.*))?$",
@@ -104,6 +170,34 @@
           "match": "^\\s*(Header)\\s*",
           "captures": {
             "1": { "name": "keyword.api.header" }
+          }
+        }
+      ]
+    },
+    "step-definitions": {
+      "patterns": [
+        {
+          "name": "meta.step",
+          "match": "^\\s*(Step)\\s+(Call|CALL)?\\s+(\\S+)\\s*(\\S+)(?:\\s+(.*))?$",
+          "captures": {
+            "1": { "name": "keyword.step" },
+            "2": { "name": "keyword.step.action" },
+            "3": { "name": "step.function" },
+            "4": { "name": "step.function.name" },
+            "5": { "name": "step.title" }
+          }
+        }
+      ]
+    },
+    "variables-definitions": {
+      "patterns": [
+        {
+          "name": "meta.variables",
+          "match": "^\\s*(Var)(?:\\s+(@\\w+))?\\s+(.*)",
+          "captures": {
+            "1": { "name": "keyword.variable" },
+            "2": { "name": "variable.pointer" },
+            "3": { "name": "variable.name" }
           }
         }
       ]

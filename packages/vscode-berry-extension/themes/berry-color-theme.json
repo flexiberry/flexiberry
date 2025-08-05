@@ -10,6 +10,93 @@
     "editorWhitespace.foreground": "#404040"
   },
   "tokenColors": [
+    // Task definitions
+    {
+      "scope": "keyword.task",
+      "settings": {
+        "foreground": "#cba6f7"
+      }
+    },
+    {
+      "scope": "task.title",
+      "settings": {
+        "foreground": "#999999",
+        "fontStyle": ""
+      }
+    },
+
+    // Step definitions
+    {
+      "scope": "keyword.step",
+      "settings": {
+        "foreground": "#cba6f7",
+        "fontStyle": "bold"
+      }
+    },
+    {
+      "scope": "keyword.step.action",
+      "settings": {
+        "foreground": "#89b4fa"
+      }
+    },
+    {
+      "scope": "step.function",
+      "settings": {
+        "foreground": "#a6e3a1"
+      }
+    },
+    {
+      "scope": "step.function.name",
+      "settings": {
+        "foreground": "#f38ba8",
+        "fontStyle": "underline"
+      }
+    },
+    {
+      "scope": "step.title",
+      "settings": {
+        "foreground": "#cdd6f4"
+      }
+    },
+
+    // Operators
+    {
+      "scope": "keyword.operator.arithmetic.berry",
+      "settings": {
+        "foreground": "#89b4fa"
+      }
+    },
+    {
+      "scope": "keyword.operator.comparison.berry",
+      "settings": {
+        "foreground": "#f38ba8"
+      }
+    },
+    {
+      "scope": "keyword.operator.logical.berry",
+      "settings": {
+        "foreground": "#f38ba8"
+      }
+    },
+    {
+      "scope": "keyword.operator.assignment.berry",
+      "settings": {
+        "foreground": "#cba6f7"
+      }
+    },
+    {
+      "scope": "keyword.operator.bitwise.berry",
+      "settings": {
+        "foreground": "#89dceb"
+      }
+    },
+    {
+      "scope": "keyword.operator.misc.berry",
+      "settings": {
+        "foreground": "#a6e3a1"
+      }
+    },
+
     // Comments
     {
       "scope": ["comment.line.double-hash.berry"],
@@ -18,7 +105,48 @@
         "fontStyle": "italic"
       }
     },
+    // Interpolation
+    {
+      "scope": ["keyword.interpolation-open", "keyword.interpolation-close"],
+      "settings": {
+        "foreground": "#cba6f7"
+      }
+    },
+    {
+      "scope": ["variable.other.interpolation"],
+      "settings": {
+        "foreground": "#f38ba8",
+        "fontStyle": ""
+      }
+    },
 
+    // VAR definitions
+    {
+      "scope": ["keyword.variable", "variable.pointer", "variable.name"],
+      "settings": {
+        "foreground": "#cba6f7"
+      }
+    },
+    {
+      "scope": "keyword.variable",
+      "settings": {
+        "foreground": "#cba6f7"
+      }
+    },
+    {
+      "scope": "variable.pointer",
+      "settings": {
+        "foreground": "#f38ba8",
+        "fontStyle": ""
+      }
+    },
+    {
+      "scope": "variable.name",
+      "settings": {
+        "foreground": "#999999",
+        "fontStyle": ""
+      }
+    },
     // API Definitions
     {
       "scope": [
@@ -156,10 +284,17 @@
         "fontStyle": "italic"
       }
     },
+
     {
       "scope": "keyvalue-pairs.value",
       "settings": {
         "foreground": "#ffb86c"
+      }
+    },
+    {
+      "scope": "meta.keyvalue.header",
+      "settings": {
+        "foreground": "#cba6f7"
       }
     }
   ]

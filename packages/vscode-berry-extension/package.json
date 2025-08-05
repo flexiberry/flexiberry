@@ -62,6 +62,9 @@
       }
     }
   },
+  "dependencies": {
+    "@flexiberry/berrycore": "workspace:*"
+  },
   "devDependencies": {
     "@types/node": "^22.14.1",
     "typescript": "^5.8.3",

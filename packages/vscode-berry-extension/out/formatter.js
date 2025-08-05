@@ -36,6 +36,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.BerryFormatter = void 0;
 exports.registerFormatter = registerFormatter;
 const vscode = __importStar(require("vscode"));
+const berrycore_1 = require("@flexiberry/berrycore");
 class BerryFormatter {
     provideDocumentRangeFormattingEdits(document, range, options, token) {
         console.log("Range formatting requested for range:", range);
@@ -52,7 +53,12 @@ class BerryFormatter {
     }
     formatRange(document, range, options) {
         const edits = [];
-        // Your range formatting logic
+        document.lineAt(range.start.line);
+        for (let i = range.start.line; i <= range.end.line; i++) {
+            const line = document.lineAt(i);
+            // const formattedLine = this.formatBerryCode(line.text, options);
+            // edits.push(vscode.TextEdit.replace(line.range, formattedLine));
+        }
         return edits;
     }
     provideDocumentFormattingEdits(document, options, token) {
@@ -60,42 +66,18 @@ class BerryFormatter {
         const text = document.getText();
         let formattedText = this.formatBerryCode(text, options);
         // Replace the entire document with formatted text
-        const firstLine = document.lineAt(0);
-        const lastLine = document.lineAt(document.lineCount - 1);
-        const range = new vscode.Range(firstLine.range.start, lastLine.range.end);
-        edits.push(vscode.TextEdit.replace(range, formattedText));
+        // const firstLine = document.lineAt(0);
+        // const lastLine = document.lineAt(document.lineCount - 1);
+        // const range = new vscode.Range(firstLine.range.start, lastLine.range.end);
+        // edits.push(vscode.TextEdit.replace(range, formattedText));
         return edits;
     }
     formatBerryCode(code, options) {
-        // Split the code into lines
-        let lines = code.split("\n");
-        let indentLevel = 0;
-        let formattedLines = [];
-        const indent = options.insertSpaces ? " ".repeat(options.tabSize) : "\t";
-        for (const line of lines) {
-            console.log(line);
-            const trimmedLine = line.trim();
-            // Decrease indent level for closing braces
-            if (trimmedLine.endsWith("}") ||
-                trimmedLine.endsWith(")") ||
-                trimmedLine.endsWith("]")) {
-                indentLevel = Math.max(0, indentLevel - 1);
-            }
-            // Add line with current indentation
-            if (trimmedLine) {
-                formattedLines.push(indent.repeat(indentLevel) + trimmedLine);
-            }
-            else {
-                formattedLines.push("");
-            }
-            // Increase indent level for opening braces
-            if (trimmedLine.endsWith("{") ||
-                trimmedLine.endsWith("(") ||
-                trimmedLine.endsWith("[")) {
-                indentLevel++;
-            }
-        }
-        return formattedLines.join("\n");
+        // new Lexer()
+        const tkn = new berrycore_1.LexerEngine(code).tokenize();
+        console.log(tkn);
+        new berrycore_1.LexerEngine(code);
+        return code;
     }
 }
 exports.BerryFormatter = BerryFormatter;
