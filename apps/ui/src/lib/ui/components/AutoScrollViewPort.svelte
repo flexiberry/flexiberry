@@ -11,12 +11,30 @@
   let animationFrame: number;
   let scrollDirection = { x: 0, y: 0 };
 
-  // Reactive values for viewport dimensions
+  // Reactive values for viewport dimensions and edge highlights
   let viewportWidth = 0;
   let viewportHeight = 0;
   let scrollLeft = 0;
   let scrollTop = 0;
   let maxScrollLeft = 0;
+  
+  // Track which edges are active for highlighting
+  let activeEdges = {
+    top: false,
+    right: false,
+    bottom: false,
+    left: false
+  };
+  
+  // Update active edges based on scroll direction
+  $: {
+    activeEdges = {
+      top: scrollDirection.y < 0,
+      right: scrollDirection.x > 0,
+      bottom: scrollDirection.y > 0,
+      left: scrollDirection.x < 0
+    };
+  }
   let maxScrollTop = 0;
 
   function updateScrollLimits() {
@@ -37,25 +55,32 @@
     // Calculate scroll direction based on cursor position
     let newScrollX = 0;
     let newScrollY = 0;
+    
+    // Reset active edges
+    activeEdges = { top: false, right: false, bottom: false, left: false };
 
     // Horizontal scrolling
     if (mouseX < edgeThreshold && scrollLeft > 0) {
       newScrollX = -1; // Scroll left
+      activeEdges.left = true;
     } else if (
       mouseX > viewportWidth - edgeThreshold &&
       scrollLeft < maxScrollLeft
     ) {
       newScrollX = 1; // Scroll right
+      activeEdges.right = true;
     }
 
     // Vertical scrolling
     if (mouseY < edgeThreshold && scrollTop > 0) {
       newScrollY = -1; // Scroll up
+      activeEdges.top = true;
     } else if (
       mouseY > viewportHeight - edgeThreshold &&
       scrollTop < maxScrollTop
     ) {
       newScrollY = 1; // Scroll down
+      activeEdges.bottom = true;
     }
 
     scrollDirection = { x: newScrollX, y: newScrollY };
@@ -210,21 +235,46 @@
 <div
   role="region"
   bind:this={viewportElement}
-  class="auto-scroll-viewport"
+  class="relative w-screen h-screen overflow-auto cursor-crosshair scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100 hover:scrollbar-thumb-gray-400"
   on:mousemove={handleMouseMove}
   on:mouseleave={handleMouseLeave}
   on:scroll={handleScroll}
 >
-  <!-- Large content area -->
-  <div class="content-area">
+  <!-- Fixed edge highlight indicators -->
+  <div class="fixed inset-0 pointer-events-none z-50 overflow-hidden">
+    {#if activeEdges.top}
+      <div 
+        class="absolute left-0 right-0 bg-gradient-to-b from-blue-500/70 to-transparent z-50 transition-opacity duration-200"
+        style="height: {edgeThreshold}px; top: 0;"
+      ></div>
+    {/if}
+    {#if activeEdges.right}
+      <div 
+        class="absolute top-0 bottom-0 bg-gradient-to-l from-blue-500/70 to-transparent z-50 transition-opacity duration-200"
+        style="width: {edgeThreshold}px; right: 0;"
+      ></div>
+    {/if}
+    {#if activeEdges.bottom}
+      <div 
+        class="absolute left-0 right-0 bg-gradient-to-t from-blue-500/70 to-transparent z-50 transition-opacity duration-200"
+        style="height: {edgeThreshold}px; bottom: 0;"
+      ></div>
+    {/if}
+    {#if activeEdges.left}
+      <div 
+        class="absolute top-0 bottom-0 bg-gradient-to-r from-blue-500/70 to-transparent z-50 transition-opacity duration-200"
+        style="width: {edgeThreshold}px; left: 0;"
+      ></div>
+    {/if}
+  </div>
+  <!-- Large content area with grid pattern background -->
+  <div class="min-w-[200vw] min-h-[200vh] bg-[linear-gradient(45deg,#f3f4f6_25%,transparent_25%),linear-gradient(-45deg,#f3f4f6_25%,transparent_25%),linear-gradient(45deg,transparent_75%,#f3f4f6_75%),linear-gradient(-45deg,transparent_75%,#f3f4f6_75%)] bg-[length:20px_20px] bg-[0_0,0_10px,10px_-10px,-10px_0px]">
     <!-- Slot for your content -->
     <slot>
       <!-- Default content for demonstration -->
       <div class="grid grid-cols-10 gap-4 p-8">
         {#each Array(100) as _, i}
-          <div
-            class="bg-blue-100 border-2 border-blue-300 rounded-lg p-4 text-center"
-          >
+          <div class="bg-blue-100 border-2 border-blue-300 rounded-lg p-4 text-center">
             <div class="text-blue-800 font-semibold">Item {i + 1}</div>
             <div class="text-blue-600 text-sm mt-2">
               Grid position: {Math.floor(i / 10) + 1}, {(i % 10) + 1}
@@ -236,58 +286,4 @@
   </div>
 </div>
 
-<style>
-  .auto-scroll-viewport {
-    position: relative;
-    width: 100vw;
-    height: 100vh;
-    overflow: auto;
-    cursor: crosshair;
-  }
-
-  .content-area {
-    min-width: 200vw;
-    min-height: 200vh;
-    background:
-      linear-gradient(45deg, #f3f4f6 25%, transparent 25%),
-      linear-gradient(-45deg, #f3f4f6 25%, transparent 25%),
-      linear-gradient(45deg, transparent 75%, #f3f4f6 75%),
-      linear-gradient(-45deg, transparent 75%, #f3f4f6 75%);
-    background-size: 20px 20px;
-    background-position:
-      0 0,
-      0 10px,
-      10px -10px,
-      -10px 0px;
-  }
-
-  .edge-indicators {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    pointer-events: none;
-    z-index: 10;
-  }
-
-  /* Custom scrollbar styling */
-  .auto-scroll-viewport::-webkit-scrollbar {
-    width: 8px;
-    height: 8px;
-  }
-
-  .auto-scroll-viewport::-webkit-scrollbar-track {
-    background: #f1f1f1;
-    border-radius: 4px;
-  }
-
-  .auto-scroll-viewport::-webkit-scrollbar-thumb {
-    background: #c1c1c1;
-    border-radius: 4px;
-  }
-
-  .auto-scroll-viewport::-webkit-scrollbar-thumb:hover {
-    background: #a8a8a8;
-  }
-</style>
+<!-- All styles have been converted to Tailwind CSS classes -->

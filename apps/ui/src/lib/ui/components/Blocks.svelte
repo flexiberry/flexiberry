@@ -1,12 +1,22 @@
 <script lang="ts">
   import { onMount, onDestroy } from "svelte";
 
+  // Props
+  export let zIndex = 1;
+  export let onSelect = () => {};
+  export let id = "";
+
   // State
   let width = 400;
   let height = 300;
   let x = 0;
   let y = 0;
   let isResizing = false;
+
+  // Handle selection
+  function handleSelect() {
+    onSelect();
+  }
   let isDragging = false;
   let resizeDirection = "";
   let startX = 0;
@@ -120,47 +130,73 @@
 </script>
 
 <div
-  class="relative bg-white shadow-lg rounded-lg overflow-hidden border border-gray-300 select-none"
-  style="width: {width}px; height: {height}px; left: {x}px; top: {y}px;"
+  on:click|stopPropagation={() => {
+    handleSelect();
+    return false;
+  }}
+  on:keydown|stopPropagation={(e) => {
+    if (e.key === "Enter" || e.key === " ") {
+      e.preventDefault();
+      handleSelect();
+      return false;
+    }
+  }}
+  role="button"
+  tabindex="0"
+  class="absolute group"
+  style="width: {width}px; height: {height}px; left: {x}px; top: {y}px; z-index: {zIndex};"
 >
-  <!-- Header -->
   <div
-    class="bg-gray-100 p-2 cursor-move border-b border-gray-200"
-    role="none"
-    on:mousedown|preventDefault|stopPropagation={handleDragStart}
+    class="w-full h-full bg-white rounded-lg shadow-lg border-2 border-transparent group-hover:border-blue-300 overflow-hidden select-none transition-all flex flex-col"
   >
-    Drag me
-  </div>
+    <!-- Header -->
+    <div
+      class="bg-gray-100 p-2 cursor-move border-b border-gray-200 select-none"
+      role="button"
+      tabindex="0"
+      on:mousedown|preventDefault={handleDragStart}
+    >
+      <div class="flex justify-between items-center">
+        <span>Drag me</span>
+      </div>
+    </div>
 
-  <!-- Content -->
-  <div class="p-4">
-    <slot>Your Window Content</slot>
-  </div>
+    <!-- Content -->
+    <div class="flex-1 overflow-auto">
+      <slot>
+        <!-- Default content if none provided -->
+        <div class="p-4">
+          <p>Drag me by the top bar</p>
+          <p class="text-sm text-gray-500">Click anywhere to select</p>
+        </div>
+      </slot>
+    </div>
 
-  {#each resizeHandlers as { position, cursor } (position)}
-    {#key position}
-      <div
-        class="absolute z-10 hover:bg-blue-400/50 transition-colors"
-        class:top-0={position.startsWith("top")}
-        class:bottom-0={position.startsWith("bottom")}
-        class:left-0={position.endsWith("left")}
-        class:right-0={position.endsWith("right")}
-        class:left-1={position === "top" || position === "bottom"}
-        class:w-full={position === "top" || position === "bottom"}
-        class:top-1={position === "left" || position === "right"}
-        class:h-full={position === "left" || position === "right"}
-        class:-translate-x-1={position === "top" || position === "bottom"}
-        class:-translate-y-1={position === "left" || position === "right"}
-        class:w-2.5={!position.includes("-")}
-        class:h-2.5={!position.includes("-")}
-        class:w-6={position.includes("-")}
-        class:h-6={position.includes("-")}
-        class:rounded-full={!position.includes("-")}
-        class:rounded-sm={position.includes("-")}
-        style="cursor: {cursor}"
-        role="none"
-        on:mousedown|stopPropagation={(e) => handleResizeStart(e, position)}
-      ></div>
-    {/key}
-  {/each}
+    {#each resizeHandlers as { position, cursor } (position)}
+      {#key position}
+        <div
+          class="absolute z-10 hover:bg-blue-100/50 transition-colors"
+          class:top-0={position.startsWith("top")}
+          class:bottom-0={position.startsWith("bottom")}
+          class:left-0={position.endsWith("left")}
+          class:right-0={position.endsWith("right")}
+          class:left-1={position === "top" || position === "bottom"}
+          class:w-full={position === "top" || position === "bottom"}
+          class:top-1={position === "left" || position === "right"}
+          class:h-full={position === "left" || position === "right"}
+          class:-translate-x-1={position === "top" || position === "bottom"}
+          class:-translate-y-1={position === "left" || position === "right"}
+          class:w-2.5={!position.includes("-")}
+          class:h-2.5={!position.includes("-")}
+          class:w-6={position.includes("-")}
+          class:h-6={position.includes("-")}
+          class:rounded-full={!position.includes("-")}
+          class:rounded-sm={position.includes("-")}
+          style="cursor: {cursor}"
+          role="none"
+          on:mousedown|stopPropagation={(e) => handleResizeStart(e, position)}
+        ></div>
+      {/key}
+    {/each}
+  </div>
 </div>
