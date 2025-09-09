@@ -13,53 +13,49 @@
   import { Folder, Plus, Search } from "lucide-svelte";
   import type { PaneAPI } from "paneforge";
 
-  let heightDifference = 0;
-  let showRightPane = true;
-  let toolbarHeight = 28; // Height of the bottom toolbar
-  let paneOne: PaneAPI;
-  let resizeObserver: ResizeObserver;
-  let collapsed = false;
-  // Add these variables to track height
+  // let heightDifference = 0;
+  // let showRightPane = true;
+  // let toolbarHeight = 28; // Height of the bottom toolbar
+  // let paneOne: PaneAPI;
+  // let resizeObserver: ResizeObserver;
+  // let collapsed = false;
+  // // Add these variables to track height
 
-  onMount(() => {
-    // Create ResizeObserver to watch container size changes
+  // onMount(() => {
+  //   // Create ResizeObserver to watch container size changes
 
-    resizeObserver = new ResizeObserver((entries) => {});
+  //   resizeObserver = new ResizeObserver((entries) => {});
 
-    const handleResize = () => {
-      const headerHeight = document?.querySelector("Header")?.clientHeight || 0;
-      const bodyHeight = window.innerHeight || 0;
-      heightDifference = bodyHeight - headerHeight - toolbarHeight;
+  //   const handleResize = () => {
+  //     const headerHeight = document?.querySelector("Header")?.clientHeight || 0;
+  //     const bodyHeight = window.innerHeight || 0;
+  //     heightDifference = bodyHeight - headerHeight - toolbarHeight;
 
-      // Update right pane visibility based on screen width
-      showRightPane = window.innerWidth >= 700;
-    };
+  //     // Update right pane visibility based on screen width
+  //     showRightPane = window.innerWidth >= 700;
+  //   };
 
-    handleResize();
-    window.addEventListener("resize", handleResize);
+  //   handleResize();
+  //   window.addEventListener("resize", handleResize);
 
-    return () => {
-      // Cleanup
-      if (resizeObserver) {
-        resizeObserver.disconnect();
-      }
-      window.removeEventListener("resize", handleResize);
-    };
-  });
+  //   return () => {
+  //     // Cleanup
+  //     if (resizeObserver) {
+  //       resizeObserver.disconnect();
+  //     }
+  //     window.removeEventListener("resize", handleResize);
+  //   };
+  // });
 
-  function expandPane() {
-    paneOne.expand();
-    paneOne.resize(25);
-  }
+  // function expandPane() {
+  //   paneOne.expand();
+  //   paneOne.resize(25);
+  // }
 </script>
-
-<!-- <SplashScreen duration={3000} /> -->
-
-<!-- Show the splash screen for 3 seconds -->
 
 <Toaster position="bottom-center" />
 <ModeWatcher />
-
+<!-- 
 <Header></Header>
 
 <Resizable.PaneGroup
@@ -77,7 +73,6 @@
     onCollapse={() => (collapsed = true)}
     onExpand={() => (collapsed = false)}
   >
-    <!-- <Separator></Separator> -->
     {#if !collapsed}
       <div class="px-2">
         <FolderHierarchy height={heightDifference} />
@@ -98,8 +93,9 @@
   </Resizable.Pane>
   <Resizable.Handle withHandle />
   <Resizable.Pane class="bg-muted" defaultSize={showRightPane ? 50 : 75}>
-    <slot></slot>
-  </Resizable.Pane>
+   -->
+<slot></slot>
+<!-- </Resizable.Pane>
   {#if showRightPane}
     <Resizable.Handle withHandle />
     <Resizable.Pane
@@ -114,10 +110,9 @@
   {/if}
 </Resizable.PaneGroup>
 
-<!-- Add the bottom toolbar -->
 <div
   class="w-full border-t border-primary bg-background bg-opacity-100 p-1 flex items-center px-2 justify-between"
   style="height: {toolbarHeight}px"
 >
   <BottomToolBar></BottomToolBar>
-</div>
+</div> -->
