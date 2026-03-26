@@ -143,7 +143,7 @@
   }}
   role="button"
   tabindex="0"
-  class="absolute group"
+  class="relative group"
   style="width: {width}px; height: {height}px; left: {x}px; top: {y}px; z-index: {zIndex};"
 >
   <div

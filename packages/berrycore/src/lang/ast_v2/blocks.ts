@@ -17,5 +17,3 @@ export type Blocks = {
 };
 
 export type BlocksParent = Blocks & {};
-
-export class BlocksBuilder {}

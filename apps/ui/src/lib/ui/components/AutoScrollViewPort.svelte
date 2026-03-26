@@ -17,22 +17,22 @@
   let scrollLeft = 0;
   let scrollTop = 0;
   let maxScrollLeft = 0;
-  
+
   // Track which edges are active for highlighting
   let activeEdges = {
     top: false,
     right: false,
     bottom: false,
-    left: false
+    left: false,
   };
-  
+
   // Update active edges based on scroll direction
   $: {
     activeEdges = {
       top: scrollDirection.y < 0,
       right: scrollDirection.x > 0,
       bottom: scrollDirection.y > 0,
-      left: scrollDirection.x < 0
+      left: scrollDirection.x < 0,
     };
   }
   let maxScrollTop = 0;
@@ -55,7 +55,7 @@
     // Calculate scroll direction based on cursor position
     let newScrollX = 0;
     let newScrollY = 0;
-    
+
     // Reset active edges
     activeEdges = { top: false, right: false, bottom: false, left: false };
 
@@ -243,45 +243,49 @@
   <!-- Fixed edge highlight indicators -->
   <div class="fixed inset-0 pointer-events-none z-50 overflow-hidden">
     {#if activeEdges.top}
-      <div 
+      <div
         class="absolute left-0 right-0 bg-gradient-to-b from-blue-500/70 to-transparent z-50 transition-opacity duration-200"
         style="height: {edgeThreshold}px; top: 0;"
       ></div>
     {/if}
     {#if activeEdges.right}
-      <div 
+      <div
         class="absolute top-0 bottom-0 bg-gradient-to-l from-blue-500/70 to-transparent z-50 transition-opacity duration-200"
         style="width: {edgeThreshold}px; right: 0;"
       ></div>
     {/if}
     {#if activeEdges.bottom}
-      <div 
+      <div
         class="absolute left-0 right-0 bg-gradient-to-t from-blue-500/70 to-transparent z-50 transition-opacity duration-200"
         style="height: {edgeThreshold}px; bottom: 0;"
       ></div>
     {/if}
     {#if activeEdges.left}
-      <div 
+      <div
         class="absolute top-0 bottom-0 bg-gradient-to-r from-blue-500/70 to-transparent z-50 transition-opacity duration-200"
         style="width: {edgeThreshold}px; left: 0;"
       ></div>
     {/if}
   </div>
   <!-- Large content area with grid pattern background -->
-  <div class="min-w-[200vw] min-h-[200vh] bg-[linear-gradient(45deg,#f3f4f6_25%,transparent_25%),linear-gradient(-45deg,#f3f4f6_25%,transparent_25%),linear-gradient(45deg,transparent_75%,#f3f4f6_75%),linear-gradient(-45deg,transparent_75%,#f3f4f6_75%)] bg-[length:20px_20px] bg-[0_0,0_10px,10px_-10px,-10px_0px]">
+  <div
+    class="min-w-[200vw] flex flex-wrap min-h-[200vh] bg-[linear-gradient(45deg,#f3f4f6_25%,transparent_25%),linear-gradient(-45deg,#f3f4f6_25%,transparent_25%),linear-gradient(45deg,transparent_75%,#f3f4f6_75%),linear-gradient(-45deg,transparent_75%,#f3f4f6_75%)] bg-[length:20px_20px] bg-[0_0,0_10px,10px_-10px,-10px_0px]"
+  >
     <!-- Slot for your content -->
     <slot>
       <!-- Default content for demonstration -->
-      <div class="grid grid-cols-10 gap-4 p-8">
+      <!-- <div class="grid grid-cols-10 gap-4 p-8">
         {#each Array(100) as _, i}
-          <div class="bg-blue-100 border-2 border-blue-300 rounded-lg p-4 text-center">
+          <div
+            class="bg-blue-100 border-2 border-blue-300 rounded-lg p-4 text-center"
+          >
             <div class="text-blue-800 font-semibold">Item {i + 1}</div>
             <div class="text-blue-600 text-sm mt-2">
               Grid position: {Math.floor(i / 10) + 1}, {(i % 10) + 1}
             </div>
           </div>
         {/each}
-      </div>
+      </div> -->
     </slot>
   </div>
 </div>

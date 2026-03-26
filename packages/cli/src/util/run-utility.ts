@@ -12,9 +12,11 @@ import * as fs from "fs";
 import * as path from "path";
 import { FileUtility } from "./file-utility.js";
 import {
+  AstEngine,
   BerryExecutor,
   Lexer,
   LexerEngine,
+  Parser,
   RUNNER_EVENT,
   RuntimeStep,
   RuntimeTask,
@@ -24,6 +26,38 @@ import { apiCliCall } from "../ui/api.cli.js";
 import { UI } from "../ui/ui.js";
 
 export class RunUtility {
+  static async test(file: any) {
+    if (file) {
+      const filePath = path.join(process.cwd(), file);
+      if (!fs.existsSync(filePath)) {
+        log.error(
+          chalk.red(`❌ Error: The specified file was not found at ${filePath}`)
+        );
+        return;
+      }
+      log.message(`📄 File detected: ${chalk.blue(filePath)}`);
+      log.success(chalk.green("✅ File successfully selected!"));
+    } else {
+      const fileSelected = await this.selectFromCurrentFolder();
+      if (!fileSelected) {
+        const hasP = await confirm({
+          message: `Would you like to proceed with the pre-selected file? (y/n) ${chalk.bgBlue(FileUtility.getPreselectedFileName())}`,
+        });
+        if (isCancel(hasP) || !hasP) {
+          log.step("⚠️ Operation skipped.");
+          return;
+        }
+        const preSelectedFile = FileUtility.getPreselectedFile();
+        if (!preSelectedFile) {
+          return;
+        }
+        log.step(`🔄 Preparing to execute script : ${preSelectedFile}`);
+
+        outro("UI is ready");
+        this.testingNewlexer(preSelectedFile);
+      }
+    }
+  }
   static async run(file: string) {
     intro(`🏎️ Starting FlexiBerry Execution`);
 
@@ -62,16 +96,14 @@ export class RunUtility {
   private static testingNewlexer(preSelectedFile: any) {
     const fileContents = fs.readFileSync(preSelectedFile, "utf8");
     console.time("New Tokenize");
+
     let token = new LexerEngine(fileContents).tokenize();
+    let blocks = new AstEngine(token).build();
+    console.log(blocks);
+
     console.timeEnd("New Tokenize");
 
-    console.debug(token);
-    // console.time("old Tokenize");
-    // let oldTkn = new Lexer(fileContents).tokenize();
-    // console.timeEnd("old Tokenize");
-
-    // console.dir("New Tokenize: ", token.length);
-    // console.log("Old Tokenize: ", oldTkn.length);
+    // console.dir(token);
   }
 
   private static berryExecutor(preSelectedFile: any) {

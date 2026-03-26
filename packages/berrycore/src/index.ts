@@ -7,6 +7,7 @@ import {
 } from "./core/runtime/runtime.types";
 import { RUNNER_EVENT } from "./enum/runner.event";
 import Parser from "./lang/ast/ast-parser";
+import { AstEngine } from "./lang/ast_v2/ast.engine";
 import { Lexer } from "./lang/tokenizer/lexer";
 import { LexerEngine } from "./lang/tokenizer/reader_v2/lexer.engine";
 import { FormatUtil } from "./script/format-util";
@@ -27,5 +28,6 @@ export {
   RuntimeJobOverview,
   RuntimeTask,
   RuntimeStep,
+  AstEngine,
   LexerEngine,
 };

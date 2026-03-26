@@ -86,4 +86,12 @@ program
     RunUtility.run(file);
   });
 
+program
+  .command("test")
+  .argument("[file]", "Enter the File name ")
+  .description("test engine .berry script")
+  .action((file, options) => {
+    RunUtility.test(file);
+  });
+
 program.parse();
