@@ -13,7 +13,7 @@
     "clean": "rm -rf dist"
   },
   "keywords": [],
-  "author": "rintu raj.c",
+  "author": "rintu raj c",
   "license": "MIT",
   "dependencies": {
     "axios": "^1.7.7"

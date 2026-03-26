@@ -16,7 +16,7 @@
     "installglobal": "npm i -g ."
   },
   "keywords": [],
-  "author": "rintu raj.c",
+  "author": "rintu raj c",
   "license": "MIT",
   "dependencies": {
     "@clack/prompts": "^0.10.0",
