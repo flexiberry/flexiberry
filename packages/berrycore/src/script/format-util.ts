@@ -1,63 +1,119 @@
+/**
+ * Format Utility
+ *
+ * Utilities for converting external API formats (CURL, etc.) to Berry code.
+ */
+
+export interface ApiCommand {
+  method: string;
+  url: string;
+  title?: string;
+  body?: string;
+  bodyType?: string;
+  headers?: string;
+}
+
 export class FormatUtil {
+  /**
+   * Convert a CURL command to Berry Api string
+   * @param curl The CURL command string
+   * @param id The name/identifier for the Api
+   */
   static convertCurlToBerry(curl: string, id: string): string {
+    // 1. Extract Method
     const methodMatch = curl.match(/(?:--location|-X)\s+(\w+)/);
-    const method = methodMatch ? methodMatch[1] : "GET"; // Default to GET if no method is found
+    const method = (methodMatch ? methodMatch[1] : "GET").toUpperCase();
 
-    const urlMatch = curl.match(/[http|https]+:\/\/[^\s'"]+/);
-    const url = urlMatch ? urlMatch[0] : "";
+    // 2. Extract URL
+    const urlMatch = curl.match(/(?:['"]?)(https?:\/\/[^\s'"]+)(?:['"]?)/);
+    const url = urlMatch ? urlMatch[1] : "";
 
+    // 3. Extract Headers
     const headers: Record<string, string> = {};
     const headerPattern = /(?:--header|-[Hh])\s+(['"])(.*?):\s*(.*?)\1/gm;
 
-    const headerMatches = curl.match(headerPattern);
-    if (headerMatches) {
-      headerMatches.forEach((header) => {
-        const [key, value] = header
-          .replace(/(?:--header|-[Hh])\s+('|")/, "")
-          .replace(/('|")/g, "")
-          .split(": ");
-        headers[key.trim()] = value.trim();
-      });
-    }
-
-    const bodyMatch = curl.match(
-      /(?:--data-raw|-[dD]|--data)\s+(['"])([^'"]+)\1/
-    );
-    const body = bodyMatch ? bodyMatch[2] : null;
-
-    // Construct the Berry format string
-    let berryFormat = `Api ${method} #${id} \n`;
-    berryFormat += `Url ${url}\n`;
-    if (body) berryFormat += `Body JSON  \`${body.replaceAll("\n", "")}\`\n`;
-    if (!!headers && Object.entries(headers).length > 0) {
-      berryFormat += `Header\n`;
-      for (const [key, value] of Object.entries(headers)) {
-        berryFormat += `- ${key}: '${value}'\n`;
+    let match;
+    while ((match = headerPattern.exec(curl)) !== null) {
+      if (match[2] && match[3]) {
+        headers[match[2].trim()] = match[3].trim();
       }
     }
 
-    return berryFormat;
+    // 4. Extract Body
+    const bodyMatch = curl.match(
+      /(?:--data-raw|--data-binary|--data|-[dD])\s+(?:'|")?(\{.*\}|.*)(?:'|")?/s
+    );
+    // Cleanup body: remove leading/trailing quotes if the regex captured them lazily
+    let body = bodyMatch ? bodyMatch[1].trim() : null;
+    if (body && (body.startsWith("'") || body.startsWith('"'))) {
+      body = body.slice(1, -1);
+    }
+
+    // 5. Construct Berry String
+    const lines = [`Api ${method} #${id}`];
+    lines.push(`Url ${url}`);
+
+    if (body) {
+      // Inline the body for simplicity in CURL conversion
+      const cleanBody = body.replace(/\n/g, " ").trim();
+      lines.push(`Body JSON \`${cleanBody}\``);
+    }
+
+    if (Object.entries(headers).length > 0) {
+      lines.push("Header");
+      for (const [key, value] of Object.entries(headers)) {
+        lines.push(`- ${key}: '${value}'`);
+      }
+    }
+
+    return lines.join("\n") + "\n";
   }
-  static buildApi(name: any, cmd: any) {
-    let template = `Api ${cmd.method} #${name}  ${cmd.title ? cmd.title : ""} \n Url ${cmd.url}`;
+
+  /**
+   * Build a Berry Api block from a command object
+   */
+  static buildApi(name: string, cmd: ApiCommand): string {
+    const lines = [`Api ${cmd.method.toUpperCase()} #${name} ${cmd.title || ""}`];
+    lines.push(`Url ${cmd.url}`);
+
     if (cmd.body) {
-      template += `Body ${cmd.bodyType ? cmd.bodyType.toUpperCase() : "JSON"}\n\`\n${cmd.body}\n\``;
+      const type = (cmd.bodyType || "JSON").toUpperCase();
+      lines.push(`Body ${type}`);
+      lines.push("`", cmd.body, "`");
     }
+
     if (cmd.headers) {
-      template += `Header\n - ${cmd.headers.split(",").join("\n  - ")}`;
+      lines.push("Header");
+      const headerList = cmd.headers.split(",").map((h) => h.trim());
+      for (const h of headerList) {
+        if (h) lines.push(`- ${h}`);
+      }
     }
-    return template;
+
+    return lines.join("\n") + "\n";
   }
 
-  static buildVar(title: string, variables: string[], env: string) {
-    const code = `Var ${env ? "@" + env : ""} ${title} \n - ${variables.join("\n - ")}`;
-    return code;
+  /**
+   * Build a Berry Var block
+   */
+  static buildVar(title: string, variables: string[], env?: string): string {
+    const header = `Var ${env ? "@" + env : ""} ${title}`;
+    const lines = [header];
+    for (const v of variables) {
+      lines.push(`- ${v}`);
+    }
+    return lines.join("\n") + "\n";
   }
 
-  static buildEnv(env: string[]) {
-    return `Env ${env
-      .filter((x) => x != null)
-      .map((x) => x.toUpperCase())
-      .join(",")}`;
+  /**
+   * Build a Berry Env block
+   */
+  static buildEnv(envs: (string | null | undefined)[]): string {
+    const validEnvs = envs
+      .filter((e): e is string => !!e)
+      .map((e) => e.trim().toUpperCase());
+
+    if (validEnvs.length === 0) return "";
+    return `Env ${validEnvs.join(",")}\n`;
   }
 }

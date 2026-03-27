@@ -1,5 +1,56 @@
 import * as fs from "fs";
 
+/**
+ * Postman Collection Interfaces (Minimal for conversion)
+ */
+export interface PostmanHeader {
+  key: string;
+  value: string;
+  description?: string;
+}
+
+export interface PostmanUrl {
+  raw: string;
+  protocol?: string;
+  host?: string[];
+  path?: string[];
+  query?: Array<{ key: string; value: string }>;
+  variable?: Array<{ key: string; value: string }>;
+}
+
+export interface PostmanBody {
+  mode: "raw" | "urlencoded" | "formdata" | "file" | "graphql";
+  raw?: string;
+  urlencoded?: Array<{ key: string; value: string }>;
+  formdata?: Array<{ key: string; value: string }>;
+  options?: {
+    raw?: {
+      language: string;
+    };
+  };
+}
+
+export interface PostmanRequest {
+  method: string;
+  header: PostmanHeader[];
+  url: PostmanUrl | string;
+  body?: PostmanBody;
+}
+
+export interface PostmanItem {
+  name: string;
+  request?: PostmanRequest;
+  item?: PostmanItem[];
+}
+
+export interface PostmanCollection {
+  info: {
+    name: string;
+    schema: string;
+  };
+  item: PostmanItem[];
+}
+
 export class PostmanUtil {
   /**
    * Convert a Postman collection file (JSON) to Berry API code
@@ -12,155 +63,177 @@ export class PostmanUtil {
     } catch (e) {
       throw new Error(`Failed to read file: ${e}`);
     }
-    let collection: any;
+
+    let collection: PostmanCollection;
     try {
       collection = JSON.parse(content);
     } catch (e) {
       throw new Error(`Invalid JSON in Postman file`);
     }
-    if (!collection.item)
+
+    if (!collection.item) {
       throw new Error("No items found in Postman collection");
-    let result = "";
+    }
 
-    // Helper: Build URL from req.url
-    function buildUrl(req: any): string {
-      if (typeof req.url === "string") return req.url;
-      if (!req.url) return "";
-      if (req.url.raw) return req.url.raw;
-      if (req.url.host) {
-        let url = `${req.url.protocol || "https"}://${req.url.host.join(".")}${req.url.path ? "/" + req.url.path.join("/") : ""}`;
-        if (req.url.query && req.url.query.length > 0) {
-          url +=
-            "?" +
-            req.url.query.map((q: any) => `${q.key}={{${q.key}}}`).join("&");
+    const lines: string[] = [];
+
+    // Recursively process items
+    this.processItems(collection.item, lines);
+
+    return lines.join("\n").trim() + "\n";
+  }
+
+  /**
+   * Internal recursive processor for Postman items
+   */
+  private static processItems(items: PostmanItem[], lines: string[], parentName = ""): void {
+    for (const item of items) {
+      if (item.item) {
+        // It's a folder/group
+        this.processItems(item.item, lines, item.name);
+        continue;
+      }
+
+      if (!item.request) continue;
+
+      const req = item.request;
+      const name = item.name || parentName || "api";
+      const method = (req.method || "GET").toUpperCase();
+
+      // 1. URL Resolution
+      let url = this.buildUrl(req.url);
+      // Replace postman path params :param with berry {{param}}
+      url = url.replace(/\/:([a-zA-Z0-9_]+)/g, "/{{$1}}");
+
+      // 2. ID Generation (Abbreviation)
+      const apiId = this.abbreviate(name);
+
+      // 3. Construct Berry Block
+      lines.push(`Api ${method} #${apiId} ${name}`);
+      lines.push(`Url ${url}`);
+
+      // 4. Headers
+      const headers = this.extractHeaders(req.header);
+      if (headers.length > 0) {
+        lines.push("Header");
+        for (const h of headers) {
+          lines.push(`- ${h}`);
         }
-        return url;
       }
-      return "";
-    }
 
-    // Helper: Extract headers
-    function extractHeaders(req: any): string[] {
-      if (!req.header || !Array.isArray(req.header)) return [];
-      return req.header
-        .filter((h: any) => h.key && h.value !== undefined)
-        .map((h: any) => `${h.key}: '${h.value}'`);
-    }
-
-    function abbreviation(title: string): string {
-      const stopWords = new Set([
-        "a",
-        "in",
-        "the",
-        "with",
-        "and",
-        "of",
-        "to",
-        "for",
-        "on",
-        "at",
-        "by",
-      ]);
-
-      return title
-        .toLowerCase()
-        .split(" ")
-        .filter((word) => !stopWords.has(word))
-        .map((word, index) =>
-          index === 0 ? word : word[0].toUpperCase() + word.slice(1)
-        )
-        .join("");
-    }
-    // Helper: Extract body content
-    function extractBody(req: any): string {
-      if (!req.body || !req.body.mode) return "";
-      if (req.body.mode === "raw" && req.body.raw) return req.body.raw;
-      if (req.body.mode === "urlencoded" && req.body.urlencoded) {
-        const obj: any = {};
-        req.body.urlencoded.forEach((kv: any) => {
-          obj[kv.key] = kv.value;
-        });
-        return JSON.stringify(obj, null, 2);
-      }
-      if (req.body.mode === "formdata" && req.body.formdata) {
-        const obj: any = {};
-        req.body.formdata.forEach((kv: any) => {
-          obj[kv.key] = kv.value;
-        });
-        return JSON.stringify(obj, null, 2);
-      }
-      return "";
-    }
-
-    // Helper: Detect body type
-    function detectBodyType(headers: string[], req: any): string {
-      let bodyType = "JSON";
-      const contentTypeHeader = headers.find((h) =>
-        h.toLowerCase().startsWith("content-type")
-      );
-      if (contentTypeHeader) {
-        const ct = contentTypeHeader.toLowerCase();
-        if (ct.includes("json")) bodyType = "JSON";
-        else if (ct.includes("xml")) bodyType = "XML";
-        else if (ct.includes("form")) bodyType = "FORM";
-        else if (ct.includes("x-www-form-urlencoded")) bodyType = "FORM";
-        else if (ct.includes("octet-stream")) bodyType = "BINARY";
-        else
-          bodyType =
-            contentTypeHeader
-              .split(":")[1]
-              ?.replace(/['\"]/g, "")
-              .trim()
-              .toUpperCase() || "RAW";
-      } else if (
-        req.body &&
-        req.body.options &&
-        req.body.options.raw &&
-        req.body.options.raw.language === "xml"
-      ) {
-        bodyType = "XML";
-      } else {
-        bodyType = "RAW";
-      }
-      return bodyType;
-    }
-
-    // Recursively process items (folders or requests)
-    function processItems(items: any[], parentName = "") {
-      for (const item of items) {
-        if (item.item) {
-          processItems(item.item, item.name);
-          continue;
+      // 5. Body
+      const bodyContent = this.extractBody(req.body);
+      if (bodyContent) {
+        const bodyType = this.detectBodyType(req.header, req.body);
+        // Clean body to single line for preview-style import or preserve formatting?
+        // Let's preserve formatting if it's multiple lines
+        if (bodyContent.includes("\n")) {
+          lines.push(`Body ${bodyType} \`${bodyContent.trim()}\``);
+        } else {
+          lines.push(`Body ${bodyType} \`${bodyContent}\``);
         }
-        if (!item.request) continue;
-        const req = item.request;
-        const name = item.name || parentName || "api";
-        const method = req.method || "GET";
-        // URL
-        let url = buildUrl(req);
-        url = url.replace(/\/:([a-zA-Z0-9_]+)/g, "/{{$1}}");
-        // ID
-        const apiId = abbreviation(name);
-        result += `Api ${method.toUpperCase()} #${apiId} ${name}\n`;
-        result += `Url ${url}\n`;
-        // Headers
-        const headers = extractHeaders(req);
-        if (headers.length > 0) {
-          result += "Header\n";
-          for (const h of headers) {
-            result += `- ${h}\n`;
-          }
-        }
-        // Body
-        const bodyContent = extractBody(req);
-        if (bodyContent) {
-          const bodyType = detectBodyType(headers, req);
-          result += `Body ${bodyType} \`${bodyContent}\`\n`;
-        }
-        result += "\n";
       }
+
+      lines.push(""); // Spacer
     }
-    processItems(collection.item);
-    return result.trim();
+  }
+
+  /**
+   * Build URL string from Postman URL object
+   */
+  private static buildUrl(url: PostmanUrl | string): string {
+    if (typeof url === "string") return url;
+    if (!url) return "";
+    if (url.raw) return url.raw;
+
+    if (url.host) {
+      const protocol = url.protocol || "https";
+      const host = url.host.join(".");
+      const path = url.path ? "/" + url.path.join("/") : "";
+      let fullUrl = `${protocol}://${host}${path}`;
+
+      if (url.query && url.query.length > 0) {
+        const queryParams = url.query
+          .filter((q) => q.key)
+          .map((q) => `${q.key}={{${q.key}}}`)
+          .join("&");
+        fullUrl += `?${queryParams}`;
+      }
+      return fullUrl;
+    }
+    return "";
+  }
+
+  /**
+   * Abbreviate title to camelCase ID
+   */
+  private static abbreviate(title: string): string {
+    const stopWords = new Set(["a", "in", "the", "with", "and", "of", "to", "for", "on", "at", "by", "is", "it"]);
+    return title
+      .toLowerCase()
+      .replace(/[^a-z0-9 ]/g, "") // Remove special chars
+      .split(" ")
+      .filter((word) => word.length > 0 && !stopWords.has(word))
+      .map((word, index) => (index === 0 ? word : word[0].toUpperCase() + word.slice(1)))
+      .join("");
+  }
+
+  /**
+   * Extract headers to Berry format
+   */
+  private static extractHeaders(headers?: PostmanHeader[]): string[] {
+    if (!headers || !Array.isArray(headers)) return [];
+    return headers
+      .filter((h) => h.key && h.value !== undefined)
+      .map((h) => `${h.key.trim()}: '${h.value.trim()}'`);
+  }
+
+  /**
+   * Extract body content from Postman request
+   */
+  private static extractBody(body?: PostmanBody): string {
+    if (!body || !body.mode) return "";
+
+    switch (body.mode) {
+      case "raw":
+        return body.raw || "";
+      case "urlencoded":
+        if (body.urlencoded) {
+          const obj: Record<string, string> = {};
+          body.urlencoded.forEach((kv) => (obj[kv.key] = kv.value));
+          return JSON.stringify(obj, null, 2);
+        }
+        break;
+      case "formdata":
+        if (body.formdata) {
+          const obj: Record<string, string> = {};
+          body.formdata.forEach((kv) => (obj[kv.key] = kv.value));
+          return JSON.stringify(obj, null, 2);
+        }
+        break;
+      case "graphql":
+        // Postman stores graphql in a specific way, but we'll treat as raw for now
+        return body.raw || "";
+    }
+    return "";
+  }
+
+  /**
+   * Detect Berry body type from content-type or Postman options
+   */
+  private static detectBodyType(headers?: PostmanHeader[], body?: PostmanBody): string {
+    if (body?.options?.raw?.language) {
+      const lang = body.options.raw.language.toUpperCase();
+      if (["JSON", "XML"].includes(lang)) return lang;
+    }
+
+    const contentType = headers?.find((h) => h.key.toLowerCase() === "content-type")?.value.toLowerCase() || "";
+
+    if (contentType.includes("json")) return "JSON";
+    if (contentType.includes("xml")) return "XML";
+    if (contentType.includes("form")) return "FORM";
+    if (contentType.includes("octet-stream")) return "BINARY";
+
+    return "RAW";
   }
 }

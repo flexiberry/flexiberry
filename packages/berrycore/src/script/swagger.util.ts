@@ -1,217 +1,258 @@
+/**
+ * Swagger / OpenAPI Utility
+ *
+ * Utilities for converting Swagger/OpenAPI definitions to Berry code.
+ */
+
+export interface OpenApiSchema {
+  type?: string;
+  properties?: Record<string, OpenApiSchema>;
+  items?: OpenApiSchema;
+  $ref?: string;
+  example?: any;
+  default?: any;
+}
+
+export interface OpenApiParameter {
+  name: string;
+  in: "path" | "query" | "header" | "body";
+  required?: boolean;
+  schema?: OpenApiSchema;
+  example?: any;
+  default?: any;
+}
+
+export interface OpenApiOperation {
+  operationId?: string;
+  summary?: string;
+  parameters?: OpenApiParameter[];
+  requestBody?: {
+    content: Record<string, { schema: OpenApiSchema; example?: any }>;
+  };
+  consumes?: string[];
+  produces?: string[];
+}
+
+export interface OpenApiDefinition {
+  openapi?: string;
+  swagger?: string;
+  host?: string;
+  basePath?: string;
+  schemes?: string[];
+  servers?: Array<{ url: string }>;
+  paths: Record<string, Record<string, OpenApiOperation>>;
+  components?: {
+    schemas: Record<string, OpenApiSchema>;
+  };
+  definitions?: Record<string, OpenApiSchema>;
+}
+
 export class SwaggerUtil {
+  /**
+   * Fetch a Swagger/OpenAPI doc from a URL and convert it to Berry code
+   */
   static async convertFromSwaggerApi(url: string): Promise<string> {
-    const response = await fetch(url);
-    if (!response.ok) {
-      return `Failed to fetch Swagger: ${response.status} ${response.statusText}`;
+    try {
+      const response = await fetch(url);
+      if (!response.ok) {
+        return `Failed to fetch Swagger: ${response.status} ${response.statusText}`;
+      }
+      const swaggerJson = await response.text();
+      const id = url.split("/").pop() || "api";
+      return this.convertSwaggerToBerry(swaggerJson, id);
+    } catch (e) {
+      return `Error fetching Swagger: ${e instanceof Error ? e.message : String(e)}`;
     }
-    const swaggerJson = await response.text();
-    // Use the URL (or a part of it) as the id, or let the user provide a custom id
-    const id = url.split("/").pop() || "api";
-    return SwaggerUtil.convertSwaggerToBerry(swaggerJson, id);
   }
 
-  static convertSwaggerToBerry(swagger: string, id: string): string {
-    let obj: any;
+  /**
+   * Convert a Swagger/OpenAPI JSON string to Berry code
+   */
+  static convertSwaggerToBerry(swagger: string | OpenApiDefinition, id: string): string {
+    let obj: OpenApiDefinition;
     try {
       obj = typeof swagger === "string" ? JSON.parse(swagger) : swagger;
     } catch (e) {
-      return `Invalid Swagger JSON`;
+      return `Invalid Swagger/OpenAPI JSON`;
     }
-    const servers =
-      obj.servers && obj.servers.length > 0 ? obj.servers[0].url : "";
-    let result = "";
-    if (!obj.paths) return "No paths found in Swagger";
+
+    if (!obj.paths) return "No paths found in Swagger definition";
+
+    const lines: string[] = [];
+    const serverUrl = obj.servers?.[0]?.url || "";
+    const schemas = obj.components?.schemas || obj.definitions || {};
+
     let apiCount = 1;
+
     for (const [path, methods] of Object.entries(obj.paths)) {
-      if (typeof methods !== "object" || methods === null) continue;
-      for (const [method, details] of Object.entries<any>(methods)) {
+      if (!methods) continue;
+
+      for (const [method, details] of Object.entries(methods)) {
+        if (typeof details !== "object") continue;
+
         const opId = details.operationId || `${id}${apiCount}`;
-        const { modPath, queryParams } = SwaggerUtil.handlePathParams(
-          path,
-          details.parameters
-        );
-        const url = SwaggerUtil.buildUrl(modPath, servers, obj, queryParams);
-        const headers = SwaggerUtil.extractHeaders(details);
-        const body = SwaggerUtil.generateBody(details, obj.components?.schemas);
-        result += SwaggerUtil.generateApiString(
-          method,
-          opId,
-          url,
-          headers,
-          body
-        );
+        const { modPath, queryParams } = this.handlePathParams(path, details.parameters || []);
+
+        const finalUrl = this.buildUrl(modPath, serverUrl, obj, queryParams);
+        const headers = this.extractHeaders(details);
+        const bodyBlock = this.generateBodyBlock(details, schemas);
+
+        // ── Construct API Block ──
+        lines.push(`Api ${method.toUpperCase()} #${opId} ${details.summary || ""}`);
+        lines.push(`Url ${finalUrl}`);
+
+        if (headers.length > 0) {
+          lines.push("Header");
+          for (const h of headers) lines.push(`- ${h}`);
+        }
+
+        if (bodyBlock) lines.push(bodyBlock);
+
+        lines.push(""); // Spacer
         apiCount++;
       }
     }
-    return result.trim();
+
+    return lines.join("\n").trim() + "\n";
   }
 
-  static handlePathParams(
-    path: string,
-    params: any[]
-  ): { modPath: string; queryParams: string[] } {
+  /**
+   * Replace {param} with {{param}} and extract query params
+   */
+  private static handlePathParams(path: string, params: OpenApiParameter[]): { modPath: string; queryParams: string[] } {
     let modPath = path;
     const queryParams: string[] = [];
-    if (params) {
-      for (const param of params) {
-        if (param.in === "path") {
-          // Replace {param} with {{param
-          modPath = modPath.replace(
-            new RegExp(`{${param.name}}`, "g"),
-            `{{${param.name}}}`
-          );
-        }
-        if (param.in === "query") {
-          queryParams.push(`${param.name}={{${param.name}}}`);
-        }
+
+    for (const param of params) {
+      if (param.in === "path") {
+        modPath = modPath.replace(new RegExp(`{${param.name}}`, "g"), `{{${param.name}}}`);
+      } else if (param.in === "query") {
+        queryParams.push(`${param.name}={{${param.name}}}`);
       }
     }
     return { modPath, queryParams };
   }
 
-  static buildUrl(
-    modPath: string,
-    servers: string,
-    obj: any,
-    queryParams: string[]
-  ): string {
+  /**
+   * Build the full URL
+   */
+  private static buildUrl(modPath: string, serverUrl: string, obj: OpenApiDefinition, queryParams: string[]): string {
     let url = modPath;
-    if (servers) {
-      url = servers + modPath;
+
+    if (serverUrl) {
+      url = serverUrl.endsWith("/") && modPath.startsWith("/") ? serverUrl + modPath.slice(1) : serverUrl + modPath;
     } else if (obj.host) {
-      // Swagger 2.0 style
-      const scheme = obj.schemes && obj.schemes[0] ? obj.schemes[0] : "https";
-      const basePath = obj.basePath || "";
-      url = `${scheme}://${obj.host}${basePath}${modPath}`;
+      const scheme = obj.schemes?.[0] || "https";
+      const base = obj.basePath || "";
+      url = `${scheme}://${obj.host}${base}${modPath}`;
     }
+
     if (queryParams.length > 0) {
       url += (url.includes("?") ? "&" : "?") + queryParams.join("&");
     }
     return url;
   }
 
-  static extractHeaders(details: any): string[] {
+  /**
+   * Extract headers from operation details
+   */
+  private static extractHeaders(details: OpenApiOperation): string[] {
     const headers: string[] = [];
-    if (details.consumes) {
+
+    // Content-Type
+    if (details.consumes?.[0]) {
       headers.push(`Content-Type: '${details.consumes[0]}'`);
-    } else if (details.requestBody && details.requestBody.content) {
+    } else if (details.requestBody?.content) {
       const types = Object.keys(details.requestBody.content);
-      if (types.length > 0) headers.push(`Content-Type: '${types[0]}'`);
+      if (types[0]) headers.push(`Content-Type: '${types[0]}'`);
     }
-    if (details.produces) {
+
+    // Accept
+    if (details.produces?.[0]) {
       headers.push(`Accept: '${details.produces[0]}'`);
     }
-    // Custom headers
+
+    // Custom headers from parameters
     if (details.parameters) {
-      for (const param of details.parameters) {
-        if (param.in === "header") {
-          headers.push(
-            `${param.name}: '${param.example || param.default || ""}'`
-          );
+      for (const p of details.parameters) {
+        if (p.in === "header") {
+          headers.push(`${p.name}: '${p.example || p.default || ""}'`);
         }
       }
     }
     return headers;
   }
 
-  static generateBody(details: any, definitions?: any): string {
-    let bodyExample = "";
-    const bodyHandled = false;
-    // OpenAPI 3: requestBody
-    if (details.requestBody && details.requestBody.content) {
+  /**
+   * Generate the Body JSON block
+   */
+  private static generateBodyBlock(details: OpenApiOperation, schemas: Record<string, OpenApiSchema>): string {
+    // OpenAPI 3
+    if (details.requestBody?.content) {
       const content = details.requestBody.content;
-      for (const [ctype, cval] of Object.entries<any>(content)) {
-        if (cval.example) {
-          bodyExample = cval.example;
-        } else if (cval.schema) {
-          bodyExample = SwaggerUtil.generateDummyFromSchema(
-            cval.schema,
-            definitions
-          );
-        }
-        if (bodyExample) {
-          // Determine bodyType from content-type
-          let bodyType = "RAW";
-          if (ctype.includes("json")) bodyType = "JSON";
-          else if (ctype.includes("xml")) bodyType = "XML";
-          else if (ctype.includes("form")) bodyType = "FORM";
-          else if (ctype.includes("x-www-form-urlencoded")) bodyType = "FORM";
-          else if (ctype.includes("octet-stream")) bodyType = "BINARY";
-          else bodyType = ctype.toUpperCase();
-          return `Body ${bodyType} \`${typeof bodyExample === "string" ? bodyExample : JSON.stringify(bodyExample, null, 2)}\`\n`;
-        }
+      for (const [ctype, cval] of Object.entries(content)) {
+        const dummy = cval.example || this.generateDummy(cval.schema, schemas);
+        const bodyType = this.mapContentTypeToBodyType(ctype);
+        return `Body ${bodyType} \`${JSON.stringify(dummy, null, 2)}\``;
       }
     }
-    // Swagger 2: parameters with in: body
-    if (!bodyHandled && details.parameters) {
-      for (const param of details.parameters) {
-        if (param.in === "body" && param.schema) {
-          bodyExample = SwaggerUtil.generateDummyFromSchema(
-            param.schema,
-            definitions
-          );
-          return `Body JSON \`${typeof bodyExample === "string" ? bodyExample : JSON.stringify(bodyExample, null, 2)}\`\n`;
-        }
+
+    // Swagger 2
+    if (details.parameters) {
+      const bodyParam = details.parameters.find((p) => p.in === "body");
+      if (bodyParam?.schema) {
+        const dummy = this.generateDummy(bodyParam.schema, schemas);
+        return `Body JSON \`${JSON.stringify(dummy, null, 2)}\``;
       }
     }
+
     return "";
   }
 
-  static generateApiString(
-    method: string,
-    opId: string,
-    url: string,
-    headers: string[],
-    body: string
-  ): string {
-    let result = `Api ${method.toUpperCase()} #${opId}\n`;
-    result += `Url ${url}\n`;
-    if (headers.length > 0) {
-      result += "Header\n";
-      for (const h of headers) {
-        result += `- ${h}\n`;
-      }
-    }
-    if (body) {
-      result += body;
-    }
-    result += "\n";
-    return result;
+  private static mapContentTypeToBodyType(ctype: string): string {
+    const ct = ctype.toLowerCase();
+    if (ct.includes("json")) return "JSON";
+    if (ct.includes("xml")) return "XML";
+    if (ct.includes("form")) return "FORM";
+    if (ct.includes("octet-stream")) return "BINARY";
+    return "RAW";
   }
 
-  // Helper: Generate dummy object from schema
-  static generateDummyFromSchema(schema: any, definitions?: any): any {
-    if (!schema) return {};
-    if (schema.example) return schema.example;
-    if (schema.default) return schema.default;
+  /**
+   * Recursively generate dummy data from an OpenAPI schema
+   */
+  private static generateDummy(schema: OpenApiSchema | undefined, schemas: Record<string, OpenApiSchema>, depth = 0): any {
+    if (!schema || depth > 5) return {};
+
+    if (schema.example !== undefined) return schema.example;
+    if (schema.default !== undefined) return schema.default;
+
     if (schema.$ref) {
-      // Resolve $ref
-      const ref = schema.$ref.replace(
-        /^#\/(definitions|components\/schemas)\//,
-        ""
-      );
-      if (definitions && definitions[ref]) {
-        return SwaggerUtil.generateDummyFromSchema(
-          definitions[ref],
-          definitions
-        );
-      }
-      return {};
+      const refName = schema.$ref.replace(/^#\/(definitions|components\/schemas)\//, "");
+      const resolved = schemas[refName];
+      return resolved ? this.generateDummy(resolved, schemas, depth + 1) : {};
     }
-    if (schema.type === "object" || schema.properties) {
-      const obj: any = {};
-      for (const [k, v] of Object.entries(schema.properties || {})) {
-        obj[k] = SwaggerUtil.generateDummyFromSchema(v, definitions);
-      }
-      return obj;
+
+    switch (schema.type) {
+      case "string":
+        return "string";
+      case "integer":
+      case "number":
+        return 0;
+      case "boolean":
+        return false;
+      case "array":
+        return schema.items ? [this.generateDummy(schema.items, schemas, depth + 1)] : [];
+      case "object":
+      default:
+        if (schema.properties) {
+          const obj: Record<string, any> = {};
+          for (const [key, prop] of Object.entries(schema.properties)) {
+            obj[key] = this.generateDummy(prop, schemas, depth + 1);
+          }
+          return obj;
+        }
+        return {};
     }
-    if (schema.type === "array" && schema.items) {
-      return [SwaggerUtil.generateDummyFromSchema(schema.items, definitions)];
-    }
-    // Fallbacks for primitive types
-    if (schema.type === "string") return "string";
-    if (schema.type === "integer" || schema.type === "number") return 0;
-    if (schema.type === "boolean") return false;
-    return {};
   }
 }
