@@ -1,4 +1,3 @@
-import Parser from "../lang/ast/ast-parser";
 import { FileUtils } from "./functions/file";
 import { InputType } from "../enum/misc";
 
@@ -10,8 +9,8 @@ export class BerryCore {
    */
   public parseContent(content: string) {
     // Parse the tokens into an AST
-    const parser = new Parser();
-    return parser.produce(content);
+    // const parser = new Parser();
+    // return parser.produce(content);
   }
 
   /**

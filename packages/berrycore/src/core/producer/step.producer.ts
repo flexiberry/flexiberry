@@ -1,32 +1,32 @@
-import { NodeType, type Step } from "../../lang/ast/ast-node-type";
-import { SequenceGenerator } from "../util/sequence-generator";
-import { CaptureProducer } from "./capture.producer";
-import { CheckProducer } from "./check.producer";
-import { type StepCoreModel } from "./core.model";
-import { ParamsProducer } from "./params.producer";
-import { type IProducer, ProducerError } from "./producer";
+// import { NodeType, type Step } from "../../lang/ast/ast-node-type";
+// import { SequenceGenerator } from "../util/sequence-generator";
+// import { CaptureProducer } from "./capture.producer";
+// import { CheckProducer } from "./check.producer";
+// import { type StepCoreModel } from "./core.model";
+// import { ParamsProducer } from "./params.producer";
+// import { type IProducer, ProducerError } from "./producer";
 
-export class StepProducer implements IProducer<StepCoreModel, Step> {
-  private captureProducer: CaptureProducer = new CaptureProducer();
-  private checkProducer: CheckProducer = new CheckProducer();
-  private paramsProducer: ParamsProducer = new ParamsProducer();
+// export class StepProducer implements IProducer<StepCoreModel, Step> {
+//   private captureProducer: CaptureProducer = new CaptureProducer();
+//   private checkProducer: CheckProducer = new CheckProducer();
+//   private paramsProducer: ParamsProducer = new ParamsProducer();
 
-  build(ast: Step): StepCoreModel {
-    if (ast.kind !== NodeType.Step)
-      throw new ProducerError(
-        "Invalid Node. expected node is " + NodeType[NodeType.Step]
-      );
-    SequenceGenerator.reset("CHECK");
-    const s: StepCoreModel = {
-      action: ast.action,
-      target: ast.target,
-      functionId: ast.functionId,
-      id: SequenceGenerator.getNext("STEP").toString(),
-      title: ast.title,
-      capture: ast.capture.map((x) => this.captureProducer.build(x)),
-      check: ast.check.map((x) => this.checkProducer.build(x)),
-      params: ast.params.map((x) => this.paramsProducer.build(x)),
-    };
-    return s;
-  }
-}
+//   build(ast: Step): StepCoreModel {
+//     if (ast.kind !== NodeType.Step)
+//       throw new ProducerError(
+//         "Invalid Node. expected node is " + NodeType[NodeType.Step]
+//       );
+//     SequenceGenerator.reset("CHECK");
+//     const s: StepCoreModel = {
+//       action: ast.action,
+//       target: ast.target,
+//       functionId: ast.functionId,
+//       id: SequenceGenerator.getNext("STEP").toString(),
+//       title: ast.title,
+//       capture: ast.capture.map((x) => this.captureProducer.build(x)),
+//       check: ast.check.map((x) => this.checkProducer.build(x)),
+//       params: ast.params.map((x) => this.paramsProducer.build(x)),
+//     };
+//     return s;
+//   }
+// }
