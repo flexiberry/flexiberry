@@ -7,3 +7,4 @@ export { default as Features } from "./components/Features.svelte";
 export { default as Documentation } from "./components/Documentation.svelte";
 export { default as CTA } from "./components/CTA.svelte";
 export { default as Footer } from "./components/Footer.svelte";
+export { default as BerryCodeScroll } from "./components/BerryCodeScroll.svelte";

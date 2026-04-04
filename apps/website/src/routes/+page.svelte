@@ -1,6 +1,6 @@
 <script>
   import { onMount } from "svelte";
-  import { Navigation, Hero, Features, Documentation, CTA, Footer } from "$lib";
+  import { Navigation, Hero, Features, Documentation, CTA, Footer, BerryCodeScroll } from "$lib";
 
   let features = [
     {
@@ -33,25 +33,23 @@
   };
 
   onMount(() => {
-    // Trigger animations after component mounts with staggered timing
-    setTimeout(() => {
-      isVisible.hero = true;
-    }, 100);
-    setTimeout(() => {
-      isVisible.features = true;
-    }, 400);
-    setTimeout(() => {
-      isVisible.docs = true;
-    }, 600);
-    setTimeout(() => {
-      isVisible.cta = true;
-    }, 800);
+    setTimeout(() => { isVisible.hero = true; }, 100);
+    setTimeout(() => { isVisible.features = true; }, 400);
+    setTimeout(() => { isVisible.docs = true; }, 600);
+    setTimeout(() => { isVisible.cta = true; }, 800);
   });
 </script>
 
 <div class="min-h-screen bg-gray-900 text-gray-100 font-mono">
   <Navigation />
   <Hero isVisible={isVisible.hero} />
+
+  <!-- Scroll-driven Berry code animation section -->
+  <!-- NOTE: No overflow-hidden here — it breaks position:sticky inside -->
+  <section class="bg-[#0d1117] relative">
+    <BerryCodeScroll />
+  </section>
+
   <Features isVisible={isVisible.features} />
   <Documentation isVisible={isVisible.docs} />
   <CTA isVisible={isVisible.cta} />
@@ -63,6 +61,10 @@
     font-family: "JetBrains Mono", monospace;
     background-color: #111827;
     color: #f3f4f6;
+    /* NOTE: overflow-x on body breaks position:sticky — use html instead */
+  }
+
+  :global(html) {
     overflow-x: hidden;
   }
 

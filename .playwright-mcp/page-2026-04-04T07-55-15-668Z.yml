@@ -1,0 +1,137 @@
+- generic [ref=e3]:
+  - navigation [ref=e4]:
+    - generic [ref=e6]:
+      - generic [ref=e9]: Flexiberry
+      - generic [ref=e10]:
+        - link "Features" [ref=e11] [cursor=pointer]:
+          - /url: "#features"
+        - link "Docs" [ref=e12] [cursor=pointer]:
+          - /url: "#docs"
+        - link "Get Started" [ref=e13] [cursor=pointer]:
+          - /url: "#get-started"
+        - link "GitHub" [ref=e14] [cursor=pointer]:
+          - /url: https://github.com
+  - generic [ref=e15]:
+    - img [ref=e17]
+    - img [ref=e22]
+    - generic [ref=e25]:
+      - generic [ref=e26]:
+        - heading [level=1]
+      - paragraph [ref=e28]: Flexiberry simplifies API testing by allowing developers to write custom scripts for APIs and their test cases. No rigid structures—just full flexibility to test APIs the way you need.
+      - generic [ref=e29]:
+        - link "Get Started" [ref=e30] [cursor=pointer]:
+          - /url: "#get-started"
+        - link "Read Docs" [ref=e31] [cursor=pointer]:
+          - /url: "#docs"
+  - generic [ref=e34]:
+    - generic [ref=e35]:
+      - paragraph [ref=e36]: Berry Language
+      - heading "Write tests like reading English" [level=2] [ref=e37]
+    - generic [ref=e38]:
+      - generic [ref=e39]: Variables
+      - generic [ref=e41]: API Definition
+      - generic [ref=e43]: Task & Steps
+      - generic [ref=e45]: Second Step
+    - generic [ref=e47]:
+      - generic [ref=e48]:
+        - generic [ref=e52]: demo-test.berry
+        - generic [ref=e54]: 0%
+      - generic [ref=e56]:
+        - generic [ref=e57]: Var
+        - generic [ref=e58]: "@UAT"
+        - generic [ref=e59]: "# global variable"
+        - generic [ref=e60]: "- baseUrl"
+        - generic [ref=e61]: ": 'https://petstore.swagger.io/v2'"
+        - generic [ref=e62]: "- petId"
+        - generic [ref=e63]: ": '1'"
+        - generic [ref=e65]: Api
+        - generic [ref=e66]: POST
+        - generic [ref=e67]: "#addPet"
+        - generic [ref=e68]: Add a new pet
+        - generic [ref=e69]: Url
+        - generic [ref=e70]: https://petstore.swagger.io/v2/pet
+        - generic [ref=e71]: Header
+        - generic [ref=e72]: "- Content-Type"
+        - generic [ref=e73]: ": 'application/json'"
+        - generic [ref=e74]: Body JSON
+        - generic [ref=e75]: "`{ \"id\": 1, \"name\": \"doggie\" }`"
+        - generic [ref=e77]: Task
+        - generic [ref=e78]: add new pet and find
+        - generic [ref=e79]: Step
+        - generic [ref=e80]: Call Api addPet
+        - generic [ref=e81]: Capture
+        - generic [ref=e82]: "- id"
+        - generic [ref=e83]: ": response.id"
+        - generic [ref=e84]: Check
+        - generic [ref=e85]: "- $.status == 200"
+        - generic [ref=e86]: "- id != null"
+        - generic [ref=e88]: Step
+        - generic [ref=e89]: Call Api getPetById
+        - generic [ref=e90]: Params
+        - generic [ref=e91]: "- petId"
+        - generic [ref=e92]: ": Step.1.id"
+        - generic [ref=e93]: Check
+        - generic [ref=e94]: "- $.status == 200"
+        - generic [ref=e95]: "- id == Step.1.id"
+    - generic [ref=e96]:
+      - generic [ref=e97]: Scroll to write
+      - generic [ref=e98]: ↓
+  - generic [ref=e100]:
+    - heading "Key Features" [level=2] [ref=e101]
+    - generic [ref=e102]:
+      - generic [ref=e103]:
+        - heading "Custom Scripts" [level=3] [ref=e104]
+        - paragraph [ref=e105]: Write API tests with full control, no limitations.
+      - generic [ref=e106]:
+        - heading "Automated Testing" [level=3] [ref=e107]
+        - paragraph [ref=e108]: Execute test cases seamlessly with real-time feedback.
+      - generic [ref=e109]:
+        - heading "Developer-Friendly" [level=3] [ref=e110]
+        - paragraph [ref=e111]: Flexible configuration options to adapt to your specific project needs.
+      - generic [ref=e112]:
+        - heading "Fast & Lightweight" [level=3] [ref=e113]
+        - paragraph [ref=e114]: No bloat, just pure efficiency.
+  - generic [ref=e116]:
+    - heading "Documentation" [level=2] [ref=e117]
+    - paragraph [ref=e118]: Everything you need to know about Flexiberry, from getting started to advanced techniques.
+    - generic [ref=e119]:
+      - generic [ref=e120]:
+        - heading "Getting Started" [level=3] [ref=e121]
+        - paragraph [ref=e122]: Learn the basics and set up your first Flexiberry project in minutes.
+        - link "Read guide →" [ref=e123] [cursor=pointer]:
+          - /url: "#"
+      - generic [ref=e124]:
+        - heading "Core Concepts" [level=3] [ref=e125]
+        - paragraph [ref=e126]: Understand the architecture and philosophy behind Flexiberry.
+        - link "Explore concepts →" [ref=e127] [cursor=pointer]:
+          - /url: "#"
+      - generic [ref=e128]:
+        - heading "API Reference" [level=3] [ref=e129]
+        - paragraph [ref=e130]: Detailed documentation of all Flexiberry APIs and components.
+        - link "View reference →" [ref=e131] [cursor=pointer]:
+          - /url: "#"
+  - generic [ref=e134]:
+    - heading "Ready to get started?" [level=2] [ref=e135]
+    - paragraph [ref=e136]: Join thousands of developers building amazing applications with Flexiberry.
+    - code [ref=e138]: npm install flexiberry
+    - generic [ref=e139]:
+      - link "Start Building" [ref=e140] [cursor=pointer]:
+        - /url: "#"
+      - link "View Examples" [ref=e141] [cursor=pointer]:
+        - /url: "#"
+  - contentinfo [ref=e142]:
+    - generic [ref=e143]:
+      - generic [ref=e144]:
+        - generic [ref=e145]:
+          - generic [ref=e147]: F
+          - generic [ref=e148]: Flexiberry
+        - generic [ref=e149]:
+          - link "GitHub" [ref=e150] [cursor=pointer]:
+            - /url: "#"
+          - link "Twitter" [ref=e151] [cursor=pointer]:
+            - /url: "#"
+          - link "Discord" [ref=e152] [cursor=pointer]:
+            - /url: "#"
+          - link "Blog" [ref=e153] [cursor=pointer]:
+            - /url: "#"
+      - generic [ref=e154]: © 2026 Flexiberry. All rights reserved.
