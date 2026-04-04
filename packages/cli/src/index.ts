@@ -2,96 +2,112 @@
 
 import { Command } from "commander";
 import { readFile } from "fs/promises";
-import { FSDB } from "file-system-db";
 
+// Resolve package metadata
 const packageJson = JSON.parse(
   (await readFile(new URL("../package.json", import.meta.url))).toString()
 );
 
 import { FileUtility } from "./util/file-utility.js";
 import { Cli } from "./util/cli.js";
+import { FileDB } from "./lib/db.js";
 
 import os from "os";
 import path from "path";
 import { AddCommand } from "./command/add-command.js";
 import { RunUtility } from "./util/run-utility.js";
 
+// ─── Persistent store ─────────────────────────────────────────────────────────
+// Stores CLI state (e.g. the currently selected .berry file) in the user's
+// Documents folder so it persists across sessions.
+
 const systemDocumentFolder = path.join(os.homedir(), "Documents");
 
-export const db = new FSDB(
-  systemDocumentFolder.concat("flexiberry/data.json"),
+export const db = new FileDB(
+  path.join(systemDocumentFolder, "flexiberry", "data.json"),
   true
 );
+
+// ─── CLI program ──────────────────────────────────────────────────────────────
+
 const program = new Command();
 program
   .name("flexiberry")
-  .description("FlexiBerry CLI - A powerful tool for testing your apis")
+  .description("FlexiBerry CLI - A powerful tool for testing your APIs")
   .version(packageJson.version);
 
+// ── flexiberry cli ────────────────────────────────────────────────────────────
 program
   .command("cli")
-  .description("Welcome to FlexiBerry CLI")
+  .description("Launch the interactive FlexiBerry CLI menu")
   .action(() => {
     Cli.main(packageJson.version);
   });
 
+// ── flexiberry create <file> [template] ───────────────────────────────────────
 program
   .command("create")
   .argument("<file>", "File name to create")
   .argument("[template]", "Template to use")
   .option("-f, --force", "Overwrite existing file")
   .option("-s, --secret", "Create a secret file for storing sensitive data")
-  .addHelpText("after", "\nExample call: flexiberry create newfile.berry")
-  .description("Create a new .berry file with specified template")
-  .action((file, template, options) => {
+  .addHelpText("after", "\nExample: flexiberry create newfile.berry")
+  .description("Create a new .berry file with optional template")
+  .action((file: string, template: string | undefined, options: { force?: boolean; secret?: boolean }) => {
     FileUtility.create(file, template, options.force, options.secret);
   });
 
+// ── flexiberry select [file] ──────────────────────────────────────────────────
 program
   .command("select")
-  .argument("[file]", "File name to select")
-  .description("Select a  *.berry file from the current directory")
-  .action(async (file) => {
+  .argument("[file]", "File name or directory path to select from")
+  .description("Select a *.berry file from the current directory")
+  .action(async (file: string | undefined) => {
     await FileUtility.select(file);
   });
 
+// ── flexiberry add <type> [name] ──────────────────────────────────────────────
 let multiline = "";
+
 program
   .command("add")
-  .argument("<type>", "Type of item to add (api, env, task, step)")
+  .argument("<type>", "Type of item to add (api, env, task, step, var)")
   .argument("[name]", "Name of the item")
   .option("-c, --curl <curl...>", "Import from cURL command", (value) => {
     multiline += value;
     return value;
   })
-  .option("-s, --swagger <url>", "Import from Swagger URL")
+  .option("-s, --swagger <url>", "Import from Swagger / OpenAPI URL")
   .option("-p, --postman <filePath>", "Import from Postman collection")
   .option("-u, --url <url>", "API URL")
-  .option("-m, --method <method>", "HTTP method")
-  .option("-h, --headers <headers>", "Request headers (comma-separated)")
+  .option("-m, --method <method>", "HTTP method (GET, POST, PUT, PATCH, DELETE)")
+  .option("-h, --headers <headers>", "Request headers (comma-separated key:value pairs)")
   .option("-b, --body <body>", "Request body")
-  .option("-e, --env <env>", "Environment ")
-  .option("-v, --var <var>", "Variables (comma-separated)")
-  .description("Add a new configuration item")
-  .action((type, name, options) => {
-    if (options.curl) options.curl = multiline;
-    AddCommand.run(type, name, options);
+  .option("-e, --env <env>", "Environment name")
+  .option("-v, --var <var>", "Variables (comma-separated key:value pairs)")
+  .description("Add a new configuration item to the selected .berry file")
+  .action((type: string, name: string, options: Record<string, unknown>) => {
+    if (options["curl"]) options["curl"] = multiline;
+    AddCommand.run(type, name, options as Parameters<typeof AddCommand.run>[2]);
     multiline = "";
   });
+
+// ── flexiberry run [file] ─────────────────────────────────────────────────────
 program
   .command("run")
-  .argument("[file]", "Enter the File name ")
-  .description("run .berry script")
-  .action((file, options) => {
-    RunUtility.run(file);
+  .argument("[file]", "Path to the .berry script file")
+  .description("Run a .berry script file")
+  .action((file: string | undefined) => {
+    RunUtility.run(file ?? "");
   });
 
+// ── flexiberry test [file] ────────────────────────────────────────────────────
 program
   .command("test")
-  .argument("[file]", "Enter the File name ")
-  .description("test engine .berry script")
-  .action((file, options) => {
-    RunUtility.test(file);
+  .argument("[file]", "Path to the .berry script file")
+  .description("Run the test engine on a .berry script")
+  .action((file: string | undefined) => {
+    RunUtility.test(file ?? "");
   });
 
 program.parse();

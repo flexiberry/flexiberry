@@ -1,96 +1,122 @@
-import chalk from "chalk";
+/**
+ * api.cli.ts
+ *
+ * Standalone HTTP call utility with professional terminal output.
+ * Replaced chalk with native lib/colors.
+ */
+
+import { colors, c } from "../lib/colors.js";
 import * as http from "http";
 import * as https from "https";
 import { URL } from "url";
 
-// Simple CLI spinner
-function startSpinner(text: string) {
-  const spinnerFrames = ["⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏"];
+// ─── Inline spinner (independent of prompts.ts) ───────────────────────────────
+
+function startSpinner(text: string): { stop: (finalText: string) => void } {
+  const frames = ["⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏"];
   let i = 0;
-  process.stdout.write(text + " ");
-  const interval = setInterval(() => {
-    process.stdout.write(
-      `\r${text} ${spinnerFrames[i++ % spinnerFrames.length]}`
-    );
+  const timer = setInterval(() => {
+    process.stdout.write(`\r${colors.cyan(frames[i++ % frames.length])} ${colors.dim(text)}`);
   }, 80);
+
   return {
-    stop: (finalText: string) => {
-      clearInterval(interval);
+    stop(finalText: string) {
+      clearInterval(timer);
       process.stdout.write(`\r${finalText}\n`);
     },
   };
 }
 
-// Helper: print important headers as table
-function printImportantHeaders(headers: Record<string, unknown>) {
-  const importantKeys = [
-    "content-type",
-    "content-length",
-    "date",
-    "server",
-    "set-cookie",
-    "x-powered-by",
-    "cache-control",
-    "etag",
-    "pragma",
-    "expires",
-    "vary",
-    "authorization",
-    "location",
-    "status",
-  ];
+// ─── Header pretty-printer ────────────────────────────────────────────────────
+
+const IMPORTANT_HEADERS = new Set([
+  "content-type", "content-length", "date", "server",
+  "set-cookie", "x-powered-by", "cache-control", "etag",
+  "pragma", "expires", "vary", "authorization", "location", "status",
+]);
+
+function printImportantHeaders(headers: Record<string, unknown>): void {
   const filtered = Object.entries(headers).filter(([k]) =>
-    importantKeys.includes(k.toLowerCase())
+    IMPORTANT_HEADERS.has(k.toLowerCase())
   );
-  console.log(chalk.magenta("\nHeaders (important only):"));
+
+  console.log(colors.magenta("\nHeaders (important only):"));
+
   if (filtered.length === 0) {
-    console.log(chalk.gray("No important headers present."));
+    console.log(colors.dim("  No important headers present."));
     return;
   }
+
   const keyWidth = Math.max(...filtered.map(([k]) => k.length));
   for (const [k, v] of filtered) {
-    const padKey = k.padEnd(keyWidth, " ");
+    const paddedKey = k.padEnd(keyWidth);
     const valueStr = Array.isArray(v) ? v.join(", ") : String(v ?? "");
-    console.log(`${chalk.bold.gray(padKey)} │ ${valueStr}`);
+    console.log(`  ${colors.bold(colors.gray(paddedKey))} │ ${valueStr}`);
   }
 }
 
-// Helper: print response body
-function printResponse(contentType: string, data: string) {
+// ─── Response body printer ────────────────────────────────────────────────────
+
+function printResponse(contentType: string, data: string): void {
   if (contentType.includes("application/json")) {
     try {
       const parsed = JSON.parse(data);
-      console.log(chalk.cyan("\nResponse (JSON):"));
-      console.log(chalk.gray(JSON.stringify(parsed, null, 2)));
+      console.log(colors.cyan("\nResponse (JSON):"));
+      console.log(colors.gray(JSON.stringify(parsed, null, 2)));
     } catch {
-      console.log(chalk.yellow("Could not parse JSON response. Raw output:"));
+      console.log(colors.yellow("Could not parse JSON response — printing raw:"));
       console.log(data);
     }
   } else {
-    console.log(chalk.cyan("\nResponse (Raw):"));
+    console.log(colors.cyan("\nResponse (Raw):"));
     console.log(data);
   }
 }
+
+function printRequest(contentType: string, raw?: string): void {
+  if (!raw) return;
+  if (contentType === "application/json") {
+    console.log("\nRequest (JSON):", JSON.stringify(raw, null, 2));
+  } else {
+    console.log("\nRequest (Raw):", raw);
+  }
+}
+
+// ─── Status-code coloriser ────────────────────────────────────────────────────
+
+function colorStatus(code?: number | string): string {
+  if (code == null) return colors.yellow("?");
+  const num = Number(code);
+  if (num >= 200 && num < 300) return colors.green(String(code));
+  if (num >= 400 && num < 600) return colors.red(String(code));
+  return colors.yellow(String(code));
+}
+
+// ─── Public interface ─────────────────────────────────────────────────────────
 
 export interface ApiCallOptions {
   url: string;
   method?: string;
   headers?: Record<string, string>;
-  body?: any;
+  body?: string | Record<string, unknown>;
 }
 
-export async function apiCliCall(options: ApiCallOptions) {
+/**
+ * Makes an HTTP/HTTPS call and renders a professional, colour-coded report
+ * in the terminal including status, headers, timing, and response body.
+ */
+export async function apiCliCall(options: ApiCallOptions): Promise<string | null> {
   const { url, method = "GET", headers = {}, body } = options;
 
-  // Attractive banner before spinner
-  console.log(chalk.magentaBright("\nContacting API, please wait...\n"));
-  const spinner = startSpinner(chalk.blueBright(`Calling ${method} ${url}`));
+  console.log(colors.magentaBright("\n  Contacting API, please wait...\n"));
+  const spin = startSpinner(`${c.boldBlueBright(method)} ${url}`);
   const start = Date.now();
 
   return new Promise((resolve) => {
     try {
       const parsedUrl = new URL(url);
       const isHttps = parsedUrl.protocol === "https:";
+
       const reqOptions: http.RequestOptions = {
         method,
         headers,
@@ -98,63 +124,46 @@ export async function apiCliCall(options: ApiCallOptions) {
         port: parsedUrl.port || (isHttps ? 443 : 80),
         path: parsedUrl.pathname + parsedUrl.search,
       };
+
       const reqModule = isHttps ? https : http;
+
       const req = reqModule.request(reqOptions, (res) => {
         let raw = "";
         res.setEncoding("utf8");
-        res.on("data", (chunk) => {
-          raw += chunk;
-        });
+        res.on("data", (chunk) => { raw += chunk; });
         res.on("end", () => {
           const time = Date.now() - start;
-          // Helper for colored status code
-          function getColoredStatusCode(code?: number | string) {
-            if (!code) return chalk.yellow("?");
-            const num = Number(code);
-            if (num >= 200 && num < 300) return chalk.green(code);
-            if (num >= 400 && num < 600) return chalk.red(code);
-            return chalk.yellow(code);
-          }
-
-          spinner.stop(
-            `\n${chalk.green("Success")} ${chalk.bold.yellow(method)} ${url} (${getColoredStatusCode(res.statusCode)}) in ${chalk.gray(time + "ms")}`
+          spin.stop(
+            `\n${colors.green("✔ Success")}  ${colors.bold(method)} ${url}` +
+            `  (${colorStatus(res.statusCode)})  ${colors.dim(time + "ms")}`
           );
-          const contentType = res.headers["content-type"] || "";
-          printImportantHeaders(res.headers);
-          printRequest(contentType, options.body);
+
+          const contentType = res.headers["content-type"] ?? "";
+          printImportantHeaders(res.headers as Record<string, unknown>);
+          printRequest(contentType, typeof body === "string" ? body : JSON.stringify(body));
           printResponse(contentType, raw);
 
-          // Highlight status
-          const statusStr = `Status: ${getColoredStatusCode(res.statusCode)}`;
-          console.log("\n" + statusStr);
-          console.log(chalk.blue(`Time: ${time}ms`));
+          console.log(`\n${colors.bold("Status:")} ${colorStatus(res.statusCode)}`);
+          console.log(`${colors.blue("Time:")} ${time}ms`);
           resolve(raw);
         });
       });
+
       req.on("error", (e) => {
-        spinner.stop(`${chalk.red("Failed")} ${method} ${url}`);
-        console.error(chalk.red("Error:"), e.message);
+        spin.stop(`${colors.red("✖ Failed")} ${method} ${url}`);
+        console.error(`${colors.red("Error:")} ${e.message}`);
         resolve(null);
       });
+
       if (body) {
         req.write(typeof body === "string" ? body : JSON.stringify(body));
       }
       req.end();
-    } catch (e: any) {
-      spinner.stop(`${chalk.red("Failed")} ${method} ${url}`);
-      console.error(chalk.red("Error:"), e.message || e);
+    } catch (e: unknown) {
+      const msg = e instanceof Error ? e.message : String(e);
+      spin.stop(`${colors.red("✖ Failed")} ${method} ${url}`);
+      console.error(`${colors.red("Error:")} ${msg}`);
       resolve(null);
     }
   });
-}
-function printRequest(contentType: string, raw: string) {
-  if (!raw) {
-    return;
-  }
-
-  if (contentType === "application/json") {
-    console.log("\nRequest (JSON): ", JSON.stringify(raw, null, 2));
-  } else {
-    console.log("\nRequest (Raw): ", raw);
-  }
 }

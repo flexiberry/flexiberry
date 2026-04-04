@@ -1,97 +1,149 @@
-import figlet from "figlet";
-import chalk from "chalk";
-import { intro, isCancel, log, outro, select, text } from "@clack/prompts";
+/**
+ * cli.ts
+ *
+ * Top-level interactive menu controller for `flexiberry cli`.
+ * Each menu option drives a real interactive flow rather than static hints.
+ */
+
+import { printBanner } from "../lib/banner.js";
+import { intro, outro, select, isCancel, log, text } from "../lib/prompts.js";
+import { colors } from "../lib/colors.js";
 import { FileUtility } from "./file-utility.js";
+import { RunUtility } from "./run-utility.js";
+import { ApiUtility } from "./api-utility.js";
+import { VarUtility } from "./var-utility.js";
+import { EnvUtility } from "./env-utility.js";
 
 export class Cli {
+  /** Entry point for `flexiberry cli` — shows the branded interactive menu. */
   public static async main(version: string): Promise<void> {
-    console.log("Hello, World!");
-    this.banner(version);
+    // Show the branded ASCII banner
+    printBanner(version);
 
-    intro("Flexiberry CLI \n");
-    const method = await this.getMethod();
-    if (!method) return;
+    intro("FlexiBerry CLI — Interactive Mode");
+
+    const method = await Cli.getMethod();
+
+    if (isCancel(method) || !method) {
+      outro("Operation cancelled.");
+      return;
+    }
+
     switch (method) {
-      case "Add":
-        // await this.add();
+
+      // ─── Add ───────────────────────────────────────────────────────────────
+      case "Add": {
+        const addType = await select({
+          message: "What would you like to add?",
+          options: [
+            { value: "api",     label: "🌐  API definition" },
+            { value: "var",     label: "📦  Variable block" },
+            { value: "env",     label: "🌍  Environment" },
+            { value: "cancel",  label: "✖   Cancel" },
+          ],
+        });
+
+        if (isCancel(addType) || addType === "cancel") {
+          log.warn("Cancelled.");
+          break;
+        }
+
+        if (addType === "api") {
+          await ApiUtility.add("", {});
+        } else if (addType === "var") {
+          await VarUtility.add("", {});
+        } else if (addType === "env") {
+          await EnvUtility.add("", {});
+        }
         break;
-      case "Create":
-        // await this.create();
+      }
+
+      // ─── Create ────────────────────────────────────────────────────────────
+      case "Create": {
+        const filename = await text({
+          message: "Enter the name for your new .berry file:",
+          placeholder: "my-tests",
+          defaultValue: "my-tests",
+          validate: (v) =>
+            v.trim().length === 0 ? "A filename is required!" : undefined,
+        });
+
+        if (isCancel(filename)) {
+          log.warn("Cancelled.");
+          break;
+        }
+
+        log.step(`Creating ${colors.cyan(filename + ".berry")}…`);
+        FileUtility.create(filename);
         break;
-      case "Run":
-        // await this.run();
+      }
+
+      // ─── Run ───────────────────────────────────────────────────────────────
+      case "Run": {
+        await RunUtility.run("");   // "" → will scan CWD for .berry files
         break;
-      case "View":
-        await this.view();
-        break;
-      case "Select":
+      }
+
+      // ─── Select ────────────────────────────────────────────────────────────
+      case "Select": {
         const folder = await askForFolderPath();
         if (!folder) {
           outro("Operation cancelled.");
           return;
         }
         await FileUtility.select(folder);
-
         break;
+      }
+
+      // ─── View ──────────────────────────────────────────────────────────────
+      case "View": {
+        await Cli.view();
+        break;
+      }
     }
-    outro("Thanks for using Flexiberry CLI!\n\n");
+
+    outro("Thanks for using FlexiBerry CLI! 🍓");
   }
-  static async view() {
+
+  // ─── Helpers ─────────────────────────────────────────────────────────────────
+
+  /** Opens the currently pre-selected .berry file in the default editor. */
+  static async view(): Promise<void> {
     const preSelectedFile = FileUtility.getPreselectedFile();
     if (!preSelectedFile) {
+      log.warn("No file selected. Use the Select option first.");
       return;
     }
-    log.message(`📂 Selected file: ${preSelectedFile}`);
-    log.message("Opening file in editor...");
+    log.message(`📂 Selected file: ${colors.cyan(preSelectedFile)}`);
+    log.message("Opening file in editor…");
     FileUtility.openEditor(preSelectedFile);
   }
 
-  static async getMethod() {
-    const value = await select({
+  /** Presents the top-level action menu and returns the chosen value. */
+  static async getMethod(): Promise<string | symbol | undefined> {
+    return select({
       message: "Please choose an option",
       options: [
-        { value: "Add", label: "Add components to .berry file" },
-        { value: "Create", label: "Create new .berry file" },
-        { value: "Run", label: "Run .berry file" },
-        { value: "Select", label: "Select .berry file from folder" },
-        { value: "View", label: "View .berry file from folder" },
+        { value: "Add",    label: "➕  Add components to .berry file" },
+        { value: "Create", label: "📝  Create new .berry file" },
+        { value: "Run",    label: "🚀  Run .berry file" },
+        { value: "Select", label: "📁  Select .berry file from folder" },
+        { value: "View",   label: "👁   View selected .berry file" },
       ],
     });
-    if (isCancel(value)) {
-      outro("Cancelled");
-      return;
-    }
-    return value;
-  }
-
-  private static banner(version: string) {
-    const text =
-      "\n\n" +
-      figlet.textSync("Flexiberry", {
-        font: "Pagga",
-      });
-
-    console.log(chalk.green(text));
-    console.log(chalk.green("Welcome to"), chalk.bgGreen(" FlexiBerry CLI! "));
-    console.log(chalk.gray("Version: ") + chalk.green(version));
-
-    console.log("\n");
   }
 }
 
 /**
- * Prompts the user to enter a folder path, defaulting to the current folder (.)
- * if left blank.
+ * Asks for a folder path. Defaults to "." (current directory).
  */
 export async function askForFolderPath(): Promise<string | undefined> {
   const folder = await text({
-    message:
-      'Specify the folder to use (use "." for current folder, or enter a relative path):',
+    message: 'Specify the folder to use (use "." for current folder):',
     placeholder: "./../sample",
     defaultValue: ".",
     validate: (value) => {
-      if (value.length === 0) return `Value is required!`;
-      return undefined;
+      if (value.trim().length === 0) return "A folder path is required!";
     },
   });
 

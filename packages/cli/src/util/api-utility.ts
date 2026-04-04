@@ -1,202 +1,245 @@
+/**
+ * api-utility.ts
+ *
+ * Handles the `flexiberry add api` command flow.
+ * Uses native lib/prompts and lib/colors instead of chalk + @clack/prompts.
+ */
+
 import { CmdOptions } from "../command/add-command.js";
 import { FileUtility } from "./file-utility.js";
 import {
+  intro,
+  outro,
+  log,
+  text,
+  select,
   confirm,
   group,
-  intro,
-  isCancel,
-  log,
-  outro,
-  select,
   spinner,
-  text,
-} from "@clack/prompts";
+  isCancel,
+} from "../lib/prompts.js";
+import { colors } from "../lib/colors.js";
 import { outroMessage } from "./util.js";
 import { FormatUtil, PostmanUtil, SwaggerUtil } from "@flexiberry/berrycore";
-import chalk from "chalk";
 
 export class ApiUtility {
-  static addFromPostman(name: string, postman: any) {
+  // ─── Import-from helpers ──────────────────────────────────────────────────
+
+  /** Imports APIs from a Postman collection file. */
+  static addFromPostman(name: string, postman: string): void {
     intro(`📦 Adding API from Postman Collection`);
     const s = spinner();
-    s.start("Please wait... Converting Postman Collection to Berry");
+    s.start("Converting Postman Collection to Berry...");
     try {
       const apiCode = PostmanUtil.convertFromPostmanFile(postman);
-      s.stop("Conversion completed successfully");
+      s.stop("Conversion completed successfully ✔");
       const status = FileUtility.updateBerryCode(apiCode);
       outro(outroMessage(status));
-    } catch (error: any) {
-      log.error(error);
-      s.stop("Conversion failed");
-      outro(chalk.red("Error"));
+    } catch (error: unknown) {
+      const msg = error instanceof Error ? error.message : String(error);
+      log.error(msg);
+      s.stop(colors.red("Conversion failed ✖"));
+      outro(colors.red("Error ❌"));
     }
   }
-  static async addFromSwagger(name: string, swagger: any) {
-    intro(`📦 Adding API from Swagger`);
+
+  /** Imports APIs from a Swagger / OpenAPI URL. */
+  static async addFromSwagger(name: string, swagger: string): Promise<void> {
+    intro(`📦 Adding API from Swagger / OpenAPI`);
     const s = spinner();
-    s.start("Please wait... Converting Swagger to Berry");
+    s.start("Fetching and converting Swagger spec...");
     try {
       const apiCode = await SwaggerUtil.convertFromSwaggerApi(swagger);
-      s.stop("Conversion completed successfully");
+      s.stop("Conversion completed successfully ✔");
       const status = FileUtility.updateBerryCode(apiCode);
       outro(outroMessage(status));
-    } catch (error: any) {
-      log.error(error);
-      s.stop("Conversion failed");
-      outro(chalk.red("Error"));
+    } catch (error: unknown) {
+      const msg = error instanceof Error ? error.message : String(error);
+      log.error(msg);
+      s.stop(colors.red("Conversion failed ✖"));
+      outro(colors.red("Error ❌"));
     }
   }
-  static addFromCurl(name: any, curl: any) {
-    intro(`📦 Adding API from cURL `);
-    const s = spinner();
-    s.start("Converting cURL to Berry");
-    const apiCode = FormatUtil.convertCurlToBerry(curl, name);
 
-    s.stop("Conversion completed successfully");
+  /** Imports an API from a cURL command string. */
+  static addFromCurl(name: string, curl: string): void {
+    intro(`📦 Adding API from cURL`);
+    const s = spinner();
+    s.start("Converting cURL to Berry DSL...");
+    const apiCode = FormatUtil.convertCurlToBerry(curl, name);
+    s.stop("Conversion completed successfully ✔");
     const status = FileUtility.updateBerryCode(apiCode);
     outro(outroMessage(status));
   }
-  static async add(name: any, arg: CmdOptions) {
-    intro(`📦 Building API`);
-    name = await this.getInput("What is the name of API?", "Api Name", name);
-    if (!name) return;
+
+  // ─── Interactive add ──────────────────────────────────────────────────────
+
+  /** Prompts for all API details interactively and generates the DSL code. */
+  static async add(name: string, arg: CmdOptions): Promise<void> {
+    intro(`📦 Building API Interactively`);
+
+    const resolvedName = await this.getInput("What is the name of this API?", "Api Name", name);
+    if (!resolvedName) return;
+
     arg.url = await this.getUrl(arg.url);
     if (!arg.url) return;
+
     arg.method = await this.getMethod(arg.method);
     if (!arg.method) return;
+
     arg.headers = await this.getHeaders(arg.headers);
+
     const body = await this.getBody(arg.body);
     arg.body = body?.payload;
     arg.bodyType = body?.type;
 
-    const code = FormatUtil.buildApi(name, arg);
-    log.step("Code generated");
+    // At this point url and method are guaranteed to be strings
+    const code = FormatUtil.buildApi(resolvedName, {
+      method: arg.method,
+      url: arg.url,
+      headers: arg.headers,
+      body: arg.body,
+      bodyType: arg.bodyType,
+    });
+    log.step("DSL code generated ✔");
 
     const status = FileUtility.updateBerryCode(code);
     outro(outroMessage(status));
   }
 
+  // ─── Field prompts ────────────────────────────────────────────────────────
+
+  /** Generic text input with optional default. Returns null on cancel. */
   static async getInput(
     message: string,
     placeholder: string,
-    defaultValue: any
-  ) {
+    defaultValue?: string
+  ): Promise<string | undefined> {
     if (defaultValue) return defaultValue;
+
     const value = await text({
       message,
       placeholder,
-      validate: (value) =>
-        value.length === 0 ? `Value is required!` : undefined,
+      validate: (v) => (v.trim().length === 0 ? "A value is required!" : undefined),
     });
+
     if (isCancel(value)) {
-      outro("Cancelled");
-      return null;
+      outro("Cancelled ❌");
+      return undefined;
     }
     return value;
   }
 
-  static async getUrl(existingUrl: any) {
+  /** Prompts for the API URL, or returns the existing value if already set. */
+  static async getUrl(existingUrl?: string): Promise<string | undefined> {
     if (existingUrl) return existingUrl;
-    return await this.getInput(
-      "Please enter the URL",
-      "https://api.example.com",
-      existingUrl
-    );
+    return this.getInput("Please enter the API URL", "https://api.example.com");
   }
 
-  static async getMethod(existingMethod: any) {
+  /** Prompts to pick an HTTP method, or returns the existing value. */
+  static async getMethod(existingMethod?: string): Promise<string | undefined> {
     if (existingMethod) return existingMethod;
+
     const value = await select({
       message: "Choose the HTTP method",
       options: [
-        { value: "GET" },
-        { value: "POST" },
-        { value: "PUT" },
-        { value: "PATCH" },
-        { value: "DELETE" },
+        { value: "GET",    label: "GET    — Retrieve data" },
+        { value: "POST",   label: "POST   — Create a resource" },
+        { value: "PUT",    label: "PUT    — Replace a resource" },
+        { value: "PATCH",  label: "PATCH  — Partially update a resource" },
+        { value: "DELETE", label: "DELETE — Remove a resource" },
       ],
     });
+
     if (isCancel(value)) {
-      outro("Cancelled");
-      return;
+      outro("Cancelled ❌");
+      return undefined;
     }
     return value;
   }
 
-  static async getHeaders(existingHeaders: any) {
+  /** Optionally prompts for request headers. */
+  static async getHeaders(existingHeaders?: string): Promise<string | undefined> {
     if (existingHeaders) return existingHeaders;
-    const hasP = await confirm({
-      message: "Do you want to update Header details?",
-    });
-    if (isCancel(hasP) || !hasP) {
-      log.step("Headers skipped");
-      return;
+
+    const add = await confirm({ message: "Do you want to add request headers?" });
+    if (isCancel(add) || !add) {
+      log.step("Headers skipped.");
+      return undefined;
     }
+
     const value = await text({
-      message: "Please enter Header Details (Optional)",
-      placeholder: "key1:value1 , key2:value2",
-      validate: (value) => {
-        if (value.length === 0) return `Value is required!`;
-        const split = value.split(",");
-        for (let i = 0; i < split.length; i++) {
-          if (!split[i].match(/[^:]+:[^:]+/)) return `Invalid Header format`;
+      message: "Enter headers as comma-separated key:value pairs",
+      placeholder: "Content-Type:application/json , Authorization:Bearer token",
+      validate: (v) => {
+        if (v.trim().length === 0) return "At least one header is required!";
+        const pairs = v.split(",");
+        for (const pair of pairs) {
+          if (!/[^:]+:[^:]+/.test(pair.trim())) return "Invalid header format — use key:value";
         }
       },
     });
+
     if (isCancel(value)) {
-      log.step("Header details not provided");
-      return;
+      log.step("Header details not provided.");
+      return undefined;
     }
     return value.toString();
   }
 
-  static async getBody(existingBody: any) {
-    if (existingBody) return existingBody;
-    const hasP = await confirm({ message: "Do you have a payload?" });
-    if (isCancel(hasP) || !hasP) {
-      log.step("Request payload skipped");
-      return;
+  /** Optionally prompts for a request body and its content type. */
+  static async getBody(existingBody?: string): Promise<{ type: string; payload: string } | undefined> {
+    if (existingBody) return undefined; // Caller already supplies the body
+
+    const has = await confirm({ message: "Does this API have a request body?" });
+    if (isCancel(has) || !has) {
+      log.step("Request body skipped.");
+      return undefined;
     }
+
     const body = await group(
       {
         type: () =>
           select({
-            message: "Choose the Payload Type",
+            message: "Choose the body content type",
             options: [
-              { value: "JSON" },
-              { value: "XML" },
-              { value: "TEXT" },
-              { value: "GRAPQL" },
-              { value: "OTHER" },
+              { value: "JSON",    label: "JSON" },
+              { value: "XML",     label: "XML" },
+              { value: "TEXT",    label: "Plain Text" },
+              { value: "GRAPHQL", label: "GraphQL" },
+              { value: "OTHER",   label: "Other" },
             ],
           }),
         payload: () =>
           text({
-            message: "Please enter Payload Details (Optional)",
-            placeholder: `json / xml / text`,
-            validate: (value) =>
-              value.length === 0 ? `Value is required!` : undefined,
+            message: "Enter the request body payload",
+            placeholder: `{ "key": "value" }`,
+            validate: (v) => (v.trim().length === 0 ? "Payload is required!" : undefined),
           }),
       },
       {
-        onCancel: ({ results }) => {
-          log.step("Request body skipped");
+        onCancel: () => {
+          log.step("Request body skipped.");
           process.exit(0);
         },
       }
     );
-    if (body.type === "JSON") {
-      body.payload = this.jsonFormat(body.payload);
-    }
-    return body;
+
+    const type = (body.type ?? "OTHER") as string;
+    const payload = (body.payload ?? "") as string;
+
+    return {
+      type,
+      payload: type === "JSON" ? this.jsonFormat(payload) : payload,
+    };
   }
 
+  /** Formats a JSON string with 2-space indentation. Returns original on parse failure. */
   private static jsonFormat(jsonString: string): string {
     try {
-      const parsed = JSON.parse(jsonString);
-      return JSON.stringify(parsed, null, 2);
-    } catch (e) {
-      return jsonString; // Return original string if parsing fails
+      return JSON.stringify(JSON.parse(jsonString), null, 2);
+    } catch {
+      return jsonString;
     }
   }
 }

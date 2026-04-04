@@ -1,4 +1,11 @@
-import { log } from "@clack/prompts";
+/**
+ * add-command.ts
+ *
+ * Routes `flexiberry add <type>` subcommands to the appropriate utility class.
+ * Uses native lib/prompts log helper instead of @clack/prompts.
+ */
+
+import { log } from "../lib/prompts.js";
 import { ApiUtility } from "./../util/api-utility.js";
 import { EnvUtility } from "./../util/env-utility.js";
 import { StepUtility } from "./../util/step-utility.js";
@@ -6,21 +13,21 @@ import { TaskUtility } from "./../util/task-utility.js";
 import { VarUtility } from "../util/var-utility.js";
 
 export type CmdOptions = {
-  curl?: any;
-  swagger?: any;
-  url?: any;
-  method?: any;
-  postman?: any;
+  curl?: string;
+  swagger?: string;
+  url?: string;
+  method?: string;
+  postman?: string;
   headers?: string;
-  body?: any;
-  bodyType: any;
-  title?: any;
-  env?: any;
-  var?: any;
+  body?: string;
+  bodyType?: string;
+  title?: string;
+  env?: string;
+  var?: string;
 };
 
 export class AddCommand {
-  static run(type: string, name: string, options: CmdOptions) {
+  static run(type: string, name: string, options: CmdOptions): void {
     switch (type.toLowerCase()) {
       case "api":
         if (options.curl) {
@@ -39,19 +46,27 @@ export class AddCommand {
         break;
 
       case "task":
-        if (!name) throw new Error("Name is required for task");
+        if (!name) {
+          log.error("A name is required for type 'task'.");
+          return;
+        }
         TaskUtility.add(name);
         break;
 
       case "step":
-        if (!name) throw new Error("Name is required for step");
+        if (!name) {
+          log.error("A name is required for type 'step'.");
+          return;
+        }
         StepUtility.add(name, options);
         break;
+
       case "var":
         VarUtility.add(name, options);
         break;
+
       default:
-        console.error(`Unknown type: ${type}`);
+        log.error(`Unknown type: "${type}". Valid types: api, env, task, step, var`);
     }
   }
 }
