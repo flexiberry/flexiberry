@@ -65,6 +65,10 @@ export interface StartPayload {
   readonly totalApis: number;
   readonly totalVars: number;
   readonly startTime: Date;
+  readonly plan: ReadonlyArray<{
+    readonly title: string | null;
+    readonly steps: ReadonlyArray<{ readonly targetName: string }>;
+  }>;
 }
 
 export interface CompletedPayload {
@@ -115,7 +119,7 @@ export type EventPayloadMap = {
   [InterpreterEvent.TaskBegin]: { readonly title: string | null; readonly index: number };
   [InterpreterEvent.TaskDone]: TaskResult;
   [InterpreterEvent.StepBegin]: { readonly targetName: string; readonly index: number; readonly taskIndex: number };
-  [InterpreterEvent.StepDone]: StepResult & { readonly taskIndex: number };
+  [InterpreterEvent.StepDone]: StepResult & { readonly taskIndex: number; readonly index: number };
   [InterpreterEvent.ApiCallBegin]: { readonly method: string; readonly url: string; readonly apiName: string };
   [InterpreterEvent.ApiCallDone]: { readonly apiName: string; readonly status: number; readonly duration: number };
   [InterpreterEvent.Log]: LogPayload;

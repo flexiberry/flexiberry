@@ -224,12 +224,18 @@ export class Interpreter {
       }
     }
 
+    const plan = tasks.map(t => ({
+      title: t.title ?? null,
+      steps: t.steps.map(s => ({ targetName: s.targetName }))
+    }));
+
     // Emit start event
     await this.emit(InterpreterEvent.Start, {
       totalTasks: tasks.length,
       totalApis: this.apiRegistry.size,
       totalVars: this.globalEnv.getOwnEntries().size,
       startTime: new Date(),
+      plan,
     });
 
     this.pushLog("info", `Starting execution: ${tasks.length} tasks, ${this.apiRegistry.size} APIs, ${this.globalEnv.getOwnEntries().size} vars`);
@@ -503,7 +509,7 @@ export class Interpreter {
       checksPassed,
     };
 
-    await this.emit(InterpreterEvent.StepDone, { ...result, taskIndex });
+    await this.emit(InterpreterEvent.StepDone, { ...result, taskIndex, index: stepIndex });
 
     const stepIcon = status === ExecutionStatus.Pass ? "✅" : "❌";
     this.pushLog("step", `${stepIcon} ${node.targetName} → ${status}`);

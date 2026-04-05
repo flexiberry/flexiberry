@@ -2,8 +2,9 @@
  * run-utility.ts
  *
  * Handles `flexiberry run` and `flexiberry test` commands.
- * Uses the actual berrycore Interpreter API: LexerEngine → AstEngine → Interpreter.
- * Uses native lib/prompts and lib/colors instead of @clack/prompts + chalk.
+ *
+ * - `test`  → uses LexerEngine + AstEngine directly to print the AST (debug mode)
+ * - `run`   → delegates to BerryCore facade with the live BerryTableAdapter
  */
 
 import { intro, outro, log, select, confirm, isCancel } from "../lib/prompts.js";
@@ -12,14 +13,13 @@ import * as fs from "fs";
 import * as path from "path";
 import { FileUtility } from "./file-utility.js";
 import {
-  AstEngine,
-  Interpreter,
+  BerryCore,
   LexerEngine,
-  CliAdapter,
+  AstEngine,
   InterpreterEvent,
-  type CompletedPayload,
+  ExecutionStatus,
 } from "@flexiberry/berrycore";
-import { UI } from "../ui/ui.js";
+import { BerryTableAdapter } from "../adapter/berry-table-adapter.js";
 
 export class RunUtility {
   /**
@@ -34,17 +34,16 @@ export class RunUtility {
       }
       log.message(`📄 File detected: ${colors.blue(filePath)}`);
       log.success(colors.green("✔ File successfully selected!"));
-      this.testingNewLexer(filePath);
+      RunUtility.testingNewLexer(filePath);
       return;
     }
 
-    const fileSelected = await this.selectFromCurrentFolder();
+    const fileSelected = await RunUtility.selectFromCurrentFolder();
     if (fileSelected) {
-      this.testingNewLexer(fileSelected);
+      RunUtility.testingNewLexer(fileSelected);
       return;
     }
 
-    // Fallback — use the pre-selected file
     const proceed = await confirm({
       message: `Proceed with pre-selected file? (${colors.blue(FileUtility.getPreselectedFileName() ?? "none")})`,
     });
@@ -59,7 +58,7 @@ export class RunUtility {
 
     log.step(`🔄 Preparing to test: ${colors.blue(preSelectedFile)}`);
     outro("Test engine ready");
-    this.testingNewLexer(preSelectedFile);
+    RunUtility.testingNewLexer(preSelectedFile);
   }
 
   /**
@@ -81,7 +80,7 @@ export class RunUtility {
       return;
     }
 
-    const fileSelected = await this.selectFromCurrentFolder();
+    const fileSelected = await RunUtility.selectFromCurrentFolder();
     if (fileSelected) {
       log.step(`🔄 Preparing to execute: ${colors.blue(fileSelected)}`);
       outro("Execution Starting...");
@@ -89,7 +88,6 @@ export class RunUtility {
       return;
     }
 
-    // Fallback — use the pre-selected file
     const proceed = await confirm({
       message: `Proceed with pre-selected file? (${colors.blue(FileUtility.getPreselectedFileName() ?? "none")})`,
     });
@@ -107,9 +105,9 @@ export class RunUtility {
     await RunUtility.berryExecutor(preSelectedFile);
   }
 
-  // ─── Private helpers ────────────────────────────────────────────────────────
+  // ─── Private helpers ───────────────────────────────────────────────────────
 
-  /** Tokenises and builds the AST, prints it (test / debug mode). */
+  /** Debug mode: tokenise + build AST and dump to stdout — no execution. */
   private static testingNewLexer(filePath: string): void {
     const source = fs.readFileSync(filePath, "utf8");
     console.time("Tokenize");
@@ -120,32 +118,99 @@ export class RunUtility {
   }
 
   /**
-   * Wires the complete pipeline: LexerEngine → AstEngine → Interpreter.
-   * Hooks the Completed event so the UI can show the final summary.
+   * Full execution via BerryCore + BerryTableAdapter (live table UI).
+   *
+   * Pipeline:
+   *   source → BerryCore({ adapter: BerryTableAdapter }) → run()
+   *
+   * Every interpreter lifecycle event is forwarded to the adapter's update
+   * methods so the table re-renders in place after each state change.
+   * On Completed the results are handed to the legacy UI for the final
+   * summary panel.
    */
   private static async berryExecutor(filePath: string): Promise<void> {
-    const source = fs.readFileSync(filePath, "utf8");
+    const source   = fs.readFileSync(filePath, "utf8");
+    const fileName = FileUtility.getPreselectedFileName() ?? path.basename(filePath);
 
-    // Tokenise + parse into an AST
-    const tokens = new LexerEngine(source).tokenize();
-    const ast = new AstEngine(tokens).build();
+    // Static job header (printed once, before the live table)
+    BerryTableAdapter.printJobDetails(fileName, "Local");
 
-    const ui = new UI();
-    ui.printJobDetails(
-      FileUtility.getPreselectedFileName() ?? path.basename(filePath),
-      "Local"
-    );
+    // Live table adapter — handles rendering + keyboard interrupt
+    const adapter = new BerryTableAdapter();
 
-    const adapter = new CliAdapter({ enableLogging: true });
-    const interpreter = new Interpreter(ast);
-    interpreter.setIOAdapter(adapter);
+    // BerryCore: tokenise → parse → execute
+    const core = new BerryCore(source, { adapter });
 
-    interpreter.on(InterpreterEvent.Completed, (_payload: CompletedPayload) => {
-      adapter.dispose();
-      ui.exit();
+    // Track current task index (used for ApiCall events that lack it)
+    let currentTaskIdx = -1;
+
+    // ── Task lifecycle ─────────────────────────────────────────────────────
+    core.on(InterpreterEvent.Start, (payload) => {
+      adapter.initPlan(payload.plan);
     });
 
-    await interpreter.execute();
+    core.on(InterpreterEvent.TaskBegin, ({ index }) => {
+      currentTaskIdx = index;
+      adapter.onTaskBegin(index);
+    });
+
+    core.on(InterpreterEvent.TaskDone, (result) => {
+      const s = RunUtility.mapStatus(result.status);
+      adapter.onTaskDone(currentTaskIdx, s);
+    });
+
+    // ── Step lifecycle ─────────────────────────────────────────────────────
+    core.on(InterpreterEvent.StepBegin, ({ index, taskIndex }) => {
+      adapter.onStepBegin(taskIndex, index);
+    });
+
+    core.on(InterpreterEvent.StepDone, (result) => {
+      const { taskIndex, index } = result;
+      adapter.onStepDone(taskIndex, index, RunUtility.mapStatus(result.status), result.error ?? undefined);
+    });
+
+    // ── API call details ───────────────────────────────────────────────────
+    // Current design limitation: API events don't carry step indices inherently because
+    // they are triggered deeper within. As a fallback, we can use the latest running step index
+    // if we needed to track it exactly, or we can just rely on the step count - 1 if we only allow 
+    // sequential execution. Actually, since execution is sequential, we can just track `currentStepIdx`.
+    let currentStepIdx = -1;
+    
+    core.on(InterpreterEvent.StepBegin, ({ index }) => {
+      currentStepIdx = index;
+    });
+
+    core.on(InterpreterEvent.ApiCallBegin, ({ method, url }) => {
+      adapter.onApiCallBegin(currentTaskIdx, currentStepIdx, method, url);
+    });
+
+    core.on(InterpreterEvent.ApiCallDone, ({ status, duration }) => {
+      adapter.onApiCallDone(currentTaskIdx, currentStepIdx, status, duration);
+    });
+
+    // ── Completed ─────────────────────────────────────────────────────────
+    core.on(InterpreterEvent.Completed, () => {
+      adapter.setCompleted();
+      adapter.dispose();
+      adapter.printFinalSummary();
+      process.exit(0);
+    });
+
+    await core.run();
+  }
+
+  /** Map ExecutionStatus enum → the string union used by BerryTableAdapter. */
+  private static mapStatus(
+    s: ExecutionStatus
+  ): "PASS" | "FAILED" | "SKIPPED" | "STOPPED" | "PENDING" {
+    switch (s) {
+      case ExecutionStatus.Pass:    return "PASS";
+      case ExecutionStatus.Failed:  return "FAILED";
+      case ExecutionStatus.Skipped: return "SKIPPED";
+      case ExecutionStatus.Stopped: return "STOPPED";
+      case ExecutionStatus.Killed:  return "STOPPED";
+      default:                      return "PENDING";
+    }
   }
 
   /**

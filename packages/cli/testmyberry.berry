@@ -1,0 +1,202 @@
+
+Var @UAT global variable
+- name: 'rintu'
+- age: '10'
+
+
+Api POST #uploadFile testubg 
+Url https://petstore.swagger.io/v2/pet/{{petId}}/uploadImage
+Header
+- Content-Type: 'multipart/form-data'
+- Accept: 'application/json'
+
+Api POST #addPet
+Url https://petstore.swagger.io/v2/pet
+Header
+- Content-Type: 'application/json'
+- Accept: 'application/json'
+Body JSON `
+{
+  "id": 1,
+  "{{category}}": {
+    "id": 1,
+    "name": "dog"
+    },
+    "name": "doggie",
+    "photoUrls": [
+      "http://localhost/"
+      ],
+      "tags": [
+        {
+          "id": 0,
+          "name": "pet"
+        }
+        ],
+        "status": "available"
+      }
+      `
+
+Api PUT #updatePet
+Url https://petstore.swagger.io/v2/pet
+Header
+- Content-Type: 'application/json'
+- Accept: 'application/json'
+Body JSON `{}`
+
+Api GET #findPetsByStatus
+Url https://petstore.swagger.io/v2/pet/findByStatus?status={{status}}
+    Header
+    - Accept: 'application/json'
+
+Api GET #findPetsByTags
+Url https://petstore.swagger.io/v2/pet/findByTags?tags={{tags}}
+  Header
+  - Accept: 'application/json'
+
+  Api GET #getPetById
+Url https://petstore.swagger.io/v2/pet/{{petId}}
+Header
+- Accept: 'application/json'
+
+Api POST #updatePetWithForm
+Url https://petstore.swagger.io/v2/pet/{{petId}}
+Header
+- Content-Type: 'application/x-www-form-urlencoded'
+- Accept: 'application/json'
+
+
+Api DELETE #deletePet
+Url https://petstore.swagger.io/v2/pet/{{petId}}
+Header
+- Accept: 'application/json'
+- api_key: ''
+
+Api GET #getInventory
+Url https://petstore.swagger.io/v2/store/inventory
+Header
+- Accept: 'application/json'
+
+Api POST #placeOrder
+Url https://petstore.swagger.io/v2/store/order
+Header
+- Content-Type: 'application/json'
+- Accept: 'application/json'
+Body JSON `{}`
+
+Api GET #getOrderById
+Url https://petstore.swagger.io/v2/store/order/{{orderId}}
+Header
+- Accept: 'application/json'
+
+Api DELETE #deleteOrder
+Url https://petstore.swagger.io/v2/store/order/{{orderId}}
+Header
+- Accept: 'application/json'
+
+Api POST #createUsersWithListInput
+Url https://petstore.swagger.io/v2/user/createWithList
+Header
+- Content-Type: 'application/json'
+- Accept: 'application/json'
+Body JSON `[
+{}
+]`
+
+Api GET #getUserByName
+Url https://petstore.swagger.io/v2/user/{{username}}
+Header
+- Accept: 'application/json'
+
+Api PUT #updateUser
+Url https://petstore.swagger.io/v2/user/{{username}}
+Header
+- Content-Type: 'application/json'
+- Accept: 'application/json'
+Body JSON `{}`
+
+Api DELETE #deleteUser
+Url https://petstore.swagger.io/v2/user/{{username}}
+Header
+- Accept: 'application/json'
+
+Api GET #loginUser
+Url https://petstore.swagger.io/v2/user/login?username={{username}}&password={{password}}
+Header
+- Accept: 'application/json'
+
+Api GET #logoutUser
+Url https://petstore.swagger.io/v2/user/logout
+Header
+- Accept: 'application/json'
+
+Api POST #createUsersWithArrayInput
+Url https://petstore.swagger.io/v2/user/createWithArray
+Header
+- Content-Type: 'application/json'
+- Accept: 'application/json'
+Body JSON `[
+{}
+]`
+
+Api POST #createUser
+Url https://petstore.swagger.io/v2/user
+Header
+- Content-Type: 'application/json'
+- Accept: 'application/json'
+Body JSON `{}`
+
+
+
+Task add new pet and find
+Step  Call Api addPet 
+Capture
+- id: response.id
+- status: response.status
+Check
+- $.status == 200 OR $.status == 201
+- $.body != null
+- id != null
+- status != null
+
+Step Call Api getPetById
+Params
+- petId: Step.1.id
+
+Capture
+- id: response.id
+- status: response.status
+
+Check
+- $.status == 200
+- $.body != null
+- id == Step.1.id
+
+
+Task second task im testing
+
+Step  Call Api addPet adding pet
+
+Capture
+- id: response.id
+- status: response.status
+
+Check
+- $.status == 200 OR $.status == 201
+- $.body != null
+- id != null
+- status != null
+
+Step Call Api getPetById
+Params
+- petId: Step.1.id
+
+Capture
+- id: response.id
+- status: response.status
+
+Check
+- $.status == 200 Or $.status == 201
+- $.body != null
+- id == Step.1.id
+- $.body == null
+- id != Step.1.id
