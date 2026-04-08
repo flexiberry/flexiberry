@@ -7,16 +7,25 @@ export default defineConfig({
   themeConfig: {
     nav: [
       { text: "Home", link: "/" },
-      { text: "Commands", link: "/guide/" },
-      { text: "App", link: "/guide/" },
+      { text: "Quick Start", link: "/quick-start" },
+      { text: "CLI", link: "/cli" },
+      { text: ".berry Language", link: "/berry-language" },
     ],
-    sidebar: {
-      "/guide/": [
-        {
-          text: "Guide",
-          items: [{ text: "Getting Started", link: "/guide/getting-started" }],
-        },
-      ],
-    },
+    sidebar: [
+      {
+        text: "Guide",
+        items: [
+          { text: "Quick Start", link: "/quick-start" },
+          { text: "CI / CD Integration", link: "/ci-cd" },
+        ],
+      },
+      {
+        text: "Reference",
+        items: [
+          { text: "CLI Commands", link: "/cli" },
+          { text: ".berry Language", link: "/berry-language" },
+        ],
+      },
+    ],
   },
 });
