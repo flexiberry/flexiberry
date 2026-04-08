@@ -15,7 +15,12 @@
     "prepare": "npm run clean && npm run build",
     "installglobal": "npm i -g ."
   },
-  "keywords": ["flexiberry", "cli", "api-testing", "berry"],
+  "keywords": [
+    "flexiberry",
+    "cli",
+    "api-testing",
+    "berry"
+  ],
   "author": "rintu raj c",
   "license": "MIT",
   "dependencies": {
