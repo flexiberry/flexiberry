@@ -74,7 +74,7 @@ export class BerryCore {
 
   // ── Constructor ──────────────────────────────────────────────────────────
 
-  constructor(source: string, options: BerryCoreOptions = {}) {
+  constructor (source: string, options: BerryCoreOptions = {}) {
     this.source = source;
     this.options = options;
   }
@@ -167,10 +167,12 @@ export class BerryCore {
     try {
       return await this.interpreter.execute();
     } finally {
-      // Keep the interpreter reference alive so callers can inspect state,
-      // but clear it on the next run() so a fresh one is created.
-      // (We intentionally do NOT null it out here so getState() still works
-      //  after execution completes.)
+      // Only destroy if the interpreter actually finished
+      const state = this.interpreter?.getState();
+      const isFinished = state === ExecutionState.Completed || state === ExecutionState.Killed || state === ExecutionState.Stopped;
+      if (!this.options.interpreterOptions?.dryRun && isFinished) {
+        this.interpreter = null;
+      }
     }
   }
 }
