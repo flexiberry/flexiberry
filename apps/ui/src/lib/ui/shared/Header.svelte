@@ -1,164 +1,170 @@
 <script lang="ts">
-  import Button from "../../components/ui/button/button.svelte";
-  import { Input } from "../../components/ui/input";
-  import { Moon, Plus, Sun, Upload } from "lucide-svelte";
-  import { LifeBuoy } from "lucide-svelte";
-  import { Github } from "lucide-svelte";
-  import { toast } from "svelte-sonner";
+  import { Button } from "$lib/components/ui/button";
+  import {
+    Home,
+    Github,
+    BookOpen,
+    TerminalSquare,
+    Plus,
+    Play,
+    Menu,
+    Star,
+    Sun,
+    Moon,
+  } from "lucide-svelte";
+  import * as DropdownMenu from "$lib/components/ui/dropdown-menu";
   import { toggleMode } from "mode-watcher";
-  import { onMount } from "svelte";
-  import { fade, slide } from "svelte/transition";
   import berry from "$lib/assets/berry.png";
-  // Add version from package.json
-  // @ts-ignore
-  const version = "v " + APP_VERSION;
-
-  let logoContainer: Element;
-  let showFullLogo = true;
-  let showOnlyIcon = false;
-  /**
-   * @type {ResizeObserver}
-   */
-  let resizeObserver: ResizeObserver;
-
-  // Add these variables to track height
-
-  const updateLogoVisibility = () => {
-    if (!logoContainer) return;
-    const containerWidth = logoContainer.clientWidth;
-
-    // Show only icon if width is less than 100px
-    // Show only title if width is less than 200px
-    // Show everything if width is greater than 200px
-    showOnlyIcon = containerWidth < 50;
-    showFullLogo = containerWidth >= 200;
-  };
-
-  onMount(() => {
-    // Create ResizeObserver to watch container size changes
-    resizeObserver = new ResizeObserver((entries) => {
-      for (const entry of entries) {
-        if (entry.target === logoContainer) {
-          updateLogoVisibility();
-        }
-      }
-    });
-
-    // Start observing the logo container
-    if (logoContainer) {
-      resizeObserver.observe(logoContainer);
-    }
-
-    const handleResize = () => {
-      const headerHeight = document?.querySelector("Header")?.clientHeight || 0;
-      const bodyHeight = window.innerHeight || 0;
-      // heightDifference = bodyHeight - headerHeight - toolbarHeight;
-
-      // Update right pane visibility based on screen width
-      // showRightPane = window.innerWidth >= 700;
-    };
-
-    handleResize();
-    window.addEventListener("resize", handleResize);
-
-    return () => {
-      // Cleanup
-      if (resizeObserver) {
-        resizeObserver.disconnect();
-      }
-      window.removeEventListener("resize", handleResize);
-    };
-  });
 </script>
 
-<header class="border-b-2 bg-primary/90 dark:bg-primary/10 drop-shadow-lg">
-  <div class=" ">
-    <nav class=" flex align-middle items-center">
-      <div
-        bind:this={logoContainer}
-        class="logo flex px-2 align-middle py-2 items-center justify-between"
-      >
-        <div class="flex items-center overflow-hidden">
-          <img
-            src={berry}
-            height={"38px"}
-            class="h-[38px] flex-shrink-0 transition-transform duration-200"
-            class:scale-110={showOnlyIcon}
-            alt="FlexiBerry Logo"
-          />
-          {#if !showOnlyIcon}
-            <div
-              class="pl-3 overflow-hidden"
-              in:slide={{ duration: 200, axis: "x" }}
-              out:slide={{ duration: 200, axis: "x" }}
-            >
-              <h1
-                class="font-extrabold text-lg tracking-tight leading-none truncate"
-              >
-                FlexiBerry
-              </h1>
-              {#if showFullLogo}
-                <p
-                  class="text-xs text-muted-foreground truncate"
-                  in:fade={{ duration: 150, delay: 100 }}
-                  out:fade={{ duration: 150 }}
-                >
-                  Your flexible api testing companion
-                </p>
-              {/if}
-            </div>
-          {/if}
-        </div>
-      </div>
-    </nav>
-  </div>
-  <div class="logo flex align-middle items-center">
-    <!-- <img src={berry} height={"40px"} class="h-10" alt="" srcset="" />
-    <h1 class="font-extrabold pl-3">FlexiBerry</h1> -->
-  </div>
-  <div>
-    <nav class=" flex align-middle items-center">
-      <span
-        class="text-lg font-thin text-muted-foreground mr-2"
-        in:fade={{ duration: 150, delay: 100 }}
-        out:fade={{ duration: 150 }}
-      >
-        {version}
+<header
+  class="flex items-center justify-between px-1 py-1 bg-transparent w-full shrink-0"
+>
+  <!-- LEFT: Navigation block -->
+  <div class="flex items-center gap-6">
+    <!-- Main Logo Block -->
+    <Button
+      variant="outline"
+      class="w-12 h-12 p-0 bg-primary/10 border-primary/20 rounded-[14px] flex items-center justify-center text-primary hover:bg-primary/20 transition-colors shadow-sm"
+    >
+      <span class="font-bold text-xl tracking-tighter">
+        <img
+          src={berry}
+          height={"38px"}
+          class="h-[38px] flex-shrink-0 transition-transform duration-200"
+          alt="FlexiBerry Logo"
+        />
       </span>
-      <Button class="mr-2" size="icon" variant="outline">
-        <LifeBuoy strokeWidth={1}></LifeBuoy>
+    </Button>
+
+    <!-- Central Icons Pill -->
+    <div
+      class="flex items-center h-12 px-1.5 bg-card border border-border shadow-sm rounded-xl gap-1"
+    >
+      <Button
+        variant="ghost"
+        size="icon"
+        class="w-9 h-9 rounded-lg text-muted-foreground hover:text-foreground"
+      >
+        <Home class="w-[18px] h-[18px]" strokeWidth={1.5} />
       </Button>
-      <Button class="mr-2" size="icon" variant="outline">
-        <Github strokeWidth={1}></Github>
+      <Button
+        variant="ghost"
+        class="h-9 px-2.5 rounded-lg text-muted-foreground hover:text-foreground flex items-center gap-2"
+      >
+        <Github class="w-[16px] h-[16px]" strokeWidth={1.5} />
+        <span class="text-xs font-medium">Github</span>
+        <div
+          class="flex items-center gap-1 bg-muted px-1.5 py-0.5 rounded text-[10px] text-foreground"
+        >
+          <Star class="w-[10px] h-[10px] fill-current" strokeWidth={1.5} /> 1.2k
+        </div>
       </Button>
-      <Button class="mr-2" on:click={toggleMode} variant="outline" size="icon">
+      <Button
+        variant="ghost"
+        class="h-9 px-2.5 rounded-lg text-muted-foreground hover:text-foreground flex items-center gap-2"
+      >
+        <BookOpen class="w-[16px] h-[16px]" strokeWidth={1.5} />
+      </Button>
+      <Button
+        variant="ghost"
+        class="h-9 px-2.5 rounded-lg text-muted-foreground hover:text-foreground flex items-center gap-2"
+      >
+        <TerminalSquare class="w-[16px] h-[16px]" strokeWidth={1.5} />
+        <span class="text-xs font-medium">CLI Docs</span>
+      </Button>
+      <div class="w-[1px] h-5 bg-border mx-1"></div>
+      <Button
+        on:click={toggleMode}
+        variant="ghost"
+        size="icon"
+        class="w-9 h-9 rounded-lg text-muted-foreground hover:text-foreground relative"
+      >
         <Sun
-          class="h-[1.2rem] w-[1.2rem] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0"
+          class="w-[18px] h-[18px] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0"
+          strokeWidth={1.5}
         />
         <Moon
-          class="absolute h-[1.2rem] w-[1.2rem] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100"
+          class="absolute w-[18px] h-[18px] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100"
+          strokeWidth={1.5}
         />
         <span class="sr-only">Toggle theme</span>
       </Button>
-      <div class=" border-l-2 border-opacity-15 mr-1 h-100"></div>
       <Button
-        class="mr-4 bg-secondary dark:bg-primary"
-        on:click={() => toast("Hello world")}
-        variant="default">Login</Button
+        variant="secondary"
+        class="h-9 px-3 rounded-lg text-foreground hover:bg-secondary/80 flex items-center gap-1.5 shadow-sm"
       >
-    </nav>
+        <Plus class="w-[16px] h-[16px]" strokeWidth={2} />
+        <span class="text-xs font-medium tracking-wide">New Project</span>
+      </Button>
+    </div>
+  </div>
+
+  <!-- RIGHT: Action block -->
+  <div class="flex items-center gap-6">
+    <div
+      class="flex items-center h-12 px-1.5 bg-card border border-border shadow-sm rounded-xl gap-1"
+    >
+      <Button
+        variant="ghost"
+        size="icon"
+        class="w-9 h-9 rounded-lg text-muted-foreground hover:text-foreground"
+      >
+        <Play class="w-[18px] h-[18px] ml-0.5" strokeWidth={1.5} />
+      </Button>
+      <div class="w-[1px] h-5 bg-border mx-1"></div>
+      <Button
+        variant="ghost"
+        class="h-9 px-1.5 rounded-lg text-muted-foreground hover:text-foreground flex items-center gap-2"
+      >
+        <Menu class="w-[18px] h-[18px]" strokeWidth={1.5} />
+        <!-- <span class="text-xs font-medium">Menu</span> -->
+      </Button>
+    </div>
+
+    <DropdownMenu.Root>
+      <DropdownMenu.Trigger asChild let:builder>
+        <div
+          use:builder.action
+          {...builder}
+          class="flex items-center gap-3 pl-2 pr-4 h-12 bg-card border border-border rounded-full shadow-sm hover:bg-muted/50 transition-colors cursor-pointer select-none outline-none"
+        >
+          <div
+            class="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-sm shrink-0"
+          >
+            R
+          </div>
+          <div class="flex flex-col truncate min-w-[120px] max-w-[150px]">
+            <span class="text-sm font-semibold leading-tight truncate"
+              >Rintu Raj</span
+            >
+            <span class="text-[10px] text-muted-foreground truncate"
+              >rintu@flexiberry.com</span
+            >
+          </div>
+        </div>
+      </DropdownMenu.Trigger>
+      <DropdownMenu.Content class="w-56" align="end" sideOffset={8}>
+        <DropdownMenu.Label class="font-normal">
+          <div class="flex flex-col space-y-1">
+            <p class="text-sm font-medium leading-none">Rintu Raj</p>
+            <p class="text-xs leading-none text-muted-foreground">
+              rintu@flexiberry.com
+            </p>
+          </div>
+        </DropdownMenu.Label>
+        <DropdownMenu.Separator />
+        <DropdownMenu.Group>
+          <DropdownMenu.Item>Profile</DropdownMenu.Item>
+          <DropdownMenu.Item>Billing</DropdownMenu.Item>
+          <DropdownMenu.Item>Settings</DropdownMenu.Item>
+        </DropdownMenu.Group>
+        <DropdownMenu.Separator />
+        <DropdownMenu.Item
+          class="text-red-500 focus:bg-red-500/10 focus:text-red-500"
+          >Log out</DropdownMenu.Item
+        >
+      </DropdownMenu.Content>
+    </DropdownMenu.Root>
   </div>
 </header>
-
-<style>
-  /* Add styles for your header here */
-  header {
-    padding: 0.15rem;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
-  .logo {
-    display: flex;
-  }
-</style>

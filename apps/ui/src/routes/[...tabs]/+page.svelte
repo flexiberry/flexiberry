@@ -22,6 +22,7 @@
   } from "lucide-svelte";
   import { getFile, saveFile } from "../../lib/writable/File";
   import { toast } from "svelte-sonner";
+  import Header from "../../lib/ui/shared/Header.svelte";
 
   let code = "";
 
@@ -36,6 +37,7 @@
 </script>
 
 <div class="h-full flex flex-col">
+  <Header />
   <div
     class="flex items-center justify-between px-4 py-1 border-b border-primary/20"
   >

@@ -38,46 +38,27 @@ exports.registerFormatter = registerFormatter;
 const vscode = __importStar(require("vscode"));
 const berrycore_1 = require("@flexiberry/berrycore");
 class BerryFormatter {
-    provideDocumentRangeFormattingEdits(document, range, options, token) {
-        console.log("Range formatting requested for range:", range);
-        return this.format(document, options);
-    }
-    provideDocumentRangesFormattingEdits(document, ranges, options, token) {
-        console.log("Range formatting requested");
-        return this.formatRange(document, ranges[0], options);
-    }
-    format(document, options) {
-        const edits = [];
-        // Your formatting logic
-        return edits;
-    }
-    formatRange(document, range, options) {
-        const edits = [];
-        document.lineAt(range.start.line);
-        for (let i = range.start.line; i <= range.end.line; i++) {
-            const line = document.lineAt(i);
-            // const formattedLine = this.formatBerryCode(line.text, options);
-            // edits.push(vscode.TextEdit.replace(line.range, formattedLine));
-        }
-        return edits;
-    }
     provideDocumentFormattingEdits(document, options, token) {
-        const edits = [];
         const text = document.getText();
-        let formattedText = this.formatBerryCode(text, options);
-        // Replace the entire document with formatted text
-        // const firstLine = document.lineAt(0);
-        // const lastLine = document.lineAt(document.lineCount - 1);
-        // const range = new vscode.Range(firstLine.range.start, lastLine.range.end);
-        // edits.push(vscode.TextEdit.replace(range, formattedText));
-        return edits;
-    }
-    formatBerryCode(code, options) {
-        // new Lexer()
-        const tkn = new berrycore_1.LexerEngine(code).tokenize();
-        console.log(tkn);
-        new berrycore_1.LexerEngine(code);
-        return code;
+        try {
+            const tokens = new berrycore_1.LexerEngine(text).tokenize();
+            const ast = new berrycore_1.AstEngine(tokens).build();
+            const formatter = new berrycore_1.BerryFormatter({
+                indentSize: options.tabSize ?? 8,
+            });
+            const formattedText = formatter.format(ast);
+            if (document.lineCount === 0)
+                return [];
+            const firstLine = document.lineAt(0);
+            const lastLine = document.lineAt(document.lineCount - 1);
+            const range = new vscode.Range(firstLine.range.start, lastLine.range.end);
+            return [vscode.TextEdit.replace(range, formattedText)];
+        }
+        catch (e) {
+            // If there's a syntax error, we silently fail formatting so we don't clear the file
+            console.warn("Berry formatting skipped due to error:", e.message);
+            return [];
+        }
     }
 }
 exports.BerryFormatter = BerryFormatter;
@@ -85,10 +66,7 @@ exports.BerryFormatter = BerryFormatter;
 function registerFormatter(context) {
     const formatter = new BerryFormatter();
     // Document formatting (Format Document command)
-    const docFormatter = vscode.languages.registerDocumentFormattingEditProvider({ language: "berry" }, // Try this syntax instead
-    formatter);
-    // Range formatting (Format Selection command)
-    const rangeFormatter = vscode.languages.registerDocumentRangeFormattingEditProvider({ language: "berry" }, formatter);
-    context.subscriptions.push(docFormatter, rangeFormatter);
+    const docFormatter = vscode.languages.registerDocumentFormattingEditProvider({ language: "berry" }, formatter);
+    context.subscriptions.push(docFormatter);
 }
 //# sourceMappingURL=formatter.js.map

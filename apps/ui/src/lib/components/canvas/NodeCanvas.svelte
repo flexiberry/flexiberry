@@ -1,0 +1,108 @@
+<script lang="ts">
+  import { SvelteFlow, Background } from "@xyflow/svelte";
+  import { writable } from "svelte/store";
+  import { mode } from "mode-watcher";
+  import "@xyflow/svelte/dist/style.css";
+
+  import IdeaNode from "./nodes/IdeaNode.svelte";
+  import ReferenceNode from "./nodes/ReferenceNode.svelte";
+  import SettingsNode from "./nodes/SettingsNode.svelte";
+  import ModelNode from "./nodes/ModelNode.svelte";
+
+  const nodeTypes = {
+    ideas: IdeaNode,
+    references: ReferenceNode,
+    settings: SettingsNode,
+    models: ModelNode,
+  };
+
+  const nodes = writable([
+    {
+      id: "n-ideas",
+      type: "ideas",
+      data: {},
+      position: { x: 50, y: 50 },
+    },
+    {
+      id: "n-refs",
+      type: "references",
+      data: {},
+      position: { x: 30, y: 320 },
+    },
+    {
+      id: "n-settings",
+      type: "settings",
+      data: {},
+      position: { x: 480, y: 50 },
+    },
+    {
+      id: "n-models",
+      type: "models",
+      data: {},
+      position: { x: 480, y: 460 },
+    },
+  ]);
+
+  const edges = writable([
+    // Smooth bezier curve for ideas -> settings
+    {
+      id: "e-ideas-settings",
+      source: "n-ideas",
+      target: "n-settings",
+      type: "smoothstep",
+      animated: true,
+      style:
+        "stroke: #febb4c; stroke-width: 2px; filter: drop-shadow(0px 0px 4px rgba(254, 187, 76, 0.6));",
+    },
+    // References -> settings
+    {
+      id: "e-refs-settings",
+      source: "n-refs",
+      target: "n-settings",
+      type: "smoothstep",
+      animated: true,
+      style:
+        "stroke: #38bdf8; stroke-width: 2px; filter: drop-shadow(0px 0px 4px rgba(56, 189, 248, 0.6));",
+    },
+    // Settings -> models
+    {
+      id: "e-settings-models",
+      source: "n-settings",
+      target: "n-models",
+      type: "straight",
+      style: "stroke: #a1a1aa; stroke-width: 1.5px; stroke-dasharray: 5 5;",
+    },
+  ]);
+</script>
+
+<div class="h-full w-full bg-background text-foreground">
+  <SvelteFlow
+    {nodes}
+    {edges}
+    {nodeTypes}
+    initialViewport={{ x: 280, y: 120, zoom: 0.35 }}
+    minZoom={0.2}
+    maxZoom={4}
+    class="bg-transparent node-canvas-flow transition-colors"
+    colorMode={$mode === "dark" ? "dark" : "light"}
+  >
+    <Background gap={28} size={1} />
+  </SvelteFlow>
+</div>
+
+<style>
+  :global(.node-canvas-flow .svelte-flow__edge-path) {
+    transition:
+      stroke-width 0.2s ease,
+      filter 0.2s ease;
+  }
+
+  :global(.node-canvas-flow .svelte-flow__edge-path:hover) {
+    stroke-width: 3px !important;
+    filter: brightness(1.5) drop-shadow(0px 0px 6px currentColor) !important;
+  }
+
+  :global(.node-canvas-flow .svelte-flow__panel.svelte-flow__attribution) {
+    display: none !important;
+  }
+</style>

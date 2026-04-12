@@ -22,6 +22,17 @@ const grammer: LexerGrammer[] = [
   checkGrammer,
 ];
 
+export class LexerError extends Error {
+  constructor(
+    message: string,
+    public readonly line: number,
+    public readonly column: number
+  ) {
+    super(`[LexerError at ${line}:${column}] ${message}`);
+    this.name = "LexerError";
+  }
+}
+
 export class LexerEngine {
   private input: string;
   private tokens: Token[] = [];
@@ -86,7 +97,7 @@ export class LexerEngine {
       return true;
     } else {
       if (grammar.isOptional === false) {
-        throw new Error("Invalid grammar");
+        throw new LexerError("Invalid syntax or grammar at current line", this.lineIndex, this.columnIndex);
       }
     }
     return false;

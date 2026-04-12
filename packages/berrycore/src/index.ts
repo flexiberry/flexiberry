@@ -1,5 +1,6 @@
-import { AstEngine } from "./parser/ast/ast.engine";
-import { LexerEngine } from "./parser/tokenizer/reader/lexer.engine";
+import { AstEngine, ParserError } from "./parser/ast/ast.engine";
+import { LexerEngine, LexerError } from "./parser/tokenizer/reader/lexer.engine";
+import { BerryFormatter } from "./parser/formatter/formatter";
 import { Interpreter } from "./interpreter/interpreter";
 import { CliAdapter } from "./adapter/cli-adapter";
 import { FormatUtil } from "./script/format-util";
@@ -25,7 +26,10 @@ export {
 
   // ── Low-level building blocks (advanced consumers) ───────────────────
   AstEngine,
+  ParserError,
   LexerEngine,
+  LexerError,
+  BerryFormatter,
   Interpreter,
   CliAdapter,
   FormatUtil,
