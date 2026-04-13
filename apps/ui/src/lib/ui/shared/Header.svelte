@@ -90,13 +90,13 @@
         />
         <span class="sr-only">Toggle theme</span>
       </Button>
-      <Button
+      <!-- <Button
         variant="secondary"
         class="h-9 px-3 rounded-lg text-foreground hover:bg-secondary/80 flex items-center gap-1.5 shadow-sm"
       >
         <Plus class="w-[16px] h-[16px]" strokeWidth={2} />
         <span class="text-xs font-medium tracking-wide">New Project</span>
-      </Button>
+      </Button> -->
     </div>
   </div>
 
