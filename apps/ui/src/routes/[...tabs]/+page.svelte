@@ -6,16 +6,7 @@
   import { ScrollArea } from "$lib/components/ui/scroll-area";
   import BerryEditor from "$lib/components/editor/BerryEditor.svelte";
   import NodeCanvas from "$lib/components/canvas/NodeCanvas.svelte";
-  import {
-    Search,
-    FileText,
-    Database,
-    Code,
-    Filter,
-    BoxSelect,
-    TableProperties,
-    CalendarDays,
-  } from "lucide-svelte";
+  import ApiAssistant from "$lib/components/editor/ApiAssistant.svelte";
   import Header from "../../lib/ui/shared/Header.svelte";
 
   import { page } from "$app/stores";
@@ -97,51 +88,7 @@
           <Resizable.Pane defaultSize={35}>
             <Resizable.PaneGroup direction="horizontal" class="gap-1 h-full">
               <!-- Bottom Left: Code Editor -->
-              <Resizable.Pane
-                defaultSize={40}
-                class="pointer-events-auto shadow-sm rounded-xl overflow-hidden border bg-card/95 backdrop-blur text-card-foreground flex flex-col relative z-20"
-              >
-                <div
-                  class="flex items-center justify-between p-3 border-b border-border/50 bg-muted/20"
-                >
-                  <div class="flex items-center gap-3">
-                    <span class="text-xs font-semibold">Code</span>
-                    {#if currentFile}
-                      <span class="text-[10px] text-muted-foreground bg-primary/10 px-2 py-0.5 rounded-full font-mono">{currentFile}</span>
-                    {/if}
-                  </div>
-                  <div class="flex items-center gap-2">
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      class="text-[10px] uppercase font-bold tracking-wider h-6 px-3 text-muted-foreground hover:text-foreground"
-                      on:click={() => {
-                        if (currentFile) {
-                          const blob = new Blob([$berryCode], { type: "text/plain" });
-                          saveFile(currentFile, blob);
-                          toast.success("File Saved");
-                        }
-                      }}
-                      >Save</Button
-                    >
-                    <Button
-                      variant="secondary"
-                      size="sm"
-                      class="text-[10px] uppercase font-bold tracking-wider h-6 px-4"
-                      >Run</Button
-                    >
-                  </div>
-                </div>
-                <div class="flex-1 relative">
-                  <BerryEditor />
-                </div>
-              </Resizable.Pane>
 
-              <Resizable.Handle
-                class="bg-transparent hover:bg-primary/50 active:bg-primary/50 hover:shadow-[0_0_5px_hsl(var(--primary))] active:shadow-[0_0_5px_hsl(var(--primary))] transition-all duration-300 ease-out w-0.5 h-full pointer-events-auto relative z-10 cursor-col-resize"
-              />
-
-              <!-- Bottom Right: Debug Console -->
               <Resizable.Pane
                 defaultSize={60}
                 class="pointer-events-auto rounded-xl overflow-hidden border bg-card/95 backdrop-blur text-card-foreground shadow-sm flex flex-col relative z-20"
@@ -201,6 +148,54 @@
                   </div>
                 </ScrollArea>
               </Resizable.Pane>
+              <Resizable.Handle
+                class="bg-transparent hover:bg-primary/50 active:bg-primary/50 hover:shadow-[0_0_5px_hsl(var(--primary))] active:shadow-[0_0_5px_hsl(var(--primary))] transition-all duration-300 ease-out w-0.5 h-full pointer-events-auto relative z-10 cursor-col-resize"
+              />
+
+              <!-- Bottom Right: Debug Console -->
+              <Resizable.Pane
+                defaultSize={40}
+                class="pointer-events-auto shadow-sm rounded-xl overflow-hidden border bg-card/95 backdrop-blur text-card-foreground flex flex-col relative z-20"
+              >
+                <div
+                  class="flex items-center justify-between p-3 border-b border-border/50 bg-muted/20"
+                >
+                  <div class="flex items-center gap-3">
+                    <span class="text-xs font-semibold">Code</span>
+                    {#if currentFile}
+                      <span
+                        class="text-[10px] text-muted-foreground bg-primary/10 px-2 py-0.5 rounded-full font-mono"
+                        >{currentFile}</span
+                      >
+                    {/if}
+                  </div>
+                  <div class="flex items-center gap-2">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      class="text-[10px] uppercase font-bold tracking-wider h-6 px-3 text-muted-foreground hover:text-foreground"
+                      on:click={() => {
+                        if (currentFile) {
+                          const blob = new Blob([$berryCode], {
+                            type: "text/plain",
+                          });
+                          saveFile(currentFile, blob);
+                          toast.success("File Saved");
+                        }
+                      }}>Save</Button
+                    >
+                    <Button
+                      variant="secondary"
+                      size="sm"
+                      class="text-[10px] uppercase font-bold tracking-wider h-6 px-4"
+                      >Run</Button
+                    >
+                  </div>
+                </div>
+                <div class="flex-1 relative">
+                  <BerryEditor />
+                </div>
+              </Resizable.Pane>
             </Resizable.PaneGroup>
           </Resizable.Pane>
         </Resizable.PaneGroup>
@@ -215,130 +210,8 @@
         defaultSize={25}
         class="pointer-events-auto gap-1 rounded-xl border border-border bg-card/95 backdrop-blur text-card-foreground shadow-sm overflow-hidden flex flex-col relative z-20"
       >
-        <ScrollArea class="h-full p-4 w-full">
-          <!-- Search Bar -->
-          <div class="relative mb-6">
-            <Search
-              class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground"
-            />
-            <Input
-              placeholder="Items search"
-              class="pl-10 text-sm bg-muted/50 border-input"
-            />
-          </div>
-
-          <!-- Categories -->
-          <div class="space-y-6">
-            <!-- Inputs -->
-            <div>
-              <h4
-                class="text-[11px] font-medium text-muted-foreground mb-3 px-1 uppercase"
-              >
-                Inputs
-              </h4>
-              <div class="space-y-1.5 flex flex-col">
-                <Button
-                  variant="outline"
-                  class="w-full justify-start gap-3 h-10 px-3 hover:bg-muted/50 border-transparent bg-muted/20"
-                >
-                  <FileText class="w-4 h-4 text-muted-foreground" />
-                  <span class="text-sm font-normal">File</span>
-                </Button>
-                <Button
-                  variant="outline"
-                  class="w-full justify-start gap-3 h-10 px-3 hover:bg-muted/50 border-transparent bg-muted/20"
-                >
-                  <span
-                    class="font-serif text-lg leading-none text-muted-foreground w-4 text-center"
-                    >T</span
-                  >
-                  <span class="text-sm font-normal">Text content</span>
-                </Button>
-                <Button
-                  variant="outline"
-                  class="w-full justify-start gap-3 h-10 px-3 hover:bg-muted/50 border-transparent bg-muted/20"
-                >
-                  <TableProperties class="w-4 h-4 text-muted-foreground" />
-                  <span class="text-sm font-normal">Sheets</span>
-                </Button>
-                <Button
-                  variant="outline"
-                  class="w-full justify-start gap-3 h-10 px-3 hover:bg-muted/50 border-transparent bg-muted/20"
-                >
-                  <CalendarDays class="w-4 h-4 text-muted-foreground" />
-                  <span class="text-sm font-normal">Example data</span>
-                </Button>
-              </div>
-            </div>
-
-            <!-- Transform -->
-            <div>
-              <h4
-                class="text-[11px] font-medium text-muted-foreground mb-3 px-1 uppercase"
-              >
-                Transform
-              </h4>
-              <div class="space-y-1.5 flex flex-col">
-                <Button
-                  variant="outline"
-                  class="w-full justify-start gap-3 h-10 px-3 hover:bg-muted/50 border-transparent bg-muted/20"
-                >
-                  <Filter class="w-4 h-4 text-muted-foreground" />
-                  <span class="text-sm font-normal">Filter</span>
-                </Button>
-                <Button
-                  variant="outline"
-                  class="w-full justify-start gap-3 h-10 px-3 hover:bg-muted/50 border-transparent bg-muted/20"
-                >
-                  <div
-                    class="relative w-4 h-4 flex items-center justify-center text-muted-foreground"
-                  >
-                    <span
-                      class="absolute w-2 h-2 border border-current rounded-full left-0 top-1"
-                    ></span>
-                    <span
-                      class="absolute w-2 h-2 border border-current rounded-full right-0 top-1"
-                    ></span>
-                    <span class="absolute w-4 h-px bg-current top-[7px]"></span>
-                  </div>
-                  <span class="text-sm font-normal">Merge</span>
-                </Button>
-                <Button
-                  variant="outline"
-                  class="w-full justify-start gap-3 h-10 px-3 hover:bg-muted/50 border-transparent bg-muted/20"
-                >
-                  <BoxSelect class="w-4 h-4 text-muted-foreground" />
-                  <span class="text-sm font-normal">Group</span>
-                </Button>
-                <Button
-                  variant="outline"
-                  class="w-full justify-start gap-3 h-10 px-3 hover:bg-muted/50 border-transparent bg-muted/20"
-                >
-                  <Code class="w-4 h-4 text-muted-foreground" />
-                  <span class="text-sm font-normal">Javascript</span>
-                </Button>
-              </div>
-            </div>
-
-            <!-- Database -->
-            <div>
-              <h4
-                class="text-[11px] font-medium text-muted-foreground mb-3 px-1 uppercase"
-              >
-                Database
-              </h4>
-              <div class="space-y-1.5 flex flex-col">
-                <Button
-                  variant="outline"
-                  class="w-full justify-start gap-3 h-10 px-3 hover:bg-muted/50 border-transparent bg-muted/20"
-                >
-                  <Database class="w-4 h-4 text-muted-foreground" />
-                  <span class="text-sm font-normal">Custom data</span>
-                </Button>
-              </div>
-            </div>
-          </div>
-        </ScrollArea>
+        <!-- Api Assistant Conversational UI -->
+        <ApiAssistant />
       </Resizable.Pane>
     </Resizable.PaneGroup>
   </div>

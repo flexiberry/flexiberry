@@ -8,12 +8,14 @@
   import ReferenceNode from "./nodes/ReferenceNode.svelte";
   import SettingsNode from "./nodes/SettingsNode.svelte";
   import ModelNode from "./nodes/ModelNode.svelte";
+  import ApiNode from "./nodes/ApiNode.svelte";
 
   const nodeTypes: any = {
     ideas: IdeaNode,
     references: ReferenceNode,
     settings: SettingsNode,
     models: ModelNode,
+    api: ApiNode,
   };
 
   const nodes = writable([
@@ -40,6 +42,17 @@
       type: "models",
       data: {},
       position: { x: 480, y: 460 },
+    },
+    {
+      id: "n-api",
+      type: "api",
+      data: {
+        title: "User Auth Endpoint",
+        method: "POST",
+        url: "https://api.flexiberry.com/v1/auth",
+        inputRaw: "curl -X POST https://api.flexiberry.com/v1/auth"
+      },
+      position: { x: 880, y: 100 },
     },
   ]);
 
@@ -71,6 +84,15 @@
       target: "n-models",
       type: "straight",
       style: "stroke: #a1a1aa; stroke-width: 1.5px; stroke-dasharray: 5 5;",
+    },
+    // Settings -> Api
+    {
+      id: "e-settings-api",
+      source: "n-settings",
+      target: "n-api",
+      type: "smoothstep",
+      animated: true,
+      style: "stroke: #10b981; stroke-width: 2px;",
     },
   ]);
 </script>
