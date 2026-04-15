@@ -1,48 +1,34 @@
 <script lang="ts">
-  import { SvelteFlow, Background, BackgroundVariant } from "@xyflow/svelte";
+  import {
+    SvelteFlow,
+    Background,
+    BackgroundVariant,
+    SelectionMode,
+    Controls,
+  } from "@xyflow/svelte";
   import { writable } from "svelte/store";
   import { mode } from "mode-watcher";
   import "@xyflow/svelte/dist/style.css";
 
-  import IdeaNode from "./nodes/IdeaNode.svelte";
-  import ReferenceNode from "./nodes/ReferenceNode.svelte";
-  import SettingsNode from "./nodes/SettingsNode.svelte";
-  import ModelNode from "./nodes/ModelNode.svelte";
   import ApiNode from "./nodes/ApiNode.svelte";
+  import VarNode from "./nodes/VarNode.svelte";
+  import TaskNode from "./nodes/TaskNode.svelte";
+  import StepNode from "./nodes/StepNode.svelte";
+  import ParamsNode from "./nodes/ParamsNode.svelte";
+  import CaptureNode from "./nodes/CaptureNode.svelte";
+  import CheckNode from "./nodes/CheckNode.svelte";
 
   const nodeTypes: any = {
-    ideas: IdeaNode,
-    references: ReferenceNode,
-    settings: SettingsNode,
-    models: ModelNode,
     api: ApiNode,
+    var: VarNode,
+    task: TaskNode,
+    step: StepNode,
+    params: ParamsNode,
+    capture: CaptureNode,
+    check: CheckNode,
   };
 
   const nodes = writable([
-    {
-      id: "n-ideas",
-      type: "ideas",
-      data: {},
-      position: { x: 50, y: 50 },
-    },
-    {
-      id: "n-refs",
-      type: "references",
-      data: {},
-      position: { x: 30, y: 320 },
-    },
-    {
-      id: "n-settings",
-      type: "settings",
-      data: {},
-      position: { x: 480, y: 50 },
-    },
-    {
-      id: "n-models",
-      type: "models",
-      data: {},
-      position: { x: 480, y: 460 },
-    },
     {
       id: "n-api",
       type: "api",
@@ -50,50 +36,104 @@
         title: "User Auth Endpoint",
         method: "POST",
         url: "https://api.flexiberry.com/v1/auth",
-        inputRaw: "curl -X POST https://api.flexiberry.com/v1/auth"
+        inputRaw: "curl -X POST https://api.flexiberry.com/v1/auth",
       },
       position: { x: 880, y: 100 },
+    },
+    {
+      id: "n-var",
+      type: "var",
+      data: {
+        env: "@UAT",
+        variables: [
+          { key: "baseUrl", value: "https://api.petstore.com" },
+          { key: "apiKey", value: "sk_test_123" },
+        ],
+      },
+      position: { x: 30, y: 550 },
+    },
+    {
+      id: "n-task",
+      type: "task",
+      data: {
+        title: "Add & Verify Pet",
+        description: "Verify that a pet can be added and then retrieved correctly."
+      },
+      position: { x: 100, y: 100 },
+      width: 1000,
+      height: 1200,
+    },
+    // Step 1 Cluster (Stuck to Task side)
+    {
+      id: "n-step-1",
+      type: "step",
+      parentId: "n-task",
+      data: { stepIndex: 1, description: "Post new pet", apiId: "addPet" },
+      position: { x: 320, y: 0 },
+      extent: "parent",
+    },
+    {
+      id: "n-step-1-params",
+      type: "params",
+      parentId: "n-task",
+      data: { params: [{ key: "name", value: "doggie", type: "literal" }] },
+      position: { x: 320, y: 250 },
+      extent: "parent",
+    },
+    {
+      id: "n-step-1-capture",
+      type: "capture",
+      parentId: "n-task",
+      data: { capture: [{ key: "petId", value: "response.id" }] },
+      position: { x: 320, y: 500 },
+      extent: "parent",
+    },
+    {
+      id: "n-step-1-check",
+      type: "check",
+      parentId: "n-task",
+      data: { checks: [{ left: "$.status", op: "==", right: "201" }] },
+      position: { x: 320, y: 800 },
+      extent: "parent",
+    },
+
+    // Step 2 Cluster (Stuck to Step 1 side)
+    {
+      id: "n-step-2",
+      type: "step",
+      parentId: "n-task",
+      data: { stepIndex: 2, description: "Get pet by ID", apiId: "getPet" },
+      position: { x: 640, y: 0 },
+      extent: "parent",
+    },
+    {
+      id: "n-step-2-params",
+      type: "params",
+      parentId: "n-task",
+      data: {
+        params: [{ key: "id", value: "Step.1.petId", type: "reference" }],
+      },
+      position: { x: 640, y: 250 },
+      extent: "parent",
+    },
+    {
+      id: "n-step-2-check",
+      type: "check",
+      parentId: "n-task",
+      data: {
+        checks: [
+          { left: "$.status", op: "==", right: "200" },
+          { left: "$.body.id", op: "==", right: "Step.1.petId" },
+        ],
+      },
+      position: { x: 640, y: 500 },
+      extent: "parent",
     },
   ]);
 
   const edges = writable([
-    // Smooth bezier curve for ideas -> settings
-    {
-      id: "e-ideas-settings",
-      source: "n-ideas",
-      target: "n-settings",
-      type: "smoothstep",
-      animated: true,
-      style:
-        "stroke: #febb4c; stroke-width: 2px; filter: drop-shadow(0px 0px 4px rgba(254, 187, 76, 0.6));",
-    },
-    // References -> settings
-    {
-      id: "e-refs-settings",
-      source: "n-refs",
-      target: "n-settings",
-      type: "smoothstep",
-      animated: true,
-      style:
-        "stroke: #38bdf8; stroke-width: 2px; filter: drop-shadow(0px 0px 4px rgba(56, 189, 248, 0.6));",
-    },
-    // Settings -> models
-    {
-      id: "e-settings-models",
-      source: "n-settings",
-      target: "n-models",
-      type: "straight",
-      style: "stroke: #a1a1aa; stroke-width: 1.5px; stroke-dasharray: 5 5;",
-    },
-    // Settings -> Api
-    {
-      id: "e-settings-api",
-      source: "n-settings",
-      target: "n-api",
-      type: "smoothstep",
-      animated: true,
-      style: "stroke: #10b981; stroke-width: 2px;",
-    },
+    // No visual edges needed for "Sticky" architecture
+    // Logic handles in code can remain invisible
   ]);
 </script>
 
@@ -122,6 +162,9 @@
     maxZoom={4}
     class="bg-transparent node-canvas-flow transition-colors relative z-10"
     colorMode={$mode === "dark" ? "dark" : "light"}
+    panOnDrag={true}
+    selectionOnDrag={true}
+    selectionMode={SelectionMode.Full}
   >
     <Background
       variant={BackgroundVariant.Dots}
@@ -129,6 +172,7 @@
       patternColor="hsl(var(--muted-foreground) / 0.2)"
       bgColor="transparent"
     />
+    <Controls />
   </SvelteFlow>
 </div>
 
