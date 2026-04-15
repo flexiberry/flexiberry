@@ -1,0 +1,68 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  @layer base {
+    :root {
+      --background: 210 20% 90%;
+      --foreground: 222.2 47.4% 11.2%;
+      --card: 0 0% 97%;
+      --card-foreground: 222.2 47.4% 11.2%;
+      --popover: 0 0% 97%;
+      --popover-foreground: 222.2 47.4% 11.2%;
+      --primary: 158 64% 45%;
+      --primary-foreground: 0 0% 100%;
+      --secondary: 210 40% 91%;
+      --secondary-foreground: 222.2 47.4% 11.2%;
+      --muted: 210 40% 91%;
+      --muted-foreground: 215.4 16.3% 40%;
+      --accent: 210 40% 91%;
+      --accent-foreground: 222.2 47.4% 11.2%;
+      --destructive: 0 84.2% 60.2%;
+      --destructive-foreground: 210 40% 98%;
+      --border: 214.3 31.8% 86%;
+      --input: 214.3 31.8% 86%;
+      --ring: 158 64% 45%;
+      --radius: 0.5rem;
+    }
+
+    .dark {
+      --background: 224 71% 4%;
+      --foreground: 210 40% 98%;
+      --card: 216 28% 7%;
+      --card-foreground: 210 40% 98%;
+      --popover: 216 28% 7%;
+      --popover-foreground: 210 40% 98%;
+      --primary: 158 64% 52%;
+      --primary-foreground: 222.2 47.4% 11.2%;
+      --secondary: 217.2 32.6% 17.5%;
+      --secondary-foreground: 210 40% 98%;
+      --muted: 217.2 32.6% 17.5%;
+      --muted-foreground: 215 20.2% 65.1%;
+      --accent: 217.2 32.6% 17.5%;
+      --accent-foreground: 210 40% 98%;
+      --destructive: 0 62.8% 30.6%;
+      --destructive-foreground: 210 40% 98%;
+      --border: 217.2 32.6% 17.5%;
+      --input: 217.2 32.6% 17.5%;
+      --ring: 158 64% 52%;
+      --radius: 0.5rem;
+    }
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}
+
+.customTag {
+  color: blue; /* Change the color to your desired style */
+  font-weight: bold; /* Make the text bold */
+  /* Add any other styles you want */
+}
