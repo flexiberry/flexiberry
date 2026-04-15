@@ -3,6 +3,8 @@
   import { FileText, Pencil, Trash2 } from "lucide-svelte";
   import { Button } from "$lib/components/ui/button";
   import { goto } from "$app/navigation";
+  import { activeWorkspaceId } from "$lib/writable/workspace.store";
+  import { buildFilePath } from "$lib/writable/File";
 
   export let files: any[];
   export let searchQuery: string;
@@ -25,7 +27,7 @@
   }
 
   function saveFileName(file: any) {
-    dispatch("saveFileName", { file });
+    dispatch("saveFileName", { file, $activeWorkspaceId });
   }
 </script>
 
@@ -74,7 +76,9 @@
           .toLowerCase()
           .includes(searchQuery.toLowerCase())) as file}
         <button
-          on:click={() => goto(`/${file.id}`)}
+          on:click={() =>
+            goto(buildFilePath($activeWorkspaceId, file.name, file.folderId ?? currentFolderId))
+          }
           class="w-full text-left grid grid-cols-[1fr_120px] sm:grid-cols-[1fr_200px_150px_60px] gap-4 p-3.5 px-6 items-center hover:bg-muted/40 transition-colors cursor-pointer group"
         >
           <div class="flex items-center gap-3 overflow-hidden">

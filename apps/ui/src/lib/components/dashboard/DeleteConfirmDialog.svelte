@@ -27,27 +27,17 @@
 <AlertDialog.Root bind:open>
   <AlertDialog.Portal>
     <!-- <AlertDialog.Overlay /> -->
-    <AlertDialog.Content class="rounded-md">
+    <AlertDialog.Content>
       <AlertDialog.Header>
-        <!-- Icon + Title row -->
-        <div class="flex items-center gap-2 mb-1">
-          <div
-            class="flex items-center justify-center w-10 h-10 rounded-full bg-destructive/10 shrink-0"
-          >
-            <Trash2 class="w-5 h-5 text-destructive" />
-          </div>
-          <AlertDialog.Title class="text-base font-semibold leading-tight">
-            Delete {itemType === "file"
-              ? "File"
-              : itemType === "folder"
-                ? "Folder"
-                : "Workspace"}?
-          </AlertDialog.Title>
-        </div>
+        <AlertDialog.Title>
+          Delete {itemType === "file"
+            ? "File"
+            : itemType === "folder"
+              ? "Folder"
+              : "Workspace"}?
+        </AlertDialog.Title>
 
-        <AlertDialog.Description
-          class="text-sm text-muted-foreground leading-relaxed"
-        >
+        <AlertDialog.Description>
           {#if itemType === "workspace"}
             <strong class="text-foreground font-medium">"{itemName}"</strong> will
             be removed. Files and folders inside it will remain in the database but
@@ -59,7 +49,7 @@
         </AlertDialog.Description>
       </AlertDialog.Header>
 
-      <AlertDialog.Footer class="mt-2 gap-1">
+      <AlertDialog.Footer>
         <AlertDialog.Cancel asChild>
           <Button
             variant="outline"
