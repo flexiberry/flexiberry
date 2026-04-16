@@ -14,4 +14,10 @@ export default defineConfig({
   define: {
     APP_VERSION: JSON.stringify(pkg.version),
   },
+  server: {
+    fs: {
+      // Allow serving files from one level up (the workspace root)
+      allow: ["../.."],
+    },
+  },
 });

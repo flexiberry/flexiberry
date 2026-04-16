@@ -1,4 +1,4 @@
-import { AstEngine, ParserError } from "./parser/ast/ast.engine";
+import { AstEngine, Ast, ParserError } from "./parser/ast/ast.engine";
 import { LexerEngine, LexerError } from "./parser/tokenizer/reader/lexer.engine";
 import { BerryFormatter } from "./parser/formatter/formatter";
 import { Interpreter } from "./interpreter/interpreter";
@@ -18,6 +18,7 @@ import {
   ExecutionStatus,
 } from "./interpreter/interpreter.types";
 import { type BerryCoreOptions } from "./berry-core";
+import { NodeType, type BaseNode, type TaskBlockNode, type StepBlockNode, type ParamsBlockNode, type CaptureBlockNode, type CheckBlockNode, type KeyValuePairNode, type ConditionNode, ProgramNode } from "./parser/ast/ast.types";
 
 export {
   // ── High-level facade (recommended entry-point) ──────────────────────
@@ -26,6 +27,7 @@ export {
 
   // ── Low-level building blocks (advanced consumers) ───────────────────
   AstEngine,
+  Ast,
   ParserError,
   LexerEngine,
   LexerError,
@@ -41,8 +43,18 @@ export {
   ExecutionCommand,
   ExecutionState,
   ExecutionStatus,
+  NodeType,
   type IOAdapter,
   type CompletedPayload,
   type TaskResult,
   type StepResult,
+  type BaseNode,
+  type TaskBlockNode,
+  type StepBlockNode,
+  type ParamsBlockNode,
+  type CaptureBlockNode,
+  type CheckBlockNode,
+  type KeyValuePairNode,
+  type ConditionNode,
+  type ProgramNode
 };

@@ -5,6 +5,7 @@
     BackgroundVariant,
     SelectionMode,
     Controls,
+    type Node,
   } from "@xyflow/svelte";
   import { writable } from "svelte/store";
   import { mode } from "mode-watcher";
@@ -28,7 +29,7 @@
     check: CheckNode,
   };
 
-  const nodes = writable([
+  const nodes = writable<Node[]>([
     {
       id: "n-api",
       type: "api",

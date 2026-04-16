@@ -7,8 +7,8 @@
     "resolveJsonModule": true,
     "declaration": true,
     "declarationMap": true,
-    "module": "CommonJS",
-    "moduleResolution": "Node",
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
     "target": "ESNext"
   },
   "include": ["src"],

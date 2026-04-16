@@ -7,6 +7,7 @@
   import DebugConsole from "$lib/components/ide/DebugConsole.svelte";
   import BerryCodePanel from "$lib/components/ide/BerryCodePanel.svelte";
   import type { FileContext } from "$lib/writable/File";
+  import SequenceCanvas from "../canvas/SequenceCanvas.svelte";
 
   // ─── Props ────────────────────────────────────────────────────────
   /** Full file location parsed from the URL. */
@@ -35,52 +36,53 @@
   │  DebugConsole │ Code │      │            │
   └───────────────┴──────┴──────┘
 -->
-<div class="h-full w-full bg-background text-foreground overflow-hidden font-sans relative">
+<div
+  class="h-full w-full bg-background text-foreground overflow-hidden font-sans relative"
+>
   <!-- Full-screen canvas sits beneath the UI overlay -->
   <div class="absolute inset-0 z-0">
-    <NodeCanvas />
+    <!-- <NodeCanvas /> -->
+    <SequenceCanvas {ctx} />
   </div>
 
   <!-- Pointer-events disabled overlay so the canvas stays interactive -->
   <div class="absolute inset-0 z-10 p-2 pointer-events-none flex flex-col">
     <Resizable.PaneGroup direction="horizontal" class="h-full w-full gap-1">
-
       <!-- ── LEFT + CENTER (75 %) ───────────────────────────────── -->
       <Resizable.Pane defaultSize={75} class="flex flex-col gap-1">
-
         <!-- Top bar -->
         <div class="pointer-events-auto shrink-0 relative z-20">
           <Header />
         </div>
 
         <Resizable.PaneGroup direction="vertical" class="gap-1">
-
           <!-- ── TOP: transparent canvas interaction area ── -->
           <Resizable.Pane defaultSize={65} class="relative">
             <CanvasToolbar />
           </Resizable.Pane>
 
-          <Resizable.Handle class="{handleBase} w-full h-0.5 cursor-row-resize" />
+          <Resizable.Handle
+            class="{handleBase} w-full h-0.5 cursor-row-resize"
+          />
 
           <!-- ── BOTTOM: debug + code editor ── -->
           <Resizable.Pane defaultSize={35}>
             <Resizable.PaneGroup direction="horizontal" class="gap-1 h-full">
-
               <!-- Debug Console (60 %) -->
               <Resizable.Pane defaultSize={60}>
                 <DebugConsole />
               </Resizable.Pane>
 
-              <Resizable.Handle class="{handleBase} w-0.5 h-full cursor-col-resize" />
+              <Resizable.Handle
+                class="{handleBase} w-0.5 h-full cursor-col-resize"
+              />
 
               <!-- Code Editor (40 %) -->
               <Resizable.Pane defaultSize={40}>
                 <BerryCodePanel {ctx} />
               </Resizable.Pane>
-
             </Resizable.PaneGroup>
           </Resizable.Pane>
-
         </Resizable.PaneGroup>
       </Resizable.Pane>
 
@@ -93,7 +95,6 @@
       >
         <ApiAssistant />
       </Resizable.Pane>
-
     </Resizable.PaneGroup>
   </div>
 </div>

@@ -10,6 +10,7 @@
  *   - Throws syntax errors with line/column info
  */
 
+import { LexerEngine } from "../tokenizer/reader/lexer.engine";
 import { Token } from "../tokenizer/token";
 import { TokenType } from "../tokenizer/tokenType";
 import {
@@ -37,7 +38,7 @@ import {
 // ─── Parser Errors ──────────────────────────────────────────────────────────
 
 export class ParserError extends Error {
-  constructor(
+  constructor (
     message: string,
     public readonly line: number,
     public readonly column: number
@@ -47,13 +48,25 @@ export class ParserError extends Error {
   }
 }
 
+
+export class Ast {
+
+  static parse(code: string): ProgramNode {
+    const lexer = new LexerEngine(code);
+    const tokens = lexer.tokenize();
+    const engine = new AstEngine(tokens);
+    return engine.build();
+  }
+
+}
+
 // ─── Parser Engine ──────────────────────────────────────────────────────────
 
 export class AstEngine {
   private readonly tokens: readonly Token[];
   private cursor: number = 0;
 
-  constructor(tokens: Token[]) {
+  constructor (tokens: Token[]) {
     this.tokens = tokens;
   }
 
