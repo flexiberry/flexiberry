@@ -57,7 +57,8 @@
       type: "task",
       data: {
         title: "Add & Verify Pet",
-        description: "Verify that a pet can be added and then retrieved correctly."
+        description:
+          "Verify that a pet can be added and then retrieved correctly.",
       },
       position: { x: 100, y: 100 },
       width: 1000,

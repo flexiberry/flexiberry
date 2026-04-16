@@ -6,7 +6,7 @@
 
   export let data: any = {
     title: "Test User Lifecycle",
-    description: "Complete flow for user creation and login"
+    description: "Complete flow for user creation and login",
   };
 
   let isEditingTitle = false;
@@ -20,8 +20,12 @@
   class="w-[320px] bg-[#1a1b1e]/95 backdrop-blur-xl rounded-l-3xl border border-white/10 shadow-2xl overflow-hidden font-sans flex flex-col relative transition-all duration-300 group hover:border-emerald-500/30 task-train-head"
 >
   <!-- Header Section -->
-  <div class="px-6 py-5 flex items-center gap-4 text-white bg-emerald-500/10 border-b border-white/5 relative z-10">
-    <div class="w-12 h-12 rounded-2xl bg-emerald-500/20 flex items-center justify-center border border-emerald-500/30 shadow-[0_0_20px_rgba(16,185,129,0.3)]">
+  <div
+    class="px-6 py-5 flex items-center gap-4 text-white bg-emerald-500/10 border-b border-white/5 relative z-10"
+  >
+    <div
+      class="w-12 h-12 rounded-2xl bg-emerald-500/20 flex items-center justify-center border border-emerald-500/30 shadow-[0_0_20px_rgba(16,185,129,0.3)]"
+    >
       <Play class="w-6 h-6 text-emerald-400 fill-emerald-400" />
     </div>
 
@@ -39,10 +43,14 @@
           on:click={editTitle}
           class="group/btn flex items-center gap-2 text-left px-1 py-0.5 rounded hover:bg-white/5 transition-colors w-full"
         >
-          <span class="text-[16px] font-black text-gray-100 truncate tracking-tight uppercase tracking-[0.1em]">
+          <span
+            class="text-[16px] font-black text-gray-100 truncate tracking-tight uppercase tracking-[0.1em]"
+          >
             {data.title || "Untitled Task"}
           </span>
-          <Pencil class="w-3.5 h-3.5 text-muted-foreground opacity-0 group-hover/btn:opacity-100 transition-opacity shrink-0" />
+          <Pencil
+            class="w-3.5 h-3.5 text-muted-foreground opacity-0 group-hover/btn:opacity-100 transition-opacity shrink-0"
+          />
         </button>
       {/if}
     </div>
@@ -52,9 +60,12 @@
   <div class="p-6 flex flex-col gap-3 bg-black/20 flex-1">
     <div class="flex items-center gap-2">
       <ClipboardList class="w-4 h-4 text-emerald-400/50" />
-      <span class="text-[10px] font-black tracking-[0.3em] text-[#a1a1aa] uppercase">Initial Context</span>
+      <span
+        class="text-[10px] font-black tracking-[0.3em] text-[#a1a1aa] uppercase"
+        >Initial Context</span
+      >
     </div>
-    
+
     <textarea
       bind:value={data.description}
       placeholder="Describe the start state..."
@@ -63,10 +74,15 @@
   </div>
 
   <!-- Footer Info -->
-  <div class="px-6 py-4 bg-emerald-500/5 border-t border-white/5 flex items-center justify-between">
+  <div
+    class="px-6 py-4 bg-emerald-500/5 border-t border-white/5 flex items-center justify-between"
+  >
     <div class="flex flex-col gap-0.5">
-        <span class="text-[9px] font-black text-emerald-400 uppercase tracking-widest">Protocol</span>
-        <span class="text-[11px] font-mono text-gray-500">INIT_BLOCK_01</span>
+      <span
+        class="text-[9px] font-black text-emerald-400 uppercase tracking-widest"
+        >Protocol</span
+      >
+      <span class="text-[11px] font-mono text-gray-500">INIT_BLOCK_01</span>
     </div>
     <div class="w-2 h-2 rounded-full bg-emerald-500/40 animate-pulse"></div>
   </div>
@@ -76,7 +92,9 @@
   <Handle type="source" position={Position.Right} class="invisible" />
 
   <!-- The "Train Connector" Shadow -->
-  <div class="absolute inset-y-0 right-0 w-[1px] bg-white/10 shadow-[2px_0_10px_rgba(0,0,0,0.5)] z-30"></div>
+  <div
+    class="absolute inset-y-0 right-0 w-[1px] bg-white/10 shadow-[2px_0_10px_rgba(0,0,0,0.5)] z-30"
+  ></div>
 </div>
 
 <style>
