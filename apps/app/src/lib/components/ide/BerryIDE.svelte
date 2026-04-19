@@ -4,7 +4,8 @@
   import ApiAssistant from "$lib/components/editor/ApiAssistant.svelte";
   import Header from "$lib/ui/shared/Header.svelte";
   import CanvasToolbar from "$lib/components/ide/CanvasToolbar.svelte";
-  import DebugConsole from "$lib/components/ide/DebugConsole.svelte";
+  import ApiStack from "$lib/components/ide/ApiStack.svelte";
+  import VarStack from "$lib/components/ide/VarStack.svelte";
   import BerryCodePanel from "$lib/components/ide/BerryCodePanel.svelte";
   import type { FileContext } from "$lib/writable/File";
   import SequenceCanvas from "../canvas/SequenceCanvas.svelte";
@@ -68,18 +69,18 @@
           <!-- ── BOTTOM: debug + code editor ── -->
           <Resizable.Pane defaultSize={35}>
             <Resizable.PaneGroup direction="horizontal" class="gap-1 h-full">
-              <!-- Debug Console (60 %) -->
+              <!-- Api Stack (60 %) -->
               <Resizable.Pane defaultSize={60}>
-                <DebugConsole />
+                <ApiStack />
               </Resizable.Pane>
 
               <Resizable.Handle
                 class="{handleBase} w-0.5 h-full cursor-col-resize"
               />
 
-              <!-- Code Editor (40 %) -->
+              <!-- Var Stack (40 %) -->
               <Resizable.Pane defaultSize={40}>
-                <BerryCodePanel {ctx} />
+                <VarStack />
               </Resizable.Pane>
             </Resizable.PaneGroup>
           </Resizable.Pane>
@@ -88,12 +89,12 @@
 
       <Resizable.Handle class="{handleBase} w-0.5 h-full cursor-col-resize" />
 
-      <!-- ── RIGHT: Inspector / API Assistant (25 %) ──────────────── -->
+      <!-- ── RIGHT SIDEBAR: Code Editor (25 %) ──────────────── -->
       <Resizable.Pane
         defaultSize={25}
-        class="pointer-events-auto gap-1 rounded-xl border border-border bg-card/95 backdrop-blur text-card-foreground shadow-sm overflow-hidden flex flex-col relative z-20"
+        class="pointer-events-auto overflow-hidden flex flex-col relative z-20"
       >
-        <ApiAssistant />
+        <BerryCodePanel {ctx} />
       </Resizable.Pane>
     </Resizable.PaneGroup>
   </div>

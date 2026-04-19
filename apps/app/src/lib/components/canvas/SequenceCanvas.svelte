@@ -24,10 +24,8 @@
   // ─── Internal State ───────────────────────────────────────────────
   let program: ProgramNode | null = null;
   let isUpdatingInternal = false;
+  let hasParseError = false;
 
-  // ─── Code -> UI Sync ──────────────────────────────────────────────
-  // When the source code changes (e.g. from the editor), parse it and
-  // update the visual tasks array.
   // ─── Code -> UI Sync ──────────────────────────────────────────────
   // When the source code changes (e.g. from the editor), parse it and
   // update the visual tasks array.
@@ -35,12 +33,14 @@
     try {
       const parsed = Ast.parse($berryCode);
       program = parsed;
+      hasParseError = false;
       // Extract only Task blocks for the sequence editor
       tasks = parsed.body.filter(
         (n) => n.type === NodeType.TaskBlock,
       ) as TaskBlockNode[];
     } catch (e) {
-      // Create a skeleton program if parsing fails or file is empty
+      hasParseError = true;
+      // If code is invalid, and we don't have a program yet, create a skeleton
       if (!program) {
         program = {
           type: NodeType.Program,
@@ -49,21 +49,41 @@
         };
       }
       console.warn(
-        "SequenceCanvas: Could not parse code, using skeleton state",
+        "SequenceCanvas: Source code contains syntax errors. Design sync disabled.",
         e,
       );
     }
   }
 
   // ─── UI -> Code Sync (Manual via Cmd+S) ───────────────────────────
-  // We've moved from automatic sync to a deliberate Cmd+S / Ctrl+S
-  // workflow as per user preference.
   async function handleKeyDown(e: KeyboardEvent) {
     if ((e.metaKey || e.ctrlKey) && e.key === "s") {
       e.preventDefault();
+      
+      // 1. Just-In-Time Parse: Ensure we are patching against the ABSOLUTE latest
+      // version of the code in the editor store. This prevents race conditions
+      // where recent sidebar edits are lost during canvas sync.
+      try {
+        const currentSource = $berryCode;
+        const freshProgram = Ast.parse(currentSource);
+        program = freshProgram;
+        hasParseError = false;
+        
+        // Re-sync visual tasks to the fresh parse to ensure indices match
+        tasks = freshProgram.body.filter(
+          (n) => n.type === NodeType.TaskBlock,
+        ) as TaskBlockNode[];
+      } catch (err) {
+        hasParseError = true;
+        toast.error("Sync Blocked", { 
+          description: "Cannot sync design while the source code has syntax errors. Please fix the editor first." 
+        });
+        return;
+      }
+
       await syncToCode();
-      toast.success("Design Synced to Code", {
-        description: `${ctx.fileName} has been updated.`,
+      toast.success("File Saved", {
+        description: `${ctx.fileName} has been persisted to disk.`,
       });
     }
   }
@@ -79,34 +99,47 @@
   });
 
   async function syncToCode() {
-    if (!program || isUpdatingInternal) return;
+    if (!program || isUpdatingInternal || hasParseError) return;
     isUpdatingInternal = true;
 
     try {
-      // Re-construct the program by merging current tasks with preserved elements (Vars, APIs, etc.)
-      const otherNodes = program.body.filter(
-        (n) => n.type !== NodeType.TaskBlock,
-      );
+      // Re-construct the program by updating tasks in their original positions
+      // We use the 'program' that was just refreshed in handleKeyDown.
+      let taskCounter = 0;
+      const newBody = program.body.map(node => {
+        if (node.type === NodeType.TaskBlock) {
+          const updatedTask = tasks[taskCounter];
+          taskCounter++;
+          return updatedTask || node;
+        }
+        return node;
+      });
+
+      // Append any "newly added" tasks that weren't in the original body
+      while (taskCounter < tasks.length) {
+        newBody.push(tasks[taskCounter]);
+        taskCounter++;
+      }
+
       const newProgram: ProgramNode = {
         ...program,
-        body: [...otherNodes, ...tasks],
+        body: newBody,
       };
 
       const formatter = new BerryFormatter();
       const updatedSource = formatter.format(newProgram);
 
-      // 1. Update the shared source store (triggers editor update)
-      if (updatedSource !== $berryCode) {
-        $berryCode = updatedSource;
+      // 1. Update the shared source store (Memory)
+      $berryCode = updatedSource;
 
-        // 2. Persist to the local file system (IndexedDB)
-        const blob = new Blob([updatedSource], { type: "text/plain" });
-        await saveFile(ctx, blob);
-      }
+      // 2. Persist to IndexedDB (Disk)
+      // We perform this globally to ensure manual/stack edits are also saved.
+      const blob = new Blob([updatedSource], { type: "text/plain" });
+      await saveFile(ctx, blob);
     } catch (e) {
       console.error("SequenceCanvas: Failed to sync UI changes to code", e);
+      toast.error("Save Failed", { description: "An unexpected error occurred during code generation." });
     } finally {
-      // Ensure the loop safety flag is reset after reactivity settle
       await tick();
       isUpdatingInternal = false;
     }
