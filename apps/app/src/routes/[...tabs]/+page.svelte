@@ -26,21 +26,23 @@
   {#key `${ctx.workspaceId}/${ctx.folderId}/${ctx.fileName}`}
     <BerryIDE {ctx} />
   {/key}
-
 {:else if ctx.fileName}
   <!-- {#key} guarantees FileViewer starts fresh on every navigation -->
   {#key `${ctx.workspaceId}/${ctx.folderId}/${ctx.fileName}`}
-    <div class="h-full w-full overflow-hidden flex flex-col bg-background relative">
+    <div
+      class="h-full w-full overflow-hidden flex flex-col bg-background relative"
+    >
       <div class="viewer-bg-pattern" aria-hidden="true"></div>
       <div class="flex-1 overflow-hidden relative z-10">
         <FileViewer {ctx} />
       </div>
     </div>
   {/key}
-
 {:else}
   <!-- Fallback: no file selected yet -->
-  <div class="h-full w-full flex items-center justify-center bg-background text-muted-foreground">
+  <div
+    class="h-full w-full flex items-center justify-center bg-background text-muted-foreground"
+  >
     <p class="text-sm">No file selected.</p>
   </div>
 {/if}

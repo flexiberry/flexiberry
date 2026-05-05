@@ -15,6 +15,17 @@
   import * as DropdownMenu from "$lib/components/ui/dropdown-menu";
   import { toggleMode } from "mode-watcher";
   import berry from "$lib/assets/berry.png";
+  import { LayoutDashboard, Terminal } from "lucide-svelte";
+
+  // ─── Props ────────────────────────────────────────────────────────
+  export let mode: "visual" | "assistant" = "visual";
+  export let onToggle: ((newMode: "visual" | "assistant") => void) | undefined =
+    undefined;
+
+  function handleModeSwitch() {
+    if (!onToggle) return;
+    onToggle(mode === "visual" ? "assistant" : "visual");
+  }
 </script>
 
 <header
@@ -115,10 +126,16 @@
       <div class="w-[1px] h-5 bg-border mx-1"></div>
       <Button
         variant="ghost"
-        class="h-9 px-1.5 rounded-lg text-muted-foreground hover:text-foreground flex items-center gap-2"
+        class="h-9 px-1.5 rounded-lg text-muted-foreground hover:text-primary flex items-center gap-2 transition-all hover:bg-primary/10"
+        on:click={handleModeSwitch}
       >
-        <Menu class="w-[18px] h-[18px]" strokeWidth={1.5} />
-        <!-- <span class="text-xs font-medium">Menu</span> -->
+        {#if mode === "visual"}
+          <Terminal class="w-[18px] h-[18px]" strokeWidth={1.5} />
+          <span class="text-[10px] font-bold uppercase tracking-wider">Assistant</span>
+        {:else}
+          <LayoutDashboard class="w-[18px] h-[18px]" strokeWidth={1.5} />
+          <span class="text-[10px] font-bold uppercase tracking-wider">Visual</span>
+        {/if}
       </Button>
     </div>
 

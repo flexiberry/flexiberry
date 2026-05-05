@@ -9,6 +9,14 @@
   import BerryCodePanel from "$lib/components/ide/BerryCodePanel.svelte";
   import type { FileContext } from "$lib/writable/File";
   import SequenceCanvas from "../canvas/SequenceCanvas.svelte";
+  import BerryChat from "./BerryChat.svelte";
+
+  // ─── Mode State ──────────────────────────────────────────────────
+  let uiMode: "visual" | "assistant" = "visual";
+
+  function handleToggleMode(newMode: "visual" | "assistant") {
+    uiMode = newMode;
+  }
 
   // ─── Props ────────────────────────────────────────────────────────
   /** Full file location parsed from the URL. */
@@ -48,54 +56,85 @@
 
   <!-- Pointer-events disabled overlay so the canvas stays interactive -->
   <div class="absolute inset-0 z-10 p-2 pointer-events-none flex flex-col">
-    <Resizable.PaneGroup direction="horizontal" class="h-full w-full gap-1">
-      <!-- ── LEFT + CENTER (75 %) ───────────────────────────────── -->
-      <Resizable.Pane defaultSize={75} class="flex flex-col gap-1">
+    {#if uiMode === "visual"}
+      <Resizable.PaneGroup direction="horizontal" class="h-full w-full gap-1">
+        <!-- ── LEFT + CENTER (75 %) ───────────────────────────────── -->
+        <Resizable.Pane defaultSize={75} class="flex flex-col gap-1">
+          <!-- Top bar -->
+          <div class="pointer-events-auto shrink-0 relative z-20">
+            <Header mode={uiMode} onToggle={handleToggleMode} />
+          </div>
+
+          <Resizable.PaneGroup direction="vertical" class="gap-1">
+            <!-- ── TOP: transparent canvas interaction area ── -->
+            <Resizable.Pane defaultSize={65} class="relative">
+              <CanvasToolbar />
+            </Resizable.Pane>
+
+            <Resizable.Handle
+              class="{handleBase} w-full h-0.5 cursor-row-resize"
+            />
+
+            <!-- ── BOTTOM: debug + code editor ── -->
+            <Resizable.Pane defaultSize={35}>
+              <Resizable.PaneGroup direction="horizontal" class="gap-1 h-full">
+                <!-- Api Stack (60 %) -->
+                <Resizable.Pane defaultSize={60}>
+                  <ApiStack />
+                </Resizable.Pane>
+
+                <Resizable.Handle
+                  class="{handleBase} w-0.5 h-full cursor-col-resize"
+                />
+
+                <!-- Var Stack (40 %) -->
+                <Resizable.Pane defaultSize={40}>
+                  <VarStack />
+                </Resizable.Pane>
+              </Resizable.PaneGroup>
+            </Resizable.Pane>
+          </Resizable.PaneGroup>
+        </Resizable.Pane>
+
+        <Resizable.Handle class="{handleBase} w-0.5 h-full cursor-col-resize" />
+
+        <!-- ── RIGHT SIDEBAR: Code Editor (25 %) ──────────────── -->
+        <Resizable.Pane
+          defaultSize={25}
+          class="pointer-events-auto overflow-hidden flex flex-col relative z-20"
+        >
+          <BerryCodePanel {ctx} />
+        </Resizable.Pane>
+      </Resizable.PaneGroup>
+    {:else}
+      <!-- ── ASSISTANT MODE (TWO COLUMN) ────────────────────────── -->
+      <div class="flex flex-col h-full w-full gap-2">
         <!-- Top bar -->
         <div class="pointer-events-auto shrink-0 relative z-20">
-          <Header />
+          <Header mode={uiMode} onToggle={handleToggleMode} />
         </div>
 
-        <Resizable.PaneGroup direction="vertical" class="gap-1">
-          <!-- ── TOP: transparent canvas interaction area ── -->
-          <Resizable.Pane defaultSize={65} class="relative">
-            <CanvasToolbar />
-          </Resizable.Pane>
+        <div class="flex-1 flex gap-2 overflow-hidden">
+          <!-- Left Column: Chat Assistant -->
+          <div class="w-[60%] pointer-events-auto">
+            <BerryChat />
+          </div>
 
-          <Resizable.Handle
-            class="{handleBase} w-full h-0.5 cursor-row-resize"
-          />
-
-          <!-- ── BOTTOM: debug + code editor ── -->
-          <Resizable.Pane defaultSize={35}>
-            <Resizable.PaneGroup direction="horizontal" class="gap-1 h-full">
-              <!-- Api Stack (60 %) -->
-              <Resizable.Pane defaultSize={60}>
-                <ApiStack />
-              </Resizable.Pane>
-
-              <Resizable.Handle
-                class="{handleBase} w-0.5 h-full cursor-col-resize"
-              />
-
-              <!-- Var Stack (40 %) -->
-              <Resizable.Pane defaultSize={40}>
-                <VarStack />
-              </Resizable.Pane>
-            </Resizable.PaneGroup>
-          </Resizable.Pane>
-        </Resizable.PaneGroup>
-      </Resizable.Pane>
-
-      <Resizable.Handle class="{handleBase} w-0.5 h-full cursor-col-resize" />
-
-      <!-- ── RIGHT SIDEBAR: Code Editor (25 %) ──────────────── -->
-      <Resizable.Pane
-        defaultSize={25}
-        class="pointer-events-auto overflow-hidden flex flex-col relative z-20"
-      >
-        <BerryCodePanel {ctx} />
-      </Resizable.Pane>
-    </Resizable.PaneGroup>
+          <!-- Right Column: Empty (Reserved) -->
+          <div
+            class="flex-1 bg-card/10 backdrop-blur-sm border border-border/30 rounded-3xl flex items-center justify-center relative overflow-hidden"
+          >
+            <div
+              class="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent pointer-events-none"
+            ></div>
+            <p
+              class="text-muted-foreground/30 text-xs font-medium tracking-widest uppercase"
+            >
+              Right Panel Empty
+            </p>
+          </div>
+        </div>
+      </div>
+    {/if}
   </div>
 </div>
