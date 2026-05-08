@@ -13,6 +13,8 @@ import { RunUtility } from "./run-utility.js";
 import { ApiUtility } from "./api-utility.js";
 import { VarUtility } from "./var-utility.js";
 import { EnvUtility } from "./env-utility.js";
+import { TaskUtility } from "./task-utility.js";
+import { StepUtility } from "./step-utility.js";
 
 export class Cli {
   /** Entry point for `flexiberry cli` — shows the branded interactive menu. */
@@ -36,10 +38,12 @@ export class Cli {
         const addType = await select({
           message: "What would you like to add?",
           options: [
-            { value: "api",     label: "🌐  API definition" },
-            { value: "var",     label: "📦  Variable block" },
-            { value: "env",     label: "🌍  Environment" },
-            { value: "cancel",  label: "✖   Cancel" },
+            { value: "api", label: "🌐  API definition" },
+            { value: "var", label: "📦  Variable block" },
+            { value: "env", label: "🌍  Environment" },
+            { value: "task", label: "📋  Task" },
+            { value: "step", label: "🎯  Step" },
+            { value: "cancel", label: "✖   Cancel" },
           ],
         });
 
@@ -54,6 +58,10 @@ export class Cli {
           await VarUtility.add("", {});
         } else if (addType === "env") {
           await EnvUtility.add("", {});
+        } else if (addType === "task") {
+          await TaskUtility.add("", {});
+        } else if (addType === "step") {
+          await StepUtility.add("", {});
         }
         break;
       }
@@ -102,7 +110,8 @@ export class Cli {
       }
     }
 
-    outro("Thanks for using FlexiBerry CLI! 🍓");
+    outro("Thanks for using FlexiBerry CLI! 🍓", true);
+    process.exit(0);
   }
 
   // ─── Helpers ─────────────────────────────────────────────────────────────────
@@ -124,11 +133,11 @@ export class Cli {
     return select({
       message: "Please choose an option",
       options: [
-        { value: "Add",    label: "➕  Add components to .berry file" },
+        { value: "Add", label: "➕  Add components to .berry file" },
         { value: "Create", label: "📝  Create new .berry file" },
-        { value: "Run",    label: "🚀  Run .berry file" },
+        { value: "Run", label: "🚀  Run .berry file" },
         { value: "Select", label: "📁  Select .berry file from folder" },
-        { value: "View",   label: "👁   View selected .berry file" },
+        { value: "View", label: "👁   View selected .berry file" },
       ],
     });
   }

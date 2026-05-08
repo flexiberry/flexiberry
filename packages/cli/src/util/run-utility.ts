@@ -145,26 +145,26 @@ export class RunUtility {
     let currentTaskIdx = -1;
 
     // ── Task lifecycle ─────────────────────────────────────────────────────
-    core.on(InterpreterEvent.Start, (payload) => {
+    core.on(InterpreterEvent.Start, (payload: any) => {
       adapter.initPlan(payload.plan);
     });
 
-    core.on(InterpreterEvent.TaskBegin, ({ index }) => {
+    core.on(InterpreterEvent.TaskBegin, ({ index }: any) => {
       currentTaskIdx = index;
       adapter.onTaskBegin(index);
     });
 
-    core.on(InterpreterEvent.TaskDone, (result) => {
+    core.on(InterpreterEvent.TaskDone, (result: any) => {
       const s = RunUtility.mapStatus(result.status);
       adapter.onTaskDone(currentTaskIdx, s);
     });
 
     // ── Step lifecycle ─────────────────────────────────────────────────────
-    core.on(InterpreterEvent.StepBegin, ({ index, taskIndex }) => {
+    core.on(InterpreterEvent.StepBegin, ({ index, taskIndex }: any) => {
       adapter.onStepBegin(taskIndex, index);
     });
 
-    core.on(InterpreterEvent.StepDone, (result) => {
+    core.on(InterpreterEvent.StepDone, (result: any) => {
       const { taskIndex, index } = result;
       adapter.onStepDone(taskIndex, index, RunUtility.mapStatus(result.status), result.error ?? undefined);
     });
@@ -176,15 +176,15 @@ export class RunUtility {
     // sequential execution. Actually, since execution is sequential, we can just track `currentStepIdx`.
     let currentStepIdx = -1;
     
-    core.on(InterpreterEvent.StepBegin, ({ index }) => {
+    core.on(InterpreterEvent.StepBegin, ({ index }: any) => {
       currentStepIdx = index;
     });
 
-    core.on(InterpreterEvent.ApiCallBegin, ({ method, url }) => {
+    core.on(InterpreterEvent.ApiCallBegin, ({ method, url }: any) => {
       adapter.onApiCallBegin(currentTaskIdx, currentStepIdx, method, url);
     });
 
-    core.on(InterpreterEvent.ApiCallDone, ({ status, duration }) => {
+    core.on(InterpreterEvent.ApiCallDone, ({ status, duration }: any) => {
       adapter.onApiCallDone(currentTaskIdx, currentStepIdx, status, duration);
     });
 

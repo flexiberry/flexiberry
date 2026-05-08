@@ -75,10 +75,18 @@ export function intro(message: string): void {
 }
 
 /** Prints a styled section footer. */
-export function outro(message: string): void {
+export function outro(message: string, textOnly?: boolean): void | Promise<void> {
+  if (textOnly) {
+    console.log(colors.cyan(" "));
+    console.log(`${colors.cyan(". ")}${colors.bold(message)}`);
+    console.log(colors.cyan(" "));
+    console.log(colors.cyan(" "));
+
+    return
+  }
   const w = process.stdout.columns ?? 80;
   console.log(colors.cyan("│"));
-  console.log(`${colors.cyan("└── ")}${colors.bold(message)}`);
+  console.log(`${colors.cyan("│ ")}${colors.bold(message)}`);
   console.log(colors.cyan("└" + "─".repeat(w - 2) + "┘") + "\n");
 }
 
@@ -86,11 +94,11 @@ export function outro(message: string): void {
 
 export const log = {
   message: (msg: string): void => console.log(`${colors.dim("│")}  ${msg}`),
-  step:    (msg: string): void => console.log(`${colors.cyan("◆")} ${msg}`),
+  step: (msg: string): void => console.log(`${colors.cyan("◆")} ${msg}`),
   success: (msg: string): void => console.log(`${colors.green("✔")} ${msg}`),
-  warn:    (msg: string): void => console.log(`${colors.yellow("⚠")} ${colors.yellow(msg)}`),
-  error:   (msg: string): void => console.log(`${colors.red("✖")} ${colors.red(msg)}`),
-  info:    (msg: string): void => console.log(`${colors.blue("ℹ")} ${msg}`),
+  warn: (msg: string): void => console.log(`${colors.yellow("⚠")} ${colors.yellow(msg)}`),
+  error: (msg: string): void => console.log(`${colors.red("✖")} ${colors.red(msg)}`),
+  info: (msg: string): void => console.log(`${colors.blue("ℹ")} ${msg}`),
 };
 
 // ─── Spinner ──────────────────────────────────────────────────────────────────

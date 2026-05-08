@@ -171,6 +171,11 @@ Check
 - $.body != null
 - id == Step.1.id
 
+Step Call Api #addPet add step cli test
+Capture
+- name: response.id
+
+
 
 Task second task im testing
 
@@ -200,3 +205,25 @@ Check
 - id == Step.1.id
 - $.body == null
 - id != Step.1.id
+
+
+Task test task
+Step Call Api GET title name is her
+Capture
+- test: response.name
+
+Params
+- input: "rintu"
+
+Check
+- rint = new
+
+Task test
+Step Call Api #loginUser tes
+Check
+- response == 200
+
+Env UAT,TEST
+
+
+Env SIT,UAT
