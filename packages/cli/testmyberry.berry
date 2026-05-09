@@ -227,3 +227,6 @@ Env UAT,TEST
 
 
 Env SIT,UAT
+
+
+Env UAT,SIT
