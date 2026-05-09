@@ -3,10 +3,10 @@
   "compilerOptions": {
     "rootDir": "./src",
     "outDir": "./dist",
-    "sourceMap": true,
+    "sourceMap": false,
     "resolveJsonModule": true,
     "declaration": true,
-    "declarationMap": true,
+    "declarationMap": false,
     "module": "NodeNext",
     "moduleResolution": "NodeNext",
     "target": "ES2022",
