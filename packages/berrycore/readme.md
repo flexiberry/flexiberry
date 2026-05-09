@@ -1,99 +1,107 @@
-# Documentation for the Custom Scripting Language
+<div align="center">
+  <img src="https://raw.githubusercontent.com/Flexiberry/flexiberry/main/assets/favicon/android-icon-192x192.png" height="120" width="120" alt="FlexiBerry Logo" />
+  <h1>🚀 @flexiberry/berrycore</h1>
+  <p><strong>The official Lexer, Parser, AST, and Runtime Engine for the Berry DSL</strong></p>
 
-## Overview
+  [![npm version](https://img.shields.io/npm/v/@flexiberry/berrycore.svg?style=flat-square)](https://www.npmjs.com/package/@flexiberry/berrycore)
+  [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=flat-square)](https://opensource.org/licenses/MIT)
 
-This scripting language is designed for defining environments, variables, API calls, and tasks in a structured format. It allows users to specify configurations for different environments (like UAT, SIT) and perform API testing with clear steps and checks.
+  <br />
+</div>
 
-## Components
+## ✨ Overview
 
-### 1. Environment Declaration
+**BerryCore** is a lightweight, zero-dependency compiler architecture built entirely in TypeScript. It provides the foundational tools required to interpret the **Berry DSL** (Domain Specific Language), a custom scripting language explicitly designed to orchestrate API flows, manage testing environments, and execute complex task runners.
 
-- **Syntax**: `Env <environment_name>`
-- **Description**: Defines the environment in which the script will run. Multiple environments can be declared, such as UAT, SIT, and TAS.
+This package exposes the complete language engineering pipeline:
+1. **LexerEngine** - Scans characters and generates grammar-aware tokens.
+2. **AstEngine** - Parses tokens into a strongly-typed Abstract Syntax Tree (AST).
+3. **Interpreter** - The runtime execution engine that evaluates the AST, manages isolated environment scopes, and fires runtime events.
+4. **Formatter** - Converts the AST back into cleanly formatted `.berry` script.
 
-### 2. Variable Declaration
+---
 
-- **Syntax**:
-  ```
-  Var <variable_name>
-  - <key>: <value>
-  ```
-- **Description**: Declares variables that can be used throughout the script. Variables can hold simple values or complex structures.
+## 📦 Installation
 
-### 3. API Call Definition
+Install `@flexiberry/berrycore` as a core dependency for your own test runners, CI pipelines, or editor integrations:
 
-- **Syntax**:
-  ```
-  Api <method> #<name> <description>
-  Url '<url>'
-  Body <format>
-  `<json>`
-  Header
-  - <key>: '<value>'
-  ```
-- **Description**: Defines an API call with its method (e.g., POST), a name for reference, a description, the URL, the body in JSON format, and any necessary headers.
+```bash
+npm install @flexiberry/berrycore
+```
 
-### 4. Task Definition
+---
 
-- **Syntax**:
-  ```
-  Task <task_name>
-  ```
-- **Description**: Defines a task that groups a series of steps to be executed.
+## 🛠️ Programmatic Usage
 
-### 5. Step Definition
+The core engine is heavily decoupled, allowing you to use just the parts you need—whether you are building a language server, an IDE, or a CLI.
 
-- **Syntax**:
-  ```
-  Step <step_name>
-  ```
-- **Description**: Defines a step within a task. Each step can include API calls, parameter definitions, and checks.
 
-### 6. Parameter Declaration
+## 📖 Language Syntax Reference
 
-- **Syntax**:
-  ```
-  Params
-  - <key>: <value>
-  ```
-- **Description**: Declares parameters that can be passed to API calls or used within steps.
+The Berry DSL was designed to be easily readable, removing complex syntax clutter in favor of a clean, indentation-aware syntax. 
 
-### 7. Capture Statement
+### 1. Environments (`Env`)
+Defines the deployment environments available for the script.
+```berry
+Env UAT, SIT, PROD
+```
 
-- **Syntax**:
-  ```
-  Capture
-  - <key>: "<value>"
-  ```
-- **Description**: Captures values from the response of an API call, such as tokens or status codes.
+### 2. Variables (`Var`)
+Isolated memory scopes for storing state. Variables are initialized directly in the runtime environment.
+```berry
+Var UserData
+- id: 101
+- name: "John Doe"
+```
 
-### 8. Check Statement
+### 3. API Declarations (`Api`)
+Defines HTTP endpoints with strict schema definitions.
+```berry
+Api POST #CreateUser "Creates a new user"
+Url 'https://api.example.com/users'
+Body JSON
+`{
+  "name": "{{UserData.name}}"
+}`
+Header
+- Authorization: 'Bearer {{token}}'
+```
 
-- **Syntax**:
-  ```
-  Check
-  - <condition>
-  ```
-- **Description**: Defines conditions that must be met for the script to proceed. Conditions can include status checks and value comparisons.
+### 4. Tasks and Steps (`Task` / `Step`)
+The execution blocks where the interpreter orchestrates logic.
+```berry
+Task "User Onboarding"
+  Step "Register New User"
+    Call #CreateUser
+    Capture
+    - token: "response.data.token"
+    Check
+    - status == 201
+```
 
-### 9. Jump and Break Statements
+### 5. Control Flow (`Jump`, `Break`)
+The interpreter supports localized control flow within Tasks.
+```berry
+Break if status == 400
+Jump To @2 If status == 401
+```
 
-- **Syntax**:
-  ```
-  Jump To @<step_number> If <condition> is True
-  Break if <condition> is true
-  ```
-- **Description**: Control flow statements that allow the script to jump to a specific step or break out of a loop based on conditions.
+---
 
-## Example Breakdown
+## 🧠 Architectural Principles
 
-Here’s a brief breakdown of the provided code:
+Following standard language engineering practices, `berrycore` adheres strictly to:
+- **Separation of Concerns:** The parser never executes code. The interpreter never scans tokens.
+- **Type Safety:** All AST nodes are backed by strict TypeScript interfaces (`BaseNode`, `TaskBlockNode`, etc.).
+- **Immutability:** The AST generated by `AstEngine` is treated as a pure, immutable data layer.
+- **Event-Driven Execution:** The `Interpreter` engine acts as an event emitter, allowing external UI layers (like CLI spinners or web dashboards) to hook directly into the runtime state.
 
-- **Environment Declaration**: The script starts by declaring environments (UAT, SIT, TAS).
-- **Variable Declarations**: Variables for user ID and age are defined for use in API calls.
-- **API Calls**: Two API calls are defined to interact with a user information service, including capturing tokens and checking responses.
-- **Task and Steps**: A task is defined to test the application, with multiple steps that include calling APIs, capturing responses, and performing checks.
+---
 
-## Conclusion
+## 🤝 Contributing
 
-This scripting language provides a clear and structured way to define environments, variables, and API interactions, making it suitable for testing and automation tasks. The use of simple syntax allows for easy readability and maintenance of scripts.
+This package is part of the FlexiBerry monorepo. We welcome contributions to grammar definitions, execution optimizations, and AST tooling. Please see the root `CONTRIBUTING.md` for guidelines.
+
+## 📄 License
+
+MIT © FlexiBerry, Inc.

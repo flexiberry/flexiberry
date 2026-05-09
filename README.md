@@ -19,6 +19,32 @@ alt="Project Logo">
 
 ## 📦 Usage
 
+### FlexiBerry CLI
+
+To interactively manage and run your test suites directly from your terminal, install the **FlexiBerry CLI** globally:
+
+```bash
+cd packages/cli
+npm run build
+sudo npm i -g .
+```
+
+Once installed, you can launch the CLI anywhere by running:
+```bash
+flexiberry
+```
+
+> [!WARNING]
+> **Troubleshooting `flexiberry: import: command not found` error:**
+> If you run `flexiberry` and receive syntax errors like `import: command not found` or `export: '{' not a valid identifier`, your system is likely executing a stale symlink as a bash script. 
+> To fix this, simply remove the stale symlink and reinstall:
+> ```bash
+> sudo rm /usr/local/bin/flexiberry
+> sudo npm i -g .
+> ```
+
+### General
+
 1. Install FlexiBerry using the package manager of your choice. 📥
 2. Configure your API endpoints in the settings. ⚙️
 3. Create test cases using the provided templates. 📝
