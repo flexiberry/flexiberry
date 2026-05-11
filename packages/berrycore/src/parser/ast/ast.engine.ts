@@ -19,6 +19,7 @@ import {
   ProgramNode,
   StatementNode,
   VarDeclarationNode,
+  LinkStatementNode,
   PointerReferenceNode,
   ApiBlockNode,
   UrlStatementNode,
@@ -100,6 +101,7 @@ export class AstEngine {
 
   private parseStatement(): StatementNode | null {
     if (this.check(TokenType.Var)) return this.parseVarDeclaration();
+    if (this.check(TokenType.Link)) return this.parseLinkStatement();
     if (this.check(TokenType.Api)) return this.parseApiBlock();
     if (this.check(TokenType.Task)) return this.parseTaskBlock();
     if (this.check(TokenType.Step)) return this.parseStepBlock();
@@ -162,6 +164,25 @@ export class AstEngine {
       position,
       symbol: pointerToken.value,
       target: pointedToken.value,
+    };
+  }
+
+  // ── Link Statement ──────────────────────────────────────────────────────
+
+  /**
+   * Grammar: Link <path>
+   * Tokens:  Link, LinkPath
+   */
+  private parseLinkStatement(): LinkStatementNode {
+    const linkToken = this.expect(TokenType.Link, "Expected 'Link' keyword");
+    const position = this.positionOf(linkToken);
+
+    const pathToken = this.expect(TokenType.LinkPath, "Expected path after 'Link'");
+
+    return {
+      type: NodeType.LinkStatement,
+      position,
+      path: pathToken.value,
     };
   }
 

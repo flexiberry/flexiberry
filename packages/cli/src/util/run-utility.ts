@@ -139,7 +139,10 @@ export class RunUtility {
     const adapter = new BerryTableAdapter();
 
     // BerryCore: tokenise → parse → execute
-    const core = new BerryCore(source, { adapter });
+    const core = new BerryCore(source, { 
+      adapter,
+      basePath: path.dirname(filePath)
+    });
 
     // Track current task index (used for ApiCall events that lack it)
     let currentTaskIdx = -1;

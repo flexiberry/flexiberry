@@ -115,6 +115,25 @@ Check
 - id == Step.1.id
 ```
 
+## 4. Multi-file Parsing (`Link`)
+
+The `Link` keyword allows you to import APIs, Variables, and Tasks from external `.berry` files. This helps in modularizing your tests by keeping environment variables, API definitions, and actual tasks in separate files. You can link local files or remote URLs.
+
+**Syntax:**
+```berry
+Link <path_or_url>
+```
+
+**Examples:**
+```berry
+Link ../envs/production.berry
+Link http://domain.com/apis/user_service.berry
+```
+
+When a file is linked, its contents are flattened and merged into the main file before execution.
+
+---
+
 ## Referencing Values
 
 As seen in the `Params` and `Check` sections, you can dynamically reference the output of previous steps using the syntax `Step.<step_index>.<captured_variable>`. 

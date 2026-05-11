@@ -14,6 +14,9 @@ export enum NodeType {
   VarDeclaration = "VarDeclaration",
   PointerReference = "PointerReference",
 
+  // Link constructs
+  LinkStatement = "LinkStatement",
+
   // API constructs
   ApiBlock = "ApiBlock",
   UrlStatement = "UrlStatement",
@@ -67,6 +70,7 @@ export interface ProgramNode extends BaseNode {
 
 export type StatementNode =
   | VarDeclarationNode
+  | LinkStatementNode
   | ApiBlockNode
   | TaskBlockNode
   | StepBlockNode
@@ -100,6 +104,19 @@ export interface PointerReferenceNode extends BaseNode {
   readonly type: NodeType.PointerReference;
   readonly symbol: string;   // the "@"
   readonly target: string;   // the pointed name
+}
+
+// ─── Link Constructs ────────────────────────────────────────────────────────
+
+/**
+ * `Link path/to/file.berry` or `Link http://example.com/file.berry`
+ *
+ * Grammar: link.grammer.ts
+ * Tokens: Link, LinkPath
+ */
+export interface LinkStatementNode extends BaseNode {
+  readonly type: NodeType.LinkStatement;
+  readonly path: string;
 }
 
 // ─── API Constructs ─────────────────────────────────────────────────────────
@@ -286,6 +303,7 @@ export interface CommentNode extends BaseNode {
 export type ASTNode =
   | ProgramNode
   | VarDeclarationNode
+  | LinkStatementNode
   | PointerReferenceNode
   | ApiBlockNode
   | UrlStatementNode

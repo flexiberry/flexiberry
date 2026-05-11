@@ -13,6 +13,8 @@ export enum TokenType {
   // Keywords
   Env,
   Var,
+  Link,
+  LinkPath,
   Pointer,
   Pointed,
 

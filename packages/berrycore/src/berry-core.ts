@@ -22,6 +22,7 @@
 
 import { LexerEngine } from "./parser/tokenizer/reader/lexer.engine";
 import { AstEngine } from "./parser/ast/ast.engine";
+import { ProgramNode, NodeType } from "./parser/ast/ast.types";
 import { Interpreter, InterpreterOptions } from "./interpreter/interpreter";
 
 import {
@@ -49,6 +50,19 @@ export interface BerryCoreOptions {
    * `Interpreter` constructor (timeout, continueOnError, dryRun, …).
    */
   readonly interpreterOptions?: Partial<InterpreterOptions>;
+
+  /**
+   * Optional base path used by the default link resolver to resolve relative local file paths.
+   * Typically the directory of the entry .berry file.
+   */
+  readonly basePath?: string;
+
+  /**
+   * Optional resolver for `Link` statements.
+   * Receives the path/url and should return the string content of that file.
+   * Required if the source code contains `Link` statements.
+   */
+  readonly linkResolver?: (path: string) => Promise<string>;
 }
 
 // ─── BerryCore ───────────────────────────────────────────────────────────────
@@ -128,6 +142,89 @@ export class BerryCore {
 
   // ── Main Run ────────────────────────────────────────────────────────────
 
+  private async resolveLinks(ast: ProgramNode, visited = new Set<string>()): Promise<ProgramNode> {
+    const resolvedBody: any[] = [];
+
+    for (const stmt of ast.body) {
+      if (stmt.type === NodeType.LinkStatement) {
+        // Prevent infinite loops in circular links
+        if (visited.has(stmt.path)) {
+          continue; // Already processed this link
+        }
+        visited.add(stmt.path);
+
+        let content: string;
+        if (this.options.linkResolver) {
+          content = await this.options.linkResolver(stmt.path);
+        } else {
+          content = await this.defaultLinkResolver(stmt.path);
+        }
+
+        const subTokens = new LexerEngine(content).tokenize();
+        const subAst = new AstEngine(subTokens).build();
+
+        // Recursively resolve links in the sub-AST
+        const resolvedSubAst = await this.resolveLinks(subAst, visited);
+
+        // Add the resolved sub-body instead of the link statement
+        resolvedBody.push(...resolvedSubAst.body);
+      } else {
+        resolvedBody.push(stmt);
+      }
+    }
+
+    return {
+      ...ast,
+      body: resolvedBody,
+    };
+  }
+
+  private async defaultLinkResolver(path: string): Promise<string> {
+    // 1. Check if it's an HTTP URL
+    if (path.startsWith("http://") || path.startsWith("https://")) {
+      try {
+        const response = await fetch(path);
+        if (!response.ok) {
+          throw new Error(`Failed to fetch URL ${path}: ${response.statusText}`);
+        }
+        return await response.text();
+      } catch (error) {
+        throw new Error(`Failed to fetch URL ${path}: ${error}`);
+      }
+    }
+
+    // 2. Check if we are in Node.js
+    const isNode = typeof process !== "undefined" && process.versions != null && process.versions.node != null;
+    if (isNode) {
+      try {
+        // Use dynamic import to avoid bundler issues in browser
+        const fs = await import("fs/promises");
+        const pathModule = await import("path");
+        const resolvedPath = this.options.basePath 
+          ? pathModule.resolve(this.options.basePath, path)
+          : pathModule.resolve(process.cwd(), path);
+        return await fs.readFile(resolvedPath, "utf-8");
+      } catch (e) {
+        throw new Error(`Failed to read local file ${path}: ${e}`);
+      }
+    }
+
+    // 3. Fallback for browser (relative URLs)
+    if (typeof window !== "undefined" && typeof fetch !== "undefined") {
+      try {
+        const response = await fetch(path);
+        if (!response.ok) {
+          throw new Error(`Failed to fetch relative URL ${path}: ${response.statusText}`);
+        }
+        return await response.text();
+      } catch (e) {
+        throw new Error(`Failed to fetch relative URL ${path}: ${e}`);
+      }
+    }
+
+    throw new Error(`Cannot resolve link '${path}': Environment does not support file reading and path is not an absolute URL.`);
+  }
+
   /**
    * Execute the source code end-to-end.
    *
@@ -148,7 +245,10 @@ export class BerryCore {
     const tokens = new LexerEngine(this.source).tokenize();
 
     // ── Phase 2: Build AST ────────────────────────────────────────────
-    const ast = new AstEngine(tokens).build();
+    let ast = new AstEngine(tokens).build();
+
+    // ── Phase 2.5: Resolve Links ──────────────────────────────────────
+    ast = await this.resolveLinks(ast);
 
     // ── Phase 3: Create Interpreter ───────────────────────────────────
     this.interpreter = new Interpreter(ast, this.options.interpreterOptions);
