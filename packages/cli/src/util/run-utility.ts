@@ -7,7 +7,7 @@
  * - `run`   → delegates to BerryCore facade with the live BerryTableAdapter
  */
 
-import { intro, outro, log, select, confirm, isCancel } from "../lib/prompts.js";
+import { intro, outro, log, select, confirm, isCancel, text, group } from "../lib/prompts.js";
 import { colors } from "../lib/colors.js";
 import * as fs from "fs";
 import * as path from "path";
@@ -64,7 +64,7 @@ export class RunUtility {
   /**
    * `flexiberry run` — runs a .berry script through the full execution engine.
    */
-  static async run(file: string): Promise<void> {
+  static async run(file: string, options?: any): Promise<void> {
     intro(`🏎️  Starting FlexiBerry Execution`);
 
     if (file) {
@@ -76,7 +76,7 @@ export class RunUtility {
       log.message(`📄 File detected: ${colors.blue(filePath)}`);
       log.success(colors.green("✔ File successfully selected!"));
       outro("Execution Starting...");
-      await RunUtility.berryExecutor(filePath);
+      await RunUtility.berryExecutor(filePath, options);
       return;
     }
 
@@ -84,7 +84,7 @@ export class RunUtility {
     if (fileSelected) {
       log.step(`🔄 Preparing to execute: ${colors.blue(fileSelected)}`);
       outro("Execution Starting...");
-      await RunUtility.berryExecutor(fileSelected);
+      await RunUtility.berryExecutor(fileSelected, options);
       return;
     }
 
@@ -102,7 +102,7 @@ export class RunUtility {
 
     log.step(`🔄 Preparing to execute: ${colors.blue(preSelectedFile)}`);
     outro("Execution Starting...");
-    await RunUtility.berryExecutor(preSelectedFile);
+    await RunUtility.berryExecutor(preSelectedFile, options);
   }
 
   // ─── Private helpers ───────────────────────────────────────────────────────
@@ -128,8 +128,8 @@ export class RunUtility {
    * On Completed the results are handed to the legacy UI for the final
    * summary panel.
    */
-  private static async berryExecutor(filePath: string): Promise<void> {
-    const source   = fs.readFileSync(filePath, "utf8");
+  private static async berryExecutor(filePath: string, options?: any): Promise<void> {
+    const source = fs.readFileSync(filePath, "utf8");
     const fileName = FileUtility.getPreselectedFileName() ?? path.basename(filePath);
 
     // Static job header (printed once, before the live table)
@@ -139,13 +139,19 @@ export class RunUtility {
     const adapter = new BerryTableAdapter();
 
     // BerryCore: tokenise → parse → execute
-    const core = new BerryCore(source, { 
+    const core = new BerryCore(source, {
       adapter,
       basePath: path.dirname(filePath)
     });
 
-    // Track current task index (used for ApiCall events that lack it)
+    // Track current task index
     let currentTaskIdx = -1;
+    let currentStepIdx = -1;
+    let dataRows: Record<string, string>[] | null = null;
+
+    core.on(InterpreterEvent.DataLoaded, (payload: any) => {
+      dataRows = payload.rows;
+    });
 
     // ── Task lifecycle ─────────────────────────────────────────────────────
     core.on(InterpreterEvent.Start, (payload: any) => {
@@ -173,12 +179,7 @@ export class RunUtility {
     });
 
     // ── API call details ───────────────────────────────────────────────────
-    // Current design limitation: API events don't carry step indices inherently because
-    // they are triggered deeper within. As a fallback, we can use the latest running step index
-    // if we needed to track it exactly, or we can just rely on the step count - 1 if we only allow 
-    // sequential execution. Actually, since execution is sequential, we can just track `currentStepIdx`.
-    let currentStepIdx = -1;
-    
+
     core.on(InterpreterEvent.StepBegin, ({ index }: any) => {
       currentStepIdx = index;
     });
@@ -194,12 +195,72 @@ export class RunUtility {
     // ── Completed ─────────────────────────────────────────────────────────
     core.on(InterpreterEvent.Completed, () => {
       adapter.setCompleted();
-      adapter.dispose();
-      adapter.printFinalSummary();
-      process.exit(0);
     });
 
+    // First run (or parsing run)
     await core.run();
+
+    const loadedRows = dataRows as Record<string, string>[] | null;
+    if (loadedRows && loadedRows.length > 0) {
+      let startIndex = 0;
+      let endIndex = loadedRows.length;
+
+      if (options?.iter === "all") {
+        // Use defaults
+      } else if (options?.iter === "custom") {
+        startIndex = options.start ? parseInt(options.start) - 1 : 0;
+        endIndex = options.end ? parseInt(options.end) : loadedRows.length;
+      } else {
+        const iterationChoice = await select({
+          message: "Input data detected. Choose iteration option:",
+          options: [
+            { value: "all", label: `All iterations (${loadedRows.length})` },
+            { value: "custom", label: "Custom range" }
+          ]
+        });
+
+        if (isCancel(iterationChoice)) {
+          process.exit(0);
+        }
+
+        if (iterationChoice === "custom") {
+          const range = await group({
+            start: () => text({
+              message: "Start index (1-based):",
+              defaultValue: "1",
+              placeholder: "1"
+            }),
+            end: () => text({
+              message: `End index (max ${loadedRows.length}):`,
+              defaultValue: loadedRows.length.toString(),
+              placeholder: loadedRows.length.toString()
+            })
+          }, {
+            onCancel: () => process.exit(0)
+          });
+
+          startIndex = parseInt(range.start as string) - 1;
+          endIndex = parseInt(range.end as string);
+        }
+      }
+
+      if (isNaN(startIndex) || startIndex < 0) startIndex = 0;
+      if (isNaN(endIndex) || endIndex > loadedRows.length) endIndex = loadedRows.length;
+      if (startIndex >= endIndex) {
+        log.error("Invalid iteration range.");
+        process.exit(1);
+      }
+
+      // It was a data-loading run, now execute per row
+      for (let i = startIndex; i < endIndex; i++) {
+        await core.run(loadedRows[i]);
+      }
+    }
+
+    adapter.printFinalSummary();
+
+    adapter.dispose();
+    process.exit(0);
   }
 
   /** Map ExecutionStatus enum → the string union used by BerryTableAdapter. */
@@ -207,12 +268,12 @@ export class RunUtility {
     s: ExecutionStatus
   ): "PASS" | "FAILED" | "SKIPPED" | "STOPPED" | "PENDING" {
     switch (s) {
-      case ExecutionStatus.Pass:    return "PASS";
-      case ExecutionStatus.Failed:  return "FAILED";
+      case ExecutionStatus.Pass: return "PASS";
+      case ExecutionStatus.Failed: return "FAILED";
       case ExecutionStatus.Skipped: return "SKIPPED";
       case ExecutionStatus.Stopped: return "STOPPED";
-      case ExecutionStatus.Killed:  return "STOPPED";
-      default:                      return "PENDING";
+      case ExecutionStatus.Killed: return "STOPPED";
+      default: return "PENDING";
     }
   }
 

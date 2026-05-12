@@ -51,6 +51,19 @@ export const keyValueGrammer: LexerGrammer = {
             },
           ],
           isOptional: true,
+          next: [
+            {
+              name: "decrypt",
+              regex: /^\s+(Decrypt)\s*$/,
+              groups: [
+                {
+                  tokenType: TokenType.Decrypt,
+                  index: 1,
+                },
+              ],
+              isOptional: true,
+            },
+          ],
         },
         {
           name: "multilineValue",
@@ -73,6 +86,19 @@ export const keyValueGrammer: LexerGrammer = {
           start: /(`)([\s\S]*?)/,
           end: /(`)([\s\S]*?)(`)/,
           mergeLines: true,
+          next: [
+            {
+              name: "decrypt",
+              regex: /^\s+(Decrypt)\s*$/,
+              groups: [
+                {
+                  tokenType: TokenType.Decrypt,
+                  index: 1,
+                },
+              ],
+              isOptional: true,
+            },
+          ],
         },
         {
           name: "unquotedValue",
@@ -84,6 +110,19 @@ export const keyValueGrammer: LexerGrammer = {
             },
           ],
           isOptional: true,
+          next: [
+            {
+              name: "decrypt",
+              regex: /^\s+(Decrypt)\s*$/,
+              groups: [
+                {
+                  tokenType: TokenType.Decrypt,
+                  index: 1,
+                },
+              ],
+              isOptional: true,
+            },
+          ],
         },
       ],
     },
@@ -119,6 +158,19 @@ export const keyValueGrammer: LexerGrammer = {
             },
           ],
           isOptional: true,
+          next: [
+            {
+              name: "decrypt",
+              regex: /^\s+(Decrypt)\s*$/,
+              groups: [
+                {
+                  tokenType: TokenType.Decrypt,
+                  index: 1,
+                },
+              ],
+              isOptional: true,
+            },
+          ],
         },
         {
           name: "multilineValue",
@@ -141,6 +193,19 @@ export const keyValueGrammer: LexerGrammer = {
           start: /(`)([\s\S]*?)/,
           end: /(`)([\s\S]*?)(`)/,
           mergeLines: true,
+          next: [
+            {
+              name: "decrypt",
+              regex: /^\s+(Decrypt)\s*$/,
+              groups: [
+                {
+                  tokenType: TokenType.Decrypt,
+                  index: 1,
+                },
+              ],
+              isOptional: true,
+            },
+          ],
         },
         {
           name: "unquotedValue",
@@ -152,6 +217,19 @@ export const keyValueGrammer: LexerGrammer = {
             },
           ],
           isOptional: true,
+          next: [
+            {
+              name: "decrypt",
+              regex: /^\s+(Decrypt)\s*$/,
+              groups: [
+                {
+                  tokenType: TokenType.Decrypt,
+                  index: 1,
+                },
+              ],
+              isOptional: true,
+            },
+          ],
         },
       ],
       isMultiline: false,

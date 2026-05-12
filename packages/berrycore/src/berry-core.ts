@@ -22,7 +22,7 @@
 
 import { LexerEngine } from "./parser/tokenizer/reader/lexer.engine";
 import { AstEngine } from "./parser/ast/ast.engine";
-import { ProgramNode, NodeType } from "./parser/ast/ast.types";
+import { ProgramNode, NodeType, InputStatementNode } from "./parser/ast/ast.types";
 import { Interpreter, InterpreterOptions } from "./interpreter/interpreter";
 
 import {
@@ -63,6 +63,12 @@ export interface BerryCoreOptions {
    * Required if the source code contains `Link` statements.
    */
   readonly linkResolver?: (path: string) => Promise<string>;
+
+  /**
+   * Optional decryption provider for `Decrypt` flagged `Var` entries.
+   * If omitted, base64 decryption is used by default.
+   */
+  readonly decryptionProvider?: (encrypted: string) => Promise<string> | string;
 }
 
 // ─── BerryCore ───────────────────────────────────────────────────────────────
@@ -225,6 +231,30 @@ export class BerryCore {
     throw new Error(`Cannot resolve link '${path}': Environment does not support file reading and path is not an absolute URL.`);
   }
 
+  private parseData(content: string, path: string): Record<string, string>[] {
+    if (path.endsWith('.json')) {
+      return JSON.parse(content);
+    }
+    
+    // Basic CSV parser
+    const lines = content.split(/\r?\n/).filter(line => line.trim().length > 0);
+    if (lines.length === 0) return [];
+    
+    const headers = lines[0].split(',').map(h => h.trim());
+    const rows: Record<string, string>[] = [];
+    
+    for (let i = 1; i < lines.length; i++) {
+      const values = lines[i].split(',').map(v => v.trim());
+      const row: Record<string, string> = {};
+      for (let j = 0; j < headers.length; j++) {
+        row[headers[j]] = values[j] ?? "";
+      }
+      rows.push(row);
+    }
+    
+    return rows;
+  }
+
   /**
    * Execute the source code end-to-end.
    *
@@ -238,9 +268,10 @@ export class BerryCore {
    *   - ParserError — if the source has a grammar error
    *   - RuntimeError — if execution encounters an unrecoverable state
    *
+   * @param inputRow Optional data row to inject into the execution for `Input` mappings
    * @returns The array of `TaskResult`s produced by the interpreter.
    */
-  async run(): Promise<TaskResult[]> {
+  async run(inputRow?: Record<string, string>): Promise<TaskResult[]> {
     // ── Phase 1: Tokenise ──────────────────────────────────────────────
     const tokens = new LexerEngine(this.source).tokenize();
 
@@ -250,8 +281,37 @@ export class BerryCore {
     // ── Phase 2.5: Resolve Links ──────────────────────────────────────
     ast = await this.resolveLinks(ast);
 
+    // ── Phase 2.6: Handle Input ───────────────────────────────────────
+    if (!inputRow) {
+      const inputNode = ast.body.find(node => node.type === NodeType.InputStatement) as InputStatementNode | undefined;
+      if (inputNode) {
+        let content: string;
+        if (this.options.linkResolver) {
+          content = await this.options.linkResolver(inputNode.path);
+        } else {
+          content = await this.defaultLinkResolver(inputNode.path);
+        }
+
+        const rows = this.parseData(content, inputNode.path);
+        
+        // Fire DataLoaded event to pending listeners
+        for (const { event, listener } of this.pendingListeners) {
+          if (event === InterpreterEvent.DataLoaded) {
+            await listener({ rows } as any);
+          }
+        }
+        
+        // Return early, adapter is expected to loop and call run(row)
+        return [];
+      }
+    }
+
     // ── Phase 3: Create Interpreter ───────────────────────────────────
-    this.interpreter = new Interpreter(ast, this.options.interpreterOptions);
+    this.interpreter = new Interpreter(ast, {
+      ...this.options.interpreterOptions,
+      inputRow,
+      decryptionProvider: this.options.decryptionProvider
+    } as any);
 
     // Wire the IO adapter (if provided)
     if (this.options.adapter) {

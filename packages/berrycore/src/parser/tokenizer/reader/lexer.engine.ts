@@ -11,9 +11,11 @@ import { paramsGrammer } from "./grammer/params.grammer";
 import { captureGrammer } from "./grammer/capture.grammer";
 import { checkGrammer } from "./grammer/check.grammer";
 import { linkGrammer } from "./grammer/link.grammer";
+import { inputGrammer } from "./grammer/input.grammer";
 
 const grammer: LexerGrammer[] = [
   linkGrammer,
+  inputGrammer,
   ...varLexerGrammer,
   comment,
   ...apiGrammer,

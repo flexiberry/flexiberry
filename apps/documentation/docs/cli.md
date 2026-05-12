@@ -97,9 +97,26 @@ Executes all tasks defined within a `.berry` script file. It runs through the sc
 
 **Usage:**
 ```bash
-flexiberry run [file]
+flexiberry run [file] [options]
 ```
 *If `[file]` is omitted, it will attempt to run the currently selected file.*
+
+**Data Iteration Options:**
+If your script contains an `Input` statement linking to external data (CSV/JSON), the CLI provides flexible execution options:
+- **Interactive Prompt:** By default, you'll be asked whether to run **All iterations** or a **Custom range**.
+- **CLI Flags:**
+  - `--iter <all|custom>` : Set the iteration mode directly.
+  - `--start <index>` : 1-based index to start from (requires `--iter custom`).
+  - `--end <index>` : 1-based index to end at (requires `--iter custom`).
+
+**Examples:**
+```bash
+# Run all data iterations
+flexiberry run script.berry --iter all
+
+# Run specific iterations (rows 1 to 10)
+flexiberry run script.berry --iter custom --start 1 --end 10
+```
 
 ---
 

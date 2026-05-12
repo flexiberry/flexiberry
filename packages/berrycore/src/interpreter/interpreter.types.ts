@@ -56,6 +56,9 @@ export enum InterpreterEvent {
 
   /** Execution state changed (paused, resumed, killed) */
   StateChanged = "STATE_CHANGED",
+
+  /** Data from an Input statement has been loaded */
+  DataLoaded = "DATA_LOADED",
 }
 
 // ─── Event Payloads ─────────────────────────────────────────────────────────
@@ -126,6 +129,7 @@ export type EventPayloadMap = {
   [InterpreterEvent.Error]: ErrorPayload;
   [InterpreterEvent.InputRequired]: { readonly prompt: string };
   [InterpreterEvent.StateChanged]: { readonly state: ExecutionState; readonly reason: string };
+  [InterpreterEvent.DataLoaded]: { readonly rows: Record<string, string>[] };
 };
 
 export type EventListener<E extends InterpreterEvent> = (payload: EventPayloadMap[E]) => void | Promise<void>;

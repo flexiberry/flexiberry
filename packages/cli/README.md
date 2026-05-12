@@ -94,6 +94,16 @@ Execute your script locally using the `berrycore` interpreter.
 flexiberry run my-test.berry
 ```
 
+> **Data Iteration Options:**
+> If your script contains an `Input` statement linking to external data (CSV/JSON), the CLI provides flexible execution options:
+> - **Interactive Prompt:** By default, you'll be asked whether to run **All iterations** or a **Custom range**.
+> - **CLI Flags:**
+>   - `--iter <all|custom>` : Set the iteration mode directly.
+>   - `--start <index>` : 1-based index to start from (requires `--iter custom`).
+>   - `--end <index>` : 1-based index to end at (requires `--iter custom`).
+>
+> *Example: `flexiberry run script.berry --iter custom --start 1 --end 10`*
+
 ---
 
 ## 🤝 Contributing & Source

@@ -15,6 +15,9 @@ export enum TokenType {
   Var,
   Link,
   LinkPath,
+  Input,
+  InputPath,
+  Decrypt,
   Pointer,
   Pointed,
 

@@ -96,9 +96,12 @@ program
 program
   .command("run")
   .argument("[file]", "Path to the .berry script file")
+  .option("--iter <type>", "Iteration type: 'all' or 'custom'")
+  .option("--start <index>", "Start index for custom iterations (1-based)")
+  .option("--end <index>", "End index for custom iterations")
   .description("Run a .berry script file")
-  .action((file: string | undefined) => {
-    RunUtility.run(file ?? "");
+  .action((file: string | undefined, options: any) => {
+    RunUtility.run(file ?? "", options);
   });
 
 // ── flexiberry test [file] ────────────────────────────────────────────────────

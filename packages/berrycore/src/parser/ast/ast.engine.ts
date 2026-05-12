@@ -20,6 +20,7 @@ import {
   StatementNode,
   VarDeclarationNode,
   LinkStatementNode,
+  InputStatementNode,
   PointerReferenceNode,
   ApiBlockNode,
   UrlStatementNode,
@@ -102,6 +103,7 @@ export class AstEngine {
   private parseStatement(): StatementNode | null {
     if (this.check(TokenType.Var)) return this.parseVarDeclaration();
     if (this.check(TokenType.Link)) return this.parseLinkStatement();
+    if (this.check(TokenType.Input)) return this.parseInputStatement();
     if (this.check(TokenType.Api)) return this.parseApiBlock();
     if (this.check(TokenType.Task)) return this.parseTaskBlock();
     if (this.check(TokenType.Step)) return this.parseStepBlock();
@@ -181,6 +183,25 @@ export class AstEngine {
 
     return {
       type: NodeType.LinkStatement,
+      position,
+      path: pathToken.value,
+    };
+  }
+
+  // ── Input Statement ──────────────────────────────────────────────────────
+
+  /**
+   * Grammar: Input <path>
+   * Tokens:  Input, InputPath
+   */
+  private parseInputStatement(): InputStatementNode {
+    const inputToken = this.expect(TokenType.Input, "Expected 'Input' keyword");
+    const position = this.positionOf(inputToken);
+
+    const pathToken = this.expect(TokenType.InputPath, "Expected path after 'Input'");
+
+    return {
+      type: NodeType.InputStatement,
       position,
       path: pathToken.value,
     };
@@ -525,6 +546,12 @@ export class AstEngine {
         value = this.advance().value;
       }
 
+      let isEncrypted = false;
+      if (this.check(TokenType.Decrypt)) {
+        this.advance(); // consume 'Decrypt'
+        isEncrypted = true;
+      }
+
       entries.push({
         type: NodeType.KeyValuePair,
         position,
@@ -533,6 +560,7 @@ export class AstEngine {
         isKeyQuoted,
         isValueQuoted,
         isMultiline,
+        isEncrypted,
       });
     }
 

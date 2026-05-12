@@ -14,8 +14,9 @@ export enum NodeType {
   VarDeclaration = "VarDeclaration",
   PointerReference = "PointerReference",
 
-  // Link constructs
+  // Link & Input constructs
   LinkStatement = "LinkStatement",
+  InputStatement = "InputStatement",
 
   // API constructs
   ApiBlock = "ApiBlock",
@@ -71,6 +72,7 @@ export interface ProgramNode extends BaseNode {
 export type StatementNode =
   | VarDeclarationNode
   | LinkStatementNode
+  | InputStatementNode
   | ApiBlockNode
   | TaskBlockNode
   | StepBlockNode
@@ -116,6 +118,17 @@ export interface PointerReferenceNode extends BaseNode {
  */
 export interface LinkStatementNode extends BaseNode {
   readonly type: NodeType.LinkStatement;
+  readonly path: string;
+}
+
+/**
+ * `Input path/to/file.csv`
+ *
+ * Grammar: input.grammer.ts
+ * Tokens: Input, InputPath
+ */
+export interface InputStatementNode extends BaseNode {
+  readonly type: NodeType.InputStatement;
   readonly path: string;
 }
 
@@ -252,6 +265,7 @@ export interface KeyValuePairNode extends BaseNode {
   readonly isKeyQuoted: boolean;
   readonly isValueQuoted: boolean;
   readonly isMultiline: boolean;
+  readonly isEncrypted?: boolean;
 }
 
 /**
@@ -304,6 +318,7 @@ export type ASTNode =
   | ProgramNode
   | VarDeclarationNode
   | LinkStatementNode
+  | InputStatementNode
   | PointerReferenceNode
   | ApiBlockNode
   | UrlStatementNode

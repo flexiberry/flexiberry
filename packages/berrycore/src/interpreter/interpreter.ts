@@ -52,6 +52,10 @@ export interface InterpreterOptions {
   readonly continueOnError: boolean;
   /** Dry run — don't make actual API calls (default: false) */
   readonly dryRun: boolean;
+  /** Injected row of data for Input statements */
+  readonly inputRow?: Record<string, string>;
+  /** Provider for decrypting encrypted variables */
+  readonly decryptionProvider?: (encrypted: string) => Promise<string> | string;
 }
 
 const DEFAULT_OPTIONS: InterpreterOptions = {
@@ -208,7 +212,7 @@ export class Interpreter {
     for (const node of this.ast.body) {
       switch (node.type) {
         case NodeType.VarDeclaration:
-          this.visitVarDeclaration(node);
+          await this.visitVarDeclaration(node);
           break;
         case NodeType.ApiBlock:
           this.visitApiBlock(node);
@@ -275,10 +279,26 @@ export class Interpreter {
 
   // ── Var Declaration Visitor ─────────────────────────────────────────────
 
-  private visitVarDeclaration(node: VarDeclarationNode): void {
+  private async visitVarDeclaration(node: VarDeclarationNode): Promise<void> {
     // Store each key-value entry as a global variable
     for (const entry of node.entries) {
-      this.globalEnv.declare(entry.key, entry.value);
+      let value: string = entry.value;
+
+      // Handle Input mapping
+      if (value.startsWith("Input.")) {
+        const fieldName = value.substring(6);
+        if (this.options.inputRow && fieldName in this.options.inputRow) {
+          value = this.options.inputRow[fieldName];
+        }
+      }
+
+      // Handle Decryption
+      if (entry.isEncrypted) {
+        const provider = this.options.decryptionProvider ?? this.defaultDecryptionProvider.bind(this);
+        value = await provider(value);
+      }
+
+      this.globalEnv.declare(entry.key, value);
     }
 
     // If the var has a pointer, store the pointer reference
@@ -784,6 +804,16 @@ export class Interpreter {
     for (const listener of eventListeners) {
       listener(payload);
     }
+  }
+
+  // ── Decryption Provider ──────────────────────────────────────────────────
+
+  private defaultDecryptionProvider(encrypted: string): string {
+    const isNode = typeof process !== "undefined" && process.versions != null && process.versions.node != null;
+    if (isNode) {
+      return Buffer.from(encrypted, "base64").toString("utf-8");
+    }
+    return atob(encrypted);
   }
 
   // ── Adapter Logging ─────────────────────────────────────────────────────
