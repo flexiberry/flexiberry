@@ -24,48 +24,49 @@ type LogLevel = "info" | "warn" | "error" | "debug" | "step" | "task" | "api";
 // ─── Domain types ─────────────────────────────────────────────────────────────
 
 export type StepStatus = "PENDING" | "RUNNING" | "PASS" | "FAILED" | "SKIPPED" | "STOPPED";
-type AdapterState     = "RUNNING" | "PAUSED"  | "COMPLETED";
+type AdapterState = "RUNNING" | "PAUSED" | "COMPLETED";
 
 interface LiveStep {
   readonly name: string;
-  status:    StepStatus;
+  status: StepStatus;
   startTime: Date;
-  endTime?:  Date;
+  endTime?: Date;
   duration?: number;   // ms
-  method?:   string;
-  url?:      string;
+  method?: string;
+  url?: string;
   httpStatus?: number;
-  error?:    string;
+  error?: string;
 }
 
 interface LiveTask {
   readonly title: string;
-  status:    StepStatus;
+  status: StepStatus;
   readonly steps: LiveStep[];
+  iteration: number;   // 1-based index
   startTime: Date;
-  endTime?:  Date;
+  endTime?: Date;
 }
 
 // ─── ANSI primitives ──────────────────────────────────────────────────────────
 
 const A = {
-  reset:      "\x1b[0m",
-  bold:       "\x1b[1m",
-  dim:        "\x1b[2m",
-  red:        "\x1b[31m",
-  green:      "\x1b[32m",
-  yellow:     "\x1b[33m",
-  cyan:       "\x1b[36m",
-  magenta:    "\x1b[35m",
-  white:      "\x1b[37m",
-  gray:       "\x1b[90m",
-  bgGreen:    "\x1b[42m",
-  bgYellow:   "\x1b[43m",
-  bgBlue:     "\x1b[44m",
-  bgCyan:     "\x1b[46m",
-  up:         (n: number) => `\x1b[${n}A`,
-  col1:       "\x1b[1G",
-  eraseDown:  "\x1b[J",
+  reset: "\x1b[0m",
+  bold: "\x1b[1m",
+  dim: "\x1b[2m",
+  red: "\x1b[31m",
+  green: "\x1b[32m",
+  yellow: "\x1b[33m",
+  cyan: "\x1b[36m",
+  magenta: "\x1b[35m",
+  white: "\x1b[37m",
+  gray: "\x1b[90m",
+  bgGreen: "\x1b[42m",
+  bgYellow: "\x1b[43m",
+  bgBlue: "\x1b[44m",
+  bgCyan: "\x1b[46m",
+  up: (n: number) => `\x1b[${n}A`,
+  col1: "\x1b[1G",
+  eraseDown: "\x1b[J",
   hideCursor: "\x1b[?25l",
   showCursor: "\x1b[?25h",
 } as const;
@@ -75,8 +76,8 @@ const A = {
 const ICON: Record<StepStatus, string> = {
   PENDING: `${A.gray}·${A.reset}`,
   RUNNING: `${A.cyan}●${A.reset}`,
-  PASS:    `${A.green}✓${A.reset}`,
-  FAILED:  `${A.red}✗${A.reset}`,
+  PASS: `${A.green}✓${A.reset}`,
+  FAILED: `${A.red}✗${A.reset}`,
   SKIPPED: `${A.yellow}⊟${A.reset}`,
   STOPPED: `\x1b[35m■${A.reset}`,
 };
@@ -85,8 +86,8 @@ function statusLabel(s: StepStatus, spinner: string): string {
   switch (s) {
     case "PENDING": return `${A.gray}Pending${A.reset}`;
     case "RUNNING": return `${A.cyan}${A.bold}${spinner} Running${A.reset}`;
-    case "PASS":    return `${A.green}${A.bold}Pass${A.reset}`;
-    case "FAILED":  return `${A.red}${A.bold}Failed${A.reset}`;
+    case "PASS": return `${A.green}${A.bold}Pass${A.reset}`;
+    case "FAILED": return `${A.red}${A.bold}Failed${A.reset}`;
     case "SKIPPED": return `${A.yellow}Skipped${A.reset}`;
     case "STOPPED": return `\x1b[35mStopped${A.reset}`;
   }
@@ -136,10 +137,10 @@ function hr(W: number, char = "─"): string {
 // ─── Column layout ────────────────────────────────────────────────────────────
 //
 // Fixed columns (all measured in visible characters):
-//   Task | "  " | Step | "  "| Status | "  " | Time | "  " | Info
+//   Iter | "  " | Task | "  " | Step | "  "| Status | "  " | Time | "  " | Info
 //
-const COL = { task: 22, step: 18, status: 9, time: 8 } as const;
-const FIXED_WIDTH = COL.task + 2 + COL.step + 2 + COL.status + 2 + COL.time + 2; // 63
+const COL = { iter: 6, task: 22, step: 18, status: 9, time: 8 } as const;
+const FIXED_WIDTH = COL.iter + 2 + COL.task + 2 + COL.step + 2 + COL.status + 2 + COL.time + 2; // 71
 
 // ─── BerryTableAdapter ────────────────────────────────────────────────────────
 
@@ -151,7 +152,7 @@ export class BerryTableAdapter implements IOAdapter {
     const fnStr = fileName ?? "Unknown File";
     const envStr = environment ?? "Local";
     const startStr = new Date().toLocaleString();
-    
+
     // Use A.cyan + bold for the title
     console.log(
       `${A.cyan}${A.bold}📝 FLEXIBERRY JOB  ${A.reset}\n` +
@@ -165,38 +166,74 @@ export class BerryTableAdapter implements IOAdapter {
   // ── Live model ──────────────────────────────────────────────────────────────
   private readonly tasks: LiveTask[] = [];
   private adapterState: AdapterState = "RUNNING";
+  private planLength = 0;
+  private totalIterations = 0;
 
   // ── Render state ────────────────────────────────────────────────────────────
   private renderedLines = 0;
-  private spinnerTick  = 0;
-  private readonly SPINNER = ["⠋","⠙","⠹","⠸","⠼","⠴","⠦","⠧","⠇","⠏"];
+  private spinnerTick = 0;
+  private readonly SPINNER = ["⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏"];
   private tickTimer: NodeJS.Timeout | null = null;
 
   // ── Command handler (injected by interpreter) ────────────────────────────────
   private commandHandler: ((cmd: ExecutionCommand) => void) | null = null;
 
   // ── Inline input state ───────────────────────────────────────────────────────
-  private inputMode    = false;
-  private inputBuffer  = "";
+  private inputMode = false;
+  private inputBuffer = "";
   private inputMessage = "";
   private inputResolver: ((val: string) => void) | null = null;
 
   // ─── Public update API (called from run-utility event listeners) ─────────────
 
-  initPlan(plan: ReadonlyArray<{ title: string | null; steps: ReadonlyArray<{ targetName: string }> }>): void {
-    this.tasks.length = 0;
-    for (const p of plan) {
-      this.tasks.push({
-        title:     truncate(p.title || "(unnamed)", COL.task - 2),
-        status:    "PENDING",
-        startTime: new Date(), // overridden when actually running
-        steps: p.steps.map(s => ({
-          name:      truncate(s.targetName, COL.step - 2),
-          status:    "PENDING",
-          startTime: new Date(), // overridden later
-        })),
-      });
+  initPlan(plan: ReadonlyArray<{ title: string | null; steps: ReadonlyArray<{ targetName: string }> }>, iterationCount: number): void {
+    const count = Math.max(1, iterationCount);
+    
+    // If the plan is the same, only grow the tasks array if count increased
+    if (this.planLength === plan.length && this.tasks.length > 0) {
+      if (count > this.totalIterations) {
+        const currentCount = this.totalIterations;
+        this.totalIterations = count;
+        for (let i = currentCount; i < count; i++) {
+          for (const p of plan) {
+            this.tasks.push({
+              title: truncate(p.title || "(unnamed)", COL.task - 2),
+              status: "PENDING",
+              iteration: i + 1,
+              startTime: new Date(),
+              steps: p.steps.map(s => ({
+                name: truncate(s.targetName, COL.step - 2),
+                status: "PENDING",
+                startTime: new Date(),
+              })),
+            });
+          }
+        }
+      }
+      return;
     }
+
+    // New plan or first initialization
+    this.tasks.length = 0;
+    this.planLength = plan.length;
+    this.totalIterations = count;
+
+    for (let i = 0; i < this.totalIterations; i++) {
+      for (const p of plan) {
+        this.tasks.push({
+          title: truncate(p.title || "(unnamed)", COL.task - 2),
+          status: "PENDING",
+          iteration: i + 1,
+          startTime: new Date(), // overridden when actually running
+          steps: p.steps.map(s => ({
+            name: truncate(s.targetName, COL.step - 2),
+            status: "PENDING",
+            startTime: new Date(), // overridden later
+          })),
+        });
+      }
+    }
+
     this.render();
   }
 
@@ -212,7 +249,7 @@ export class BerryTableAdapter implements IOAdapter {
   onTaskDone(taskIdx: number, status: StepStatus): void {
     const t = this.tasks[taskIdx];
     if (!t) return;
-    t.status  = status;
+    t.status = status;
     t.endTime = new Date();
     this.render();
   }
@@ -229,10 +266,10 @@ export class BerryTableAdapter implements IOAdapter {
   onStepDone(taskIdx: number, stepIdx: number, status: StepStatus, error?: string): void {
     const s = this.tasks[taskIdx]?.steps[stepIdx];
     if (!s) return;
-    s.status   = status;
-    s.endTime  = new Date();
+    s.status = status;
+    s.endTime = new Date();
     s.duration = s.endTime.getTime() - s.startTime.getTime();
-    s.error    = error;
+    s.error = error;
     this.render();
   }
 
@@ -240,7 +277,7 @@ export class BerryTableAdapter implements IOAdapter {
     const s = this.tasks[taskIdx]?.steps[stepIdx];
     if (!s) return;
     s.method = method;
-    s.url    = url;
+    s.url = url;
     this.render();
   }
 
@@ -248,7 +285,7 @@ export class BerryTableAdapter implements IOAdapter {
     const s = this.tasks[taskIdx]?.steps[stepIdx];
     if (!s) return;
     s.httpStatus = httpStatus;
-    s.duration   = duration;
+    s.duration = duration;
     this.render();
   }
 
@@ -263,18 +300,18 @@ export class BerryTableAdapter implements IOAdapter {
     let passed = 0;
     let failed = 0;
     let pending = 0;
-    
+
     let startMs = Infinity;
     let endMs = -Infinity;
 
     for (const t of this.tasks) {
       if (t.startTime) startMs = Math.min(startMs, t.startTime.getTime());
       if (t.endTime) endMs = Math.max(endMs, t.endTime.getTime());
-      
+
       for (const s of t.steps) {
         if (s.startTime) startMs = Math.min(startMs, s.startTime.getTime());
         if (s.endTime) endMs = Math.max(endMs, s.endTime.getTime());
-        
+
         if (s.status === "PASS") passed++;
         else if (s.status === "FAILED") failed++;
         else if (s.status === "PENDING" || s.status === "RUNNING") pending++;
@@ -346,8 +383,8 @@ export class BerryTableAdapter implements IOAdapter {
   log(_level: LogLevel, _message: string): void { /* intentionally silent */ }
 
   prompt(message: string): Promise<string> {
-    this.inputMode    = true;
-    this.inputBuffer  = "";
+    this.inputMode = true;
+    this.inputBuffer = "";
     this.inputMessage = message;
     this.render();
     return new Promise<string>((resolve) => {
@@ -418,12 +455,12 @@ export class BerryTableAdapter implements IOAdapter {
 
   private handleInputChar(key: string): void {
     if (key === "\r" || key === "\n") {
-      const value         = this.inputBuffer;
-      this.inputMode      = false;
-      this.inputBuffer    = "";
-      this.inputMessage   = "";
-      const resolver      = this.inputResolver;
-      this.inputResolver  = null;
+      const value = this.inputBuffer;
+      this.inputMode = false;
+      this.inputBuffer = "";
+      this.inputMessage = "";
+      const resolver = this.inputResolver;
+      this.inputResolver = null;
       this.render();
       resolver?.(value);
     } else if (key === "\x7f" || key === "\x08") {
@@ -439,7 +476,7 @@ export class BerryTableAdapter implements IOAdapter {
 
   private render(): void {
     // Clamp to actual terminal width but never less than 60
-    const W     = Math.max(60, process.stdout.columns ?? 100);
+    const W = Math.max(60, process.stdout.columns ?? 100);
     const lines = this.buildLines(W);
 
     if (this.renderedLines > 0) {
@@ -450,9 +487,9 @@ export class BerryTableAdapter implements IOAdapter {
   }
 
   private buildLines(W: number): string[] {
-    const spinner  = this.SPINNER[this.spinnerTick];
+    const spinner = this.SPINNER[this.spinnerTick];
     // Info column gets whatever space is left, minimum 8 chars
-    const infoW    = Math.max(8, W - FIXED_WIDTH);
+    const infoW = Math.max(8, W - FIXED_WIDTH);
     const lines: string[] = [];
 
     // ── Top separator ──────────────────────────────────────────────────────────
@@ -461,10 +498,11 @@ export class BerryTableAdapter implements IOAdapter {
     // ── Column header (plain text — no ANSI in padR inputs here) ──────────────
     lines.push(
       `${A.bold}\x1b[34m` +
-      padR("Task",   COL.task)   + "  " +
-      padR("Step",   COL.step)   + "  " +
+      padR("Iter", COL.iter) + "  " +
+      padR("Task", COL.task) + "  " +
+      padR("Step", COL.step) + "  " +
       padR("Status", COL.status) + "  " +
-      padR("Time",   COL.time)   + "  " +
+      padR("Time", COL.time) + "  " +
       "Info" +
       A.reset
     );
@@ -472,10 +510,11 @@ export class BerryTableAdapter implements IOAdapter {
     // ── Column separator (matches column widths exactly) ───────────────────────
     lines.push(
       A.gray +
-      "─".repeat(COL.task)   + "  " +
-      "─".repeat(COL.step)   + "  " +
+      "─".repeat(COL.iter) + "  " +
+      "─".repeat(COL.task) + "  " +
+      "─".repeat(COL.step) + "  " +
       "─".repeat(COL.status) + "  " +
-      "─".repeat(COL.time)   + "  " +
+      "─".repeat(COL.time) + "  " +
       "─".repeat(Math.min(infoW, 28)) +
       A.reset
     );
@@ -485,75 +524,105 @@ export class BerryTableAdapter implements IOAdapter {
       lines.push(`  ${A.dim}Waiting to start…${A.reset}`);
     }
 
-    for (let ti = 0; ti < this.tasks.length; ti++) {
-      const task      = this.tasks[ti];
-      const taskIcon  = ICON[task.status];
-      // taskLabel visible length: 1 (icon) + 1 (space) + title.length
+    // Determine which tasks to show (compact view for many iterations)
+    let activeIteration = 1;
+    if (this.planLength > 0) {
+      for (let i = this.tasks.length - 1; i >= 0; i--) {
+        if (this.tasks[i].status !== "PENDING") {
+          activeIteration = Math.floor(i / this.planLength) + 1;
+          break;
+        }
+      }
+    }
+
+    const tasksToRender: LiveTask[] = [];
+    if (this.planLength > 0) {
+      // 1. Always show Iteration 1
+      for (let i = 0; i < this.planLength; i++) {
+        if (this.tasks[i]) tasksToRender.push(this.tasks[i]);
+      }
+
+      // 2. If we are past iteration 1, show the active one
+      if (activeIteration > 1) {
+        const start = (activeIteration - 1) * this.planLength;
+        for (let i = start; i < start + this.planLength; i++) {
+          if (this.tasks[i]) tasksToRender.push(this.tasks[i]);
+        }
+      } else if (this.totalIterations > 1) {
+        // Show next iteration as pending
+        const start = this.planLength;
+        for (let i = start; i < start + this.planLength; i++) {
+          if (this.tasks[i]) tasksToRender.push(this.tasks[i]);
+        }
+      }
+    } else {
+      // Fallback if no plan length
+      tasksToRender.push(...this.tasks);
+    }
+
+    for (let ti = 0; ti < tasksToRender.length; ti++) {
+      const task = tasksToRender[ti];
+      const taskIcon = ICON[task.status];
       const taskLabel = `${taskIcon} ${task.title}`;
-      let firstStep   = true;
+      let firstStep = true;
+
+      // Group visual separator: add empty line if this is the start of a new iteration set
+      // (except for the very first row)
+      if (ti > 0 && ti % this.planLength === 0) {
+        lines.push("");
+      }
 
       if (task.steps.length === 0) {
-        // Task started but no steps yet
+        const iterStr = `${task.iteration}/${this.totalIterations}`;
         lines.push(
-          padR(taskLabel, COL.task)   + "  " +
-          padR("",        COL.step)   + "  " +
+          padR(iterStr, COL.iter) + "  " +
+          padR(taskLabel, COL.task) + "  " +
+          padR("", COL.step) + "  " +
           padR(statusLabel(task.status, spinner), COL.status) + "  " +
-          padR("",        COL.time)
+          padR("", COL.time)
         );
-        if (ti < this.tasks.length - 1) lines.push("");
         continue;
       }
 
       for (let si = 0; si < task.steps.length; si++) {
-        const step    = task.steps[si];
-        const sIcon   = ICON[step.status];
-        const sLabel  = statusLabel(step.status, spinner);
-
-        // Time string (visible only, no ANSI)
+        const step = task.steps[si];
+        const sIcon = ICON[step.status];
+        const sLabel = statusLabel(step.status, spinner);
         const timeStr = step.duration !== undefined
           ? `${step.duration}ms`
           : step.status === "RUNNING" ? "…" : "";
 
-        // Info column — built from plain text so truncation is accurate
-        let infoPlain = "";
-        let infoAnsi  = "";
-
+        let infoAnsi = "";
         if (step.status === "RUNNING" && step.url) {
-          infoPlain = `${step.method ?? "?"} ${step.url}`;
-          infoAnsi  = `${A.dim}${infoPlain.slice(0, infoW)}${A.reset}`;
+          infoAnsi = `${A.dim}${(step.method ?? "?") + " " + step.url.slice(0, infoW)}${A.reset}`;
         } else if (step.httpStatus !== undefined) {
-          const httpPart  = `HTTP ${step.httpStatus}`;
-          const errPart   = step.error ? `  ${step.error}` : "";
-          infoPlain       = httpPart + errPart;
-          const httpColor = step.httpStatus < 300 ? A.green
-            : step.httpStatus < 400 ? A.yellow : A.red;
-          // Truncate errPart so total visible ≤ infoW
-          const maxErr    = infoW - httpPart.length - 2;
-          const errSlice  = errPart.slice(0, Math.max(0, maxErr));
-          infoAnsi        = `${httpColor}${httpPart}${A.reset}${A.gray}${errSlice}${A.reset}`;
+          const httpPart = `HTTP ${step.httpStatus}`;
+          const errPart = step.error ? `  ${step.error}` : "";
+          const httpColor = step.httpStatus < 300 ? A.green : step.httpStatus < 400 ? A.yellow : A.red;
+          const maxErr = infoW - httpPart.length - 2;
+          infoAnsi = `${httpColor}${httpPart}${A.reset}${A.gray}${errPart.slice(0, Math.max(0, maxErr))}${A.reset}`;
         } else if (step.error) {
-          infoPlain = step.error;
-          infoAnsi  = `${A.red}${step.error.slice(0, infoW)}${A.reset}`;
+          infoAnsi = `${A.red}${step.error.slice(0, infoW)}${A.reset}`;
         }
-        void infoPlain; // used for length reference above
 
-        // Task column: show label only on first step of this task
-        const taskCol = firstStep
-          ? padR(taskLabel, COL.task)
-          : " ".repeat(COL.task);
+        const taskCol = firstStep ? padR(taskLabel, COL.task) : " ".repeat(COL.task);
+        const iterStr = firstStep ? `${task.iteration}/${this.totalIterations}` : "";
 
         lines.push(
+          padR(iterStr, COL.iter) + "  " +
           taskCol + "  " +
           padR(`${sIcon} ${step.name}`, COL.step) + "  " +
-          padR(sLabel,  COL.status) + "  " +
-          padR(timeStr, COL.time)  + "  " +
+          padR(sLabel, COL.status) + "  " +
+          padR(timeStr, COL.time) + "  " +
           infoAnsi
         );
         firstStep = false;
       }
 
       // Visual gap between tasks
-      if (ti < this.tasks.length - 1) lines.push("");
+      if (ti < tasksToRender.length - 1) {
+        lines.push("");
+      }
     }
 
     // ── Bottom separator ───────────────────────────────────────────────────────

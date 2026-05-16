@@ -144,9 +144,11 @@ export class RunUtility {
       basePath: path.dirname(filePath)
     });
 
-    // Track current task index
+    // Track current task index and iteration offset
     let currentTaskIdx = -1;
     let currentStepIdx = -1;
+    let iterationOffset = 0;
+    let planLength = 0;
     let dataRows: Record<string, string>[] | null = null;
 
     core.on(InterpreterEvent.DataLoaded, (payload: any) => {
@@ -155,34 +157,33 @@ export class RunUtility {
 
     // ── Task lifecycle ─────────────────────────────────────────────────────
     core.on(InterpreterEvent.Start, (payload: any) => {
-      adapter.initPlan(payload.plan);
+      planLength = payload.plan.length;
+      // Preliminary plan: 1 (discovery) + potential rows
+      adapter.initPlan(payload.plan, (dataRows?.length || 0));
     });
 
     core.on(InterpreterEvent.TaskBegin, ({ index }: any) => {
-      currentTaskIdx = index;
-      adapter.onTaskBegin(index);
+      currentTaskIdx = iterationOffset + index;
+      adapter.onTaskBegin(currentTaskIdx);
     });
 
     core.on(InterpreterEvent.TaskDone, (result: any) => {
       const s = RunUtility.mapStatus(result.status);
-      adapter.onTaskDone(currentTaskIdx, s);
+      adapter.onTaskDone(iterationOffset + result.index, s);
     });
 
     // ── Step lifecycle ─────────────────────────────────────────────────────
     core.on(InterpreterEvent.StepBegin, ({ index, taskIndex }: any) => {
-      adapter.onStepBegin(taskIndex, index);
+      currentStepIdx = index;
+      adapter.onStepBegin(iterationOffset + taskIndex, index);
     });
 
     core.on(InterpreterEvent.StepDone, (result: any) => {
       const { taskIndex, index } = result;
-      adapter.onStepDone(taskIndex, index, RunUtility.mapStatus(result.status), result.error ?? undefined);
+      adapter.onStepDone(iterationOffset + taskIndex, index, RunUtility.mapStatus(result.status), result.error ?? undefined);
     });
 
     // ── API call details ───────────────────────────────────────────────────
-
-    core.on(InterpreterEvent.StepBegin, ({ index }: any) => {
-      currentStepIdx = index;
-    });
 
     core.on(InterpreterEvent.ApiCallBegin, ({ method, url }: any) => {
       adapter.onApiCallBegin(currentTaskIdx, currentStepIdx, method, url);
@@ -199,6 +200,7 @@ export class RunUtility {
 
     // First run (or parsing run)
     await core.run();
+    iterationOffset += planLength;
 
     const loadedRows = dataRows as Record<string, string>[] | null;
     if (loadedRows && loadedRows.length > 0) {
@@ -254,6 +256,7 @@ export class RunUtility {
       // It was a data-loading run, now execute per row
       for (let i = startIndex; i < endIndex; i++) {
         await core.run(loadedRows[i]);
+        iterationOffset += planLength;
       }
     }
 
