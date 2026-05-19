@@ -8,7 +8,7 @@
     "berrycore": "./dist/index.js"
   },
   "scripts": {
-    "build": "tsc && node scripts/fix-esm.mjs",
+    "build": "tsc",
     "watch": "tsc --watch",
     "clean": "rm -rf dist",
     "prepare": "npm run build"
