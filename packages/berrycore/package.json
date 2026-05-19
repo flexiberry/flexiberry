@@ -10,7 +10,8 @@
   "scripts": {
     "build": "tsc && node scripts/fix-esm.mjs",
     "watch": "tsc --watch",
-    "clean": "rm -rf dist"
+    "clean": "rm -rf dist",
+    "prepare": "npm run build"
   },
   "keywords": [],
   "author": "rintu raj c",

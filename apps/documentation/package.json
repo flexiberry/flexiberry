@@ -1,5 +1,5 @@
 {
-  "name": "vitepress-project",
+  "name": "documentation",
   "private": true,
   "type": "module",
   "scripts": {
@@ -10,13 +10,6 @@
   "devDependencies": {
     "vitepress": "1.0.0-alpha.28",
     "vue": "3.2.44"
-  },
-  "pnpm": {
-    "peerDependencyRules": {
-      "ignoreMissing": [
-        "@algolia/client-search"
-      ]
-    }
   },
   "dependencies": {}
 }
