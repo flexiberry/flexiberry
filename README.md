@@ -1,90 +1,156 @@
-# 🚀 FlexiBerry
+<div align="center">
 
-**🌟 FlexiBerry** is a comprehensive API testing framework that supports a wide range of testing scenarios, including functional, load, security, data comparison, response validation, unit, and end-to-end testing.
+<img src="./assets/favicon/android-icon-192x192.png" height="100" width="100" alt="FlexiBerry Logo" />
 
-<div class="flex justify-center">
-<img src="./assets/favicon/android-icon-192x192.png" 
-height="100"
-width="100"
-alt="Project Logo">
-</div>
+# FlexiBerry
 
-## ✨ Features
+**A powerful, developer-friendly API testing framework built for every team.**
 
-- **Comprehensive Testing**: Supports various types of API testing including functional, load, and security testing. 🔍
-- **User-Friendly Interface**: Designed with a minimalistic UI for ease of use. 🖥️
-- **Customizable Test Suites**: Create and manage test suites tailored to your specific needs. ⚙️
-- **Real-Time Results**: Get immediate feedback on your API tests. ⏱️
-- **Integration Support**: Easily integrate with CI/CD pipelines for automated testing. 🔗
+[![Website](https://img.shields.io/badge/website-flexiberry.dev-6C63FF?style=for-the-badge&logo=google-chrome&logoColor=white)](https://flexiberry.dev)
+[![Status](https://img.shields.io/badge/status-in%20development-orange?style=for-the-badge&logo=gitbook&logoColor=white)](https://flexiberry.dev)
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue?style=for-the-badge)](./LICENSE.md)
+[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen?style=for-the-badge&logo=github)](./CONTRIBUTING.md)
+[![Node.js](https://img.shields.io/badge/node.js-18%2B-339933?style=for-the-badge&logo=node.js&logoColor=white)](https://nodejs.org)
+[![TypeScript](https://img.shields.io/badge/TypeScript-strict-3178C6?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org)
 
-## 📦 Usage
-
-### FlexiBerry CLI
-
-To interactively manage and run your test suites directly from your terminal, install the **FlexiBerry CLI** globally:
-
-```bash
-cd packages/cli
-npm run build
-sudo npm i -g .
-```
-
-Once installed, you can launch the CLI anywhere by running:
-```bash
-flexiberry
-```
+<br/>
 
 > [!WARNING]
-> **Troubleshooting `flexiberry: import: command not found` error:**
-> If you run `flexiberry` and receive syntax errors like `import: command not found` or `export: '{' not a valid identifier`, your system is likely executing a stale symlink as a bash script. 
-> To fix this, simply remove the stale symlink and reinstall:
-> ```bash
-> sudo rm /usr/local/bin/flexiberry
-> sudo npm i -g .
-> ```
+> 🚧 **Active Development — Not Production Ready**
+>
+> FlexiBerry is currently in its **early development phase**. APIs, syntax, and features are subject to **breaking changes** without prior notice. We do **not** recommend using it in production environments yet.
+>
+> ⭐ **Star this repo** to stay notified as we approach a stable release!
 
-### General
+<br/>
 
-1. Install FlexiBerry using the package manager of your choice. 📥
-2. Configure your API endpoints in the settings. ⚙️
-3. Create test cases using the provided templates. 📝
-4. Run your tests and view the results in real-time. 📊
+[🌐 Website](https://flexiberry.dev) · [📖 Docs](https://docs.flexiberry.dev) · [📦 Installation](#-installation) · [⚡ Quick Start](#-quick-start) · [✨ Features](#-features) · [🤝 Contributing](#-contributing) · [💬 Support](#-support)
 
-## 🛠️ Developing
-
-To get started with developing FlexiBerry, follow our self-hosting documentation to set up your development environment. 📚
-
-## 🤝 Contributing
-
-We welcome contributions! Please follow these steps to contribute:
-
-1. Fork the repository. 🍴
-2. Create a new branch for your feature or bug fix. 🌿
-3. Make your changes and commit them. 💻
-4. Open a pull request with a description of your changes. 📬
-
-Please read the [CONTRIBUTING](CONTRIBUTING.md) file for more details on our code of conduct and the process for submitting pull requests.
-
-## 🔄 Continuous Integration
-
-We use GitHub Actions for continuous integration. Check out our build workflows to see how we ensure code quality. ✅
-
-## 📜 Changelog
-
-See the [CHANGELOG](CHANGELOG.md) file for details on the latest updates and changes.
-
-## 📝 License
-
-This project is licensed under the MIT License — see the [LICENSE](LICENSE.md) file for details.
-
-## 👥 Authors
-
-This project owes its existence to the collective efforts of all those who contribute — contribute now! 🙌
-
-## 💬 Support
-
-For support, please reach out via our [Discord](link_to_discord) or [GitHub Discussions](link_to_github_discussions).
+</div>
 
 ---
 
-© 2025 FlexiBerry, Inc.
+## ✨ Features
+
+| Feature | Description |
+|---|---|
+| 🔍 **Comprehensive Testing** | Functional, load, security, data comparison, and end-to-end API testing |
+| 🖥️ **Minimalistic UI** | Clean, distraction-free interface for efficient test management |
+| ⚙️ **Customizable Suites** | Build and organize test suites tailored to your workflows |
+| ⏱️ **Real-Time Feedback** | Instant results and live progress directly in your terminal |
+| 🔗 **CI/CD Integration** | Drop-in support for GitHub Actions, GitLab CI, and more |
+| 📂 **External Data Sources** | Load test data from CSV/JSON files with row-by-row iteration |
+| 🔐 **Encrypted Fields** | Built-in support for decrypting sensitive credential fields at runtime |
+
+---
+
+## 📦 Installation
+
+### Prerequisites
+
+- **Node.js** `v18+`
+- **npm** or **pnpm**
+
+### FlexiBerry CLI
+
+Install the CLI globally to run and manage test suites from anywhere in your terminal:
+
+```bash
+# Step 1 — Build the CLI package
+cd packages/cli
+npm run build
+
+# Step 2 — Install globally
+sudo npm i -g .
+```
+
+---
+
+## ⚡ Quick Start
+
+```bash
+# 1. Clone the repository
+git clone https://github.com/flexiberry/flexiberry.git
+cd flexiberry
+
+# 2. Install dependencies
+npm install
+
+# 3. Launch the CLI
+flexiberry
+```
+
+Once inside the CLI:
+1. Configure your API endpoints
+2. Create test cases from the built-in templates
+3. Run your suite and watch results stream in real-time
+
+---
+
+## 🛠️ Development Setup
+
+Want to hack on FlexiBerry itself? Here's how to get started:
+
+```bash
+# Install all workspace dependencies
+npm install
+
+# Run the CLI in development mode
+cd packages/cli && npm run dev
+```
+
+Refer to our [self-hosting documentation](https://docs.flexiberry.dev/self-hosting) for a full environment setup guide.
+
+---
+
+## 🤝 Contributing
+
+We warmly welcome contributions of all kinds — bug fixes, new features, documentation improvements, and more.
+
+```
+1. Fork the repository
+2. Create your branch:  git checkout -b feat/your-feature
+3. Commit your changes: git commit -m 'feat: add your feature'
+4. Push to the branch:  git push origin feat/your-feature
+5. Open a Pull Request
+```
+
+Please read [CONTRIBUTING.md](CONTRIBUTING.md) for our code of conduct and PR guidelines.
+
+---
+
+## 🔄 Continuous Integration
+
+FlexiBerry uses **GitHub Actions** for automated builds and quality checks on every commit and pull request.
+
+---
+
+## 📜 Changelog
+
+All notable changes are documented in [CHANGELOG.md](CHANGELOG.md).
+
+---
+
+## 📝 License
+
+Distributed under the **MIT License**. See [LICENSE.md](LICENSE.md) for details.
+
+---
+
+## 💬 Support
+
+| Channel | Link |
+|---|---|
+| 🌐 Website | [flexiberry.dev](https://flexiberry.dev) |
+| 📖 Docs | [docs.flexiberry.dev](https://docs.flexiberry.dev) |
+| 💬 Discord | [Join our server](https://discord.flexiberry.dev) |
+| 🐛 Bug Reports | [GitHub Issues](https://github.com/flexiberry/flexiberry/issues) |
+| 💡 Discussions | [GitHub Discussions](https://github.com/flexiberry/flexiberry/discussions) |
+
+---
+
+<div align="center">
+
+Made with ❤️ by the FlexiBerry community · [flexiberry.dev](https://flexiberry.dev) · © 2025 FlexiBerry, Inc.
+
+</div>
