@@ -16,7 +16,14 @@
     "lint": "eslint . --ext .ts,.tsx --fix",
     "lint:check": "eslint . --ext .ts,.tsx",
     "build:all": "node scripts/build-all.js",
-    "dev:all": "node scripts/run-all.js"
+    "dev:all": "node scripts/run-all.js",
+    "build:app": "pnpm --filter ui build",
+    "build:doc": "pnpm --filter vitepress-project build",
+    "build:website": "pnpm --filter website build",
+    "build:apps": "pnpm run build:app && pnpm run build:doc && pnpm run build:website",
+    "dev:app": "pnpm --filter ui dev",
+    "dev:doc": "pnpm --filter vitepress-project dev",
+    "dev:website": "pnpm --filter website dev"
   },
   "keywords": [
     "flexiberry",
