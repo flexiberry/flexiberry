@@ -3,7 +3,7 @@
     "name": "flexiberrydocumentation",
     "compatibility_date": "2026-05-19",
     "observability": {
-        "enabled": true
+        "enabled": false
     },
     "assets": {
         "directory": "docs/.vitepress/dist"

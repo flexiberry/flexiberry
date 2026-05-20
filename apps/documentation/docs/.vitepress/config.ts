@@ -3,7 +3,26 @@ import { defineConfig } from "vitepress";
 export default defineConfig({
   title: "FlexiBerry",
   description: "FlexiBerry Documentation",
-  head: [["link", { rel: "icon", href: "/logo.png" }]],
+  head: [
+    ["link", { rel: "icon", href: "/logo.png" }],
+    [
+      "script",
+      {
+        async: "true",
+        src: "https://www.googletagmanager.com/gtag/js?id=G-7KCF2JGTV5",
+      },
+    ],
+    [
+      "script",
+      {},
+      `
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-7KCF2JGTV5');
+      `,
+    ],
+  ],
   themeConfig: {
     nav: [
       { text: "Home", link: "/" },
