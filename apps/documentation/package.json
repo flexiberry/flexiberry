@@ -6,7 +6,7 @@
     "dev": "vitepress dev docs",
     "build": "vitepress build docs",
     "serve": "vitepress serve docs",
-    "deploy": "npx wrangler deploy"
+    "deploy": "pnpm dlx wrangler deploy"
   },
   "devDependencies": {
     "vitepress": "1.0.0-alpha.28",
