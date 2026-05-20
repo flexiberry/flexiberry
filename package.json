@@ -23,7 +23,9 @@
     "build:apps": "pnpm run build:app && pnpm run build:doc && pnpm run build:website",
     "dev:app": "pnpm --filter ui dev",
     "dev:doc": "pnpm --filter documentation dev",
-    "dev:website": "pnpm --filter website dev"
+    "dev:website": "pnpm --filter website dev",
+    "deploy:doc": "pnpm --filter documentation deploy",
+    "deploy:website": "pnpm --filter website deploy"
   },
   "keywords": [
     "flexiberry",
