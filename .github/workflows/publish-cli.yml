@@ -1,18 +1,14 @@
 name: Publish CLI
 
 on:
+  workflow_dispatch:
   push:
     branches:
-      - master
+      - main
     paths:
       - 'packages/cli/**'
       - '.github/workflows/publish-cli.yml'
-  pull_request:
-    branches:
-      - master
-    paths:
-      - 'packages/cli/**'
-      - '.github/workflows/publish-cli.yml'
+  
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}

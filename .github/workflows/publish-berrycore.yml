@@ -1,15 +1,10 @@
 name: Publish Berrycore
 
 on:
+  workflow_dispatch:
   push:
     branches:
-      - master
-    paths:
-      - 'packages/berrycore/**'
-      - '.github/workflows/publish-berrycore.yml'
-  pull_request:
-    branches:
-      - master
+      - main
     paths:
       - 'packages/berrycore/**'
       - '.github/workflows/publish-berrycore.yml'
