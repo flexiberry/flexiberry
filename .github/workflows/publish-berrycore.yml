@@ -7,6 +7,12 @@ on:
     paths:
       - 'packages/berrycore/**'
       - '.github/workflows/publish-berrycore.yml'
+  pull_request:
+    branches:
+      - master
+    paths:
+      - 'packages/berrycore/**'
+      - '.github/workflows/publish-berrycore.yml'
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
