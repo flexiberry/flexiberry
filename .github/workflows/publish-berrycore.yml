@@ -1,6 +1,7 @@
 name: Publish Berrycore
 
 on:
+  workflow_dispatch:
   push:
     branches:
       - main
