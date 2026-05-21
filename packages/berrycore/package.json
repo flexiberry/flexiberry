@@ -10,11 +10,15 @@
   "scripts": {
     "build": "tsc",
     "watch": "tsc --watch",
-    "clean": "rm -rf dist"
+    "clean": "rm -rf dist",
+    "prepublishOnly": "pnpm run build"
   },
   "keywords": [],
   "author": "rintu raj c",
   "license": "MIT",
+  "files": [
+    "dist"
+  ],
   "dependencies": {},
   "devDependencies": {
     "typescript": "^5.9.2"
