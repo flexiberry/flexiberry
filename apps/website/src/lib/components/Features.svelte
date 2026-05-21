@@ -70,7 +70,8 @@
 
     <div class="feat-cards">
       {#each features as feat, i}
-        <div
+        <a
+          href="/features"
           class="feat-card"
           class:card-in={sectionRevealed || isVisible}
           style="--c:{feat.color}; --delay:{i * 100}ms"
@@ -81,7 +82,7 @@
           <span class="feat-tag" style="color:{feat.color}; border-color:color-mix(in srgb,{feat.color} 30%,transparent); background:color-mix(in srgb,{feat.color} 10%,transparent)">{feat.tag}</span>
           <h3 class="feat-title">{feat.title}</h3>
           <p class="feat-desc">{feat.description}</p>
-        </div>
+        </a>
       {/each}
     </div>
   </div>
@@ -154,6 +155,8 @@
   }
 
   .feat-card {
+    display: block;
+    text-decoration: none;
     position: relative;
     background: rgba(255,255,255,.025);
     border: 1px solid rgba(255,255,255,.07);
