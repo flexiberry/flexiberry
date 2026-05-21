@@ -11,7 +11,11 @@
  *   - Uses IOAdapter for user input (CLI or UI)
  */
 
-import axios, { AxiosResponse } from "axios";
+export interface FetchResponse {
+  readonly status: number;
+  readonly data: any;
+  readonly headers: Record<string, string>;
+}
 
 import {
   ProgramNode,
@@ -482,32 +486,8 @@ export class Interpreter {
       status = ExecutionStatus.Failed;
       if (err instanceof RuntimeError) {
         error = err.message;
-      } else if (axios.isAxiosError(err)) {
-        error = `API call failed: ${err.message}`;
-        // Even on HTTP errors, store response for capture/check
-        if (err.response) {
-          apiResponse = {
-            status: err.response.status,
-            headers: err.response.headers as Record<string, string>,
-            body: err.response.data,
-          };
-          stepEnv.declare("$.status", err.response.status);
-          stepEnv.declare("$.body", err.response.data ?? null);
-
-          // Still try capture and check on error responses
-          if (node.capture) {
-            this.processCapture(node.capture.entries, err.response, stepIndex, taskEnv);
-          }
-          if (node.check) {
-            checksPassed = this.processCheck(node.check.conditions, stepEnv, taskEnv);
-            if (checksPassed) {
-              status = ExecutionStatus.Pass;
-              error = null;
-            }
-          }
-        }
       } else {
-        error = String(err);
+        error = err instanceof Error ? err.message : String(err);
       }
 
       await this.emit(InterpreterEvent.Error, {
@@ -543,7 +523,7 @@ export class Interpreter {
     apiDef: ApiDefinition,
     stepEnv: Environment,
     taskEnv: Environment
-  ): Promise<AxiosResponse> {
+  ): Promise<FetchResponse> {
     const allVars = taskEnv.getAllEntries();
     // Merge step env on top
     for (const [k, v] of stepEnv.getOwnEntries()) {
@@ -583,31 +563,58 @@ export class Interpreter {
         status: 200,
         data: { dryRun: true },
         headers: {},
-        statusText: "OK",
-        config: {} as AxiosResponse["config"],
-      } as AxiosResponse;
+      };
     }
 
     const callStart = Date.now();
-    const response = await axios({
-      method: apiDef.method.toLowerCase(),
-      url,
-      data,
-      headers,
-      timeout: this.options.apiTimeout,
-      validateStatus: () => true, // don't throw on non-2xx
-    });
 
-    const duration = Date.now() - callStart;
-    await this.emit(InterpreterEvent.ApiCallDone, {
-      apiName: apiDef.name,
-      status: response.status,
-      duration,
-    });
+    // Create abort controller for the request timeout
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), this.options.apiTimeout);
 
-    this.pushLog("api", `${apiDef.name} → ${response.status} (${duration}ms)`);
+    try {
+      const response = await fetch(url, {
+        method: apiDef.method.toUpperCase(),
+        headers,
+        body: data,
+        signal: controller.signal,
+      });
 
-    return response;
+      const responseHeaders: Record<string, string> = {};
+      response.headers.forEach((val, key) => {
+        responseHeaders[key] = val;
+      });
+
+      let responseData: any = null;
+      const text = await response.text();
+      const contentType = response.headers.get("content-type") || "";
+      if (contentType.includes("application/json")) {
+        try {
+          responseData = JSON.parse(text);
+        } catch {
+          responseData = text;
+        }
+      } else {
+        responseData = text;
+      }
+
+      const duration = Date.now() - callStart;
+      await this.emit(InterpreterEvent.ApiCallDone, {
+        apiName: apiDef.name,
+        status: response.status,
+        duration,
+      });
+
+      this.pushLog("api", `${apiDef.name} → ${response.status} (${duration}ms)`);
+
+      return {
+        status: response.status,
+        data: responseData,
+        headers: responseHeaders,
+      };
+    } finally {
+      clearTimeout(timeoutId);
+    }
   }
 
   // ── Params Resolution ───────────────────────────────────────────────────
@@ -628,7 +635,7 @@ export class Interpreter {
 
   private processCapture(
     entries: ReadonlyArray<KeyValuePairNode>,
-    response: AxiosResponse,
+    response: FetchResponse,
     stepIndex: number,
     taskEnv: Environment
   ): void {
