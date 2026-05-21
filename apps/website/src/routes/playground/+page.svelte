@@ -125,7 +125,7 @@ Check
   // State Management (Svelte 5 Runes)
   let codeContent = $state(presets.petstore);
   let isRunning = $state(false);
-  let executionMode = $state("dry"); // "dry" (dry run, simulated calls) or "live" (axios calls)
+  let executionMode = $state("dry"); // "dry" (dry run, simulated calls) or "live" (fetch calls)
   let currentPreset = $state("petstore");
   let logs = $state<{ id: string; type: string; message: string; timestamp: string }[]>([]);
   let taskResults = $state<any[]>([]);
@@ -409,7 +409,7 @@ Check
               onclick={() => executionMode = "live"}
               class="px-3 py-1 text-[10px] uppercase font-bold rounded-md transition {executionMode === 'live' ? 'bg-emerald-500 text-gray-950 shadow-[0_0_10px_rgba(52,211,153,0.3)]' : 'text-slate-400 hover:text-white'}"
             >
-              Live (Axios)
+              Live (Fetch)
             </button>
           </div>
         </div>

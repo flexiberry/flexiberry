@@ -9,6 +9,8 @@
   "scripts": {
     "build": "pnpm -r build",
     "dev": "pnpm -r dev",
+    "release:version": "changeset version",
+    "release:publish": "pnpm build && changeset publish",
     "test": "echo \"Error: no test specified\" && exit 1",
     "runui": "cd ./apps/ui && pnpm run dev ",
     "watch": "cd ./packages/berrycore && pnpm run watch ",
@@ -43,14 +45,15 @@
   "author": "rinturajc@gmail.com",
   "license": "MIT",
   "devDependencies": {
+    "@changesets/cli": "^2.31.0",
     "@types/node": "^20.14.11",
-    "ts-node": "^10.9.2",
-    "typescript": "^5.5.3",
     "@typescript-eslint/eslint-plugin": "^7.0.0",
     "@typescript-eslint/parser": "^7.0.0",
     "eslint": "^8.56.0",
     "eslint-import-resolver-typescript": "^3.6.1",
-    "eslint-plugin-import": "^2.29.1"
+    "eslint-plugin-import": "^2.29.1",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.5.3"
   },
   "pnpm": {
     "onlyBuiltDependencies": [

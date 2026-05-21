@@ -1,6 +1,6 @@
 {
   "name": "@flexiberry/berrycore",
-  "version": "1.0.0",
+  "version": "0.1.0",
   "description": "",
   "main": "./dist/index.js",
   "type": "module",
@@ -10,14 +10,16 @@
   "scripts": {
     "build": "tsc",
     "watch": "tsc --watch",
-    "clean": "rm -rf dist"
+    "clean": "rm -rf dist",
+    "prepublishOnly": "pnpm run build"
   },
   "keywords": [],
   "author": "rintu raj c",
   "license": "MIT",
-  "dependencies": {
-    "axios": "^1.7.7"
-  },
+  "files": [
+    "dist"
+  ],
+  "dependencies": {},
   "devDependencies": {
     "typescript": "^5.9.2"
   }

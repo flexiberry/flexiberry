@@ -1,6 +1,6 @@
 {
   "name": "@flexiberry/cli",
-  "version": "1.0.0",
+  "version": "0.1.0",
   "description": "CLI package for FlexiBerry — zero third-party dependency shell",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -12,7 +12,8 @@
     "dev": "tsx src/index.ts",
     "build": "tsc",
     "clean": "rm -rf dist",
-    "installglobal": "npm i -g ."
+    "installglobal": "npm i -g .",
+    "prepublishOnly": "pnpm run build"
   },
   "keywords": [
     "flexiberry",
@@ -22,6 +23,9 @@
   ],
   "author": "rintu raj c",
   "license": "MIT",
+  "files": [
+    "dist"
+  ],
   "dependencies": {
     "@flexiberry/berrycore": "workspace:*",
     "commander": "^12.0.0"
