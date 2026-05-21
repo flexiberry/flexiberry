@@ -1,6 +1,6 @@
 {
   "name": "@flexiberry/cli",
-  "version": "1.0.0",
+  "version": "0.1.0",
   "description": "CLI package for FlexiBerry — zero third-party dependency shell",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
