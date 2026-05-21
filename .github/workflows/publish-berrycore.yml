@@ -43,5 +43,5 @@ jobs:
           publish: pnpm --filter @flexiberry/berrycore publish --access public --no-git-checks
           version: pnpm release:version
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GIT_TOKEN }}
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
