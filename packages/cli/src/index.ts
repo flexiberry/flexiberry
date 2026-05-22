@@ -9,7 +9,7 @@ const packageJson = JSON.parse(
 );
 
 import { FileUtility } from "./util/file-utility.js";
-import { Cli } from "./util/cli.js";
+import { Cli } from "./util/Cli.js";
 import { FileDB } from "./lib/db.js";
 
 import os from "os";
