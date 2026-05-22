@@ -104,4 +104,4 @@ This package is part of the FlexiBerry monorepo. We welcome contributions to gra
 
 ## 📄 License
 
-MIT © FlexiBerry, Inc.
+MIT © FlexiBerry.dev
