@@ -41,4 +41,4 @@ jobs:
       - name: Publish to NPM
         run: pnpm --filter @flexiberry/berrycore publish --access public --no-git-checks
         env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
