@@ -392,7 +392,7 @@
           <div class="cli-box">
             <span class="cli-prompt">$</span>
             <span class="cli-cmd">
-              berrycore run <span class="cli-file">demo.berry</span></span
+              flexiberry run <span class="cli-file">demo.berry</span></span
             >
             <span class="cli-blink">▌</span>
           </div>

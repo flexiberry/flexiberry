@@ -107,7 +107,7 @@
         <h3 class="doc-title">CLI Reference</h3>
         <p class="doc-desc">
           Every flag, option and exit code for <code class="ic"
-            >berrycore run</code
+            >flexiberry run</code
           > documented with examples.
         </p>
         <span class="doc-link">View reference →</span>
