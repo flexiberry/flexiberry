@@ -19,7 +19,7 @@
     "lint:check": "eslint . --ext .ts,.tsx",
     "build:all": "node scripts/build-all.js",
     "dev:all": "node scripts/run-all.js",
-    "build:app": "pnpm --filter @flexiberry/berrycore build && pnpm --filter @flexiberry/cli build && pnpm --filter @flexiberry/vscode-berry-extension build",
+    "build:app": "pnpm --filter @flexiberry/app build",
     "build:doc": "pnpm --filter documentation build",
     "build:website": "pnpm --filter website build",
     "build:apps": "pnpm run build:app && pnpm run build:doc && pnpm run build:website",

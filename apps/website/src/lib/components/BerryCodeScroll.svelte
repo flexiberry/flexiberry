@@ -437,7 +437,7 @@
             <span>✔</span>
             <span
               >Ready — <span style="color:#6ee7b7;"
-                >`berrycore run demo-test.berry`</span
+                >`flexiberry run demo-test.berry`</span
               ></span
             >
           </div>
