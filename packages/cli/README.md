@@ -1,6 +1,14 @@
+# @flexiberry/cli
+
+The official zero-dependency CLI shell for the **FlexiBerry** API Testing Framework, bringing keyboard-driven interactive creation, parsing, validation, and execution of `.berry` DSL scripts straight to your terminal.
+
+`@flexiberry/cli` eliminates the need for heavy API clients and constant context switching. It features a rich terminal-based wizard to generate tasks, steps, endpoints, and environment variables interactively, converts cURL and Swagger definitions into Berry DSL, and executes scripts locally with live execution metrics powered by `@flexiberry/berrycore`.
+
+---
+
 <div align="center">
   <img src="https://raw.githubusercontent.com/Flexiberry/flexiberry/main/assets/favicon/android-icon-192x192.png" height="120" width="120" alt="FlexiBerry Logo" />
-  <h1>🚀 @flexiberry/cli</h1>
+  <h2>🚀 @flexiberry/cli</h2>
   <p><strong>The official zero-dependency CLI shell for FlexiBerry API Testing Framework</strong></p>
 
   [![npm version](https://img.shields.io/npm/v/@flexiberry/cli.svg?style=flat-square)](https://www.npmjs.com/package/@flexiberry/cli)
@@ -8,6 +16,8 @@
 
   <br />
 </div>
+
+---
 
 ## ✨ What is FlexiBerry CLI?
 

@@ -1,6 +1,14 @@
+# @flexiberry/berrycore
+
+The official compiler, runtime engine, lexer, parser, and formatter for **Berry DSL**—an elegant, indentation-aware scripting language designed to orchestrate API workflows, test automation suites, and task execution plans.
+
+`@flexiberry/berrycore` is a lightweight, zero-dependency engine built in TypeScript that processes clean `.berry` scripts through a complete language engineering pipeline: parsing them into a strongly-typed Abstract Syntax Tree (AST), formatting them back to source code, and executing them in isolated, event-driven runtime environments with full support for variables, HTTP requests, steps, and control-flow.
+
+---
+
 <div align="center">
   <img src="https://raw.githubusercontent.com/Flexiberry/flexiberry/main/assets/favicon/android-icon-192x192.png" height="120" width="120" alt="FlexiBerry Logo" />
-  <h1>🚀 @flexiberry/berrycore</h1>
+  <h2>🚀 @flexiberry/berrycore</h2>
   <p><strong>The official Lexer, Parser, AST, and Runtime Engine for the Berry DSL</strong></p>
 
   [![npm version](https://img.shields.io/npm/v/@flexiberry/berrycore.svg?style=flat-square)](https://www.npmjs.com/package/@flexiberry/berrycore)
@@ -8,6 +16,8 @@
 
   <br />
 </div>
+
+---
 
 ## ✨ Overview
 
