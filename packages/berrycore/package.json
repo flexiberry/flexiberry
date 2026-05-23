@@ -1,7 +1,7 @@
 {
   "name": "@flexiberry/berrycore",
   "version": "0.1.0",
-  "description": "",
+  "description": "The official compiler, runtime engine, lexer, parser, and formatter for FlexiBerry .Berry DSL—a scripting language for API orchestration and test automation.",
   "main": "./dist/index.js",
   "type": "module",
   "bin": {
@@ -13,9 +13,39 @@
     "clean": "rm -rf dist",
     "prepublishOnly": "pnpm run build"
   },
-  "keywords": [],
-  "author": "rintu raj c",
+  "keywords": [
+    "flexiberry",
+    "berrycore",
+    "berry",
+    "dsl",
+    "lexer",
+    "parser",
+    "ast",
+    "interpreter",
+    "compiler",
+    "api-testing",
+    "test-runner",
+    "runtime-engine",
+    "typescript",
+    "formatter"
+  ],
+  "author": "Rintu Raj C <rinturajc@gmail.com>",
   "license": "MIT",
+  "homepage": "https://flexiberry.dev",
+  "bugs": {
+    "url": "https://github.com/flexiberry/flexiberry/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/flexiberry/flexiberry.git",
+    "directory": "packages/berrycore"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
   "files": [
     "dist"
   ],

@@ -1,7 +1,7 @@
 {
   "name": "@flexiberry/cli",
   "version": "0.1.0",
-  "description": "CLI package for FlexiBerry — zero third-party dependency shell",
+  "description": "The official CLI shell for the FlexiBerry API Testing Framework, enabling keyboard-driven interactive creation, parsing, validation, and execution of Berry DSL scripts.",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "type": "module",
@@ -19,10 +19,36 @@
     "flexiberry",
     "cli",
     "api-testing",
-    "berry"
+    "berry",
+    "api-client",
+    "rest-api",
+    "test-automation",
+    "interactive-cli",
+    "dsl",
+    "task-runner",
+    "ci-cd",
+    "openapi-parser",
+    "swagger-importer",
+    "curl-parser",
+    "terminal-ui"
   ],
-  "author": "rintu raj c",
+  "author": "Rintu Raj C <rinturajc@gmail.com>",
   "license": "MIT",
+  "homepage": "https://flexiberry.dev",
+  "bugs": {
+    "url": "https://github.com/flexiberry/flexiberry/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/flexiberry/flexiberry.git",
+    "directory": "packages/cli"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
   "files": [
     "dist"
   ],
