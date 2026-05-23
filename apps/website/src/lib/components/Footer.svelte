@@ -23,10 +23,7 @@
     },
     {
       group: "Community",
-      items: [
-        { label: "Twitter / X", href: "https://x.com" },
-        { label: "Blog", href: "#" },
-      ],
+      items: [{ label: "Coming soon", href: "" }],
     },
   ];
 </script>
