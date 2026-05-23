@@ -14,9 +14,10 @@
   let checked = false;
 
   onMount(() => {
-    isUnderDevelopmentDomain = window.location.hostname === "app.flexiberry.dev";
+    isUnderDevelopmentDomain =
+      window.location.hostname === "app.flexiberry.dev";
     bypass = localStorage.getItem("flexiberry_dev_bypass") === "true";
-    
+
     const params = new URLSearchParams(window.location.search);
     if (params.has("bypass")) {
       const val = params.get("bypass");
@@ -59,4 +60,3 @@
     </AuthOverlay>
   </div>
 {/if}
-
