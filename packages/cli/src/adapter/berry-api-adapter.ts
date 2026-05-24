@@ -59,7 +59,7 @@ export class BerryApiAdapter implements IOAdapter {
       printLine(`  ${colors.dim("(None)")}`);
     } else {
       for (const [key, val] of Object.entries(request.headers)) {
-        printLine(`  ${colors.bold(key)}: ${colors.dim(val)}`);
+        printLine(`  ${colors.dim(key)}: ${colors.bold(val)}`);
       }
     }
 
@@ -91,17 +91,17 @@ export class BerryApiAdapter implements IOAdapter {
     printLine(`${colors.bold("RESPONSE STATUS:")} ${statusColor(colors.bold(`${statusIcon} ${response.status}`))}`);
 
     printLine("");
-    printLine(`${colors.black(colors.bold("RESPONSE HEADERS"))}`);
+    printLine(`${colors.whiteBright(colors.bold("RESPONSE HEADERS"))}`);
     if (Object.keys(response.headers).length === 0) {
       printLine(`  ${colors.dim("(None)")}`);
     } else {
       for (const [key, val] of Object.entries(response.headers)) {
-        printLine(`  ${colors.bold(key)}: ${colors.dim(val)}`);
+        printLine(`  ${colors.dim(key)}: ${colors.bold(val)}`);
       }
     }
 
     printLine("");
-    printLine(`${colors.black(colors.bold("RESPONSE BODY"))}`);
+    printLine(`${colors.whiteBright(colors.bold("RESPONSE BODY"))}`);
     let bodyStr = "";
     let isJson = false;
     if (typeof response.body === "object" && response.body !== null) {
@@ -162,18 +162,18 @@ export class BerryApiAdapter implements IOAdapter {
         let cls = colors.white;
         if (/^"/.test(match)) {
           if (/:$/.test(match)) {
-            cls = colors.cyan;
+            cls = colors.magenta;
             const key = match.slice(0, -1);
             return `${cls(key)}${colors.white(":")}`;
           } else {
-            cls = colors.yellow;
+            cls = colors.green;
           }
         } else if (/true|false/.test(match)) {
           cls = colors.green;
         } else if (/null/.test(match)) {
           cls = colors.red;
         } else if (/[0-9]/.test(match)) {
-          cls = colors.magenta;
+          cls = colors.green;
         } else {
           cls = colors.gray;
         }
