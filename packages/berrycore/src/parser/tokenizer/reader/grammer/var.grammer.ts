@@ -9,6 +9,7 @@ export const varLexerGrammer: LexerGrammer[] = [
     groups: [
       {
         tokenType: TokenType.Var,
+        index: 0,
       },
     ],
     next: [

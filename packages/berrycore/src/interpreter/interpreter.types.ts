@@ -189,6 +189,15 @@ export interface IOAdapter {
   onCommand?(handler: (command: ExecutionCommand) => void): void;
 
   /**
+   * Print a beautifully formatted summary of the API request and response
+   * specifically for API-only execution.
+   */
+  showApiExecution?(
+    request: { method: string; url: string; headers: Record<string, string>; body?: string | null },
+    response: { status: number; body: any; headers: Record<string, string> }
+  ): void;
+
+  /**
    * Called when the interpreter is being killed.
    * Adapter should clean up its resources (close readline, sockets, etc.).
    */

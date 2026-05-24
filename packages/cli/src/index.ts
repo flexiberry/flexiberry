@@ -16,6 +16,7 @@ import os from "os";
 import path from "path";
 import { AddCommand } from "./command/add-command.js";
 import { RunUtility } from "./util/run-utility.js";
+import { RunApiUtility } from "./util/run-api-utility.js";
 
 // ─── Persistent store ─────────────────────────────────────────────────────────
 // Stores CLI state (e.g. the currently selected .berry file) in the user's
@@ -99,9 +100,14 @@ program
   .option("--iter <type>", "Iteration type: 'all' or 'custom'")
   .option("--start <index>", "Start index for custom iterations (1-based)")
   .option("--end <index>", "End index for custom iterations")
+  .option("--api [name]", "Select and run a specific API directly")
   .description("Run a .berry script file")
   .action((file: string | undefined, options: any) => {
-    RunUtility.run(file ?? "", options);
+    if (options.api !== undefined) {
+      RunApiUtility.runApi(file ?? "", options.api);
+    } else {
+      RunUtility.run(file ?? "", options);
+    }
   });
 
 // ── flexiberry test [file] ────────────────────────────────────────────────────

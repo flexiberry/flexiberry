@@ -17,6 +17,7 @@ import {
   ExecutionCommand,
 } from "@flexiberry/berrycore";
 import { colors } from "../lib/colors.js";
+import { intro, outro } from "../lib/prompts.js";
 
 // LogLevel is internal to berrycore — mirror it locally.
 type LogLevel = "info" | "warn" | "error" | "debug" | "step" | "task" | "api";
@@ -159,7 +160,7 @@ export class BerryTableAdapter implements IOAdapter {
       `${A.bold}📄 File:${A.reset} ${A.yellow}${fnStr}${A.reset}` +
       `  ${A.bold}🌐 Env:${A.reset} ${A.magenta}${envStr}${A.reset}` +
       `  ${A.bold}⏱️  Start:${A.reset} ${A.cyan}${startStr}${A.reset}` +
-      `\n${A.gray}─${A.reset}`.repeat(Math.max(60, process.stdout.columns ?? 100)) + `\n`
+      `\n` + `${A.gray}─${A.reset}`.repeat(Math.max(60, process.stdout.columns ?? 100)) + `\n`
     );
   }
 
@@ -168,6 +169,7 @@ export class BerryTableAdapter implements IOAdapter {
   private adapterState: AdapterState = "RUNNING";
   private planLength = 0;
   private totalIterations = 0;
+  private activeIteration = 1;
 
   // ── Render state ────────────────────────────────────────────────────────────
   private renderedLines = 0;
@@ -186,9 +188,13 @@ export class BerryTableAdapter implements IOAdapter {
 
   // ─── Public update API (called from run-utility event listeners) ─────────────
 
-  initPlan(plan: ReadonlyArray<{ title: string | null; steps: ReadonlyArray<{ targetName: string }> }>, iterationCount: number): void {
+  initPlan(plan: ReadonlyArray<{ title: string | null; steps: ReadonlyArray<{ targetName: string }> }>, iterationCount: number, activeIteration?: number): void {
+    this.adapterState = "RUNNING";
+    if (activeIteration !== undefined) {
+      this.activeIteration = activeIteration;
+    }
     const count = Math.max(1, iterationCount);
-    
+
     // If the plan is the same, only grow the tasks array if count increased
     if (this.planLength === plan.length && this.tasks.length > 0) {
       if (count > this.totalIterations) {
@@ -210,9 +216,11 @@ export class BerryTableAdapter implements IOAdapter {
           }
         }
       }
+      this.render();
       return;
     }
 
+    this.renderedLines = 0;
     // New plan or first initialization
     this.tasks.length = 0;
     this.planLength = plan.length;
@@ -235,6 +243,10 @@ export class BerryTableAdapter implements IOAdapter {
     }
 
     this.render();
+  }
+
+  resetBaseline(): void {
+    this.renderedLines = 0;
   }
 
   onTaskBegin(taskIdx: number): void {
@@ -354,7 +366,8 @@ export class BerryTableAdapter implements IOAdapter {
       "",
       `${colors.gray("Start:")} ${A.white}${startTimeLabel}${A.reset}   ` +
       `${colors.gray("End:")} ${A.white}${endTimeLabel}${A.reset}   ` +
-      `${colors.gray("Duration:")} ${A.white}${durationLabel}${A.reset}`,
+      `${colors.gray("Duration:")} ${A.white}${durationLabel}${A.reset}   ` +
+      `${colors.gray("Iterations:")} ${A.white}${this.totalIterations}${A.reset}`,
       "",
       `${colors.green(`${passed} Passed (${pct(passed)})`)}   ` +
       `${colors.red(`${failed} Failed (${pct(failed)})`)}   ` +
@@ -395,6 +408,67 @@ export class BerryTableAdapter implements IOAdapter {
   async confirm(message: string): Promise<boolean> {
     const ans = await this.prompt(`${message}  (y/n)`);
     return ans.toLowerCase() === "y" || ans.toLowerCase() === "yes";
+  }
+
+  showApiExecution(
+    request: { method: string; url: string; headers: Record<string, string>; body?: string | null },
+    response: { status: number; body: any; headers: Record<string, string> }
+  ): void {
+    intro(`DIRECT API EXECUTION CALL: ${request.method} ${request.url}`);
+
+    const printLine = (msg: string) => {
+      console.log(`${colors.cyan("│")}  ${msg}`);
+    };
+
+    printLine("");
+    printLine(`${colors.cyan(colors.bold("👉 REQUEST HEADERS"))}`);
+    if (Object.keys(request.headers).length === 0) {
+      printLine(`  ${colors.dim("(None)")}`);
+    } else {
+      for (const [key, val] of Object.entries(request.headers)) {
+        printLine(`  ${colors.bold(key)}: ${colors.dim(val)}`);
+      }
+    }
+
+    if (request.body) {
+      printLine("");
+      printLine(`${colors.cyan(colors.bold("👉 REQUEST BODY"))}`);
+      const bodyLines = request.body.split("\n");
+      for (const line of bodyLines) {
+        printLine(`  ${colors.dim(line)}`);
+      }
+    }
+
+    printLine("");
+    printLine(`${colors.cyan("─".repeat(Math.max(40, (process.stdout.columns ?? 80) - 6)))}`);
+    printLine("");
+
+    const isSuccess = response.status < 400;
+    const statusColor = isSuccess ? colors.green : colors.red;
+    const statusIcon = isSuccess ? "✔" : "✖";
+    printLine(`${colors.bold("👈 RESPONSE STATUS:")} ${statusColor(colors.bold(`${statusIcon} ${response.status}`))}`);
+
+    printLine("");
+    printLine(`${colors.magenta(colors.bold("👉 RESPONSE HEADERS"))}`);
+    if (Object.keys(response.headers).length === 0) {
+      printLine(`  ${colors.dim("(None)")}`);
+    } else {
+      for (const [key, val] of Object.entries(response.headers)) {
+        printLine(`  ${colors.bold(key)}: ${colors.dim(val)}`);
+      }
+    }
+
+    printLine("");
+    printLine(`${colors.magenta(colors.bold("👉 RESPONSE BODY"))}`);
+    const bodyStr = typeof response.body === "object"
+      ? JSON.stringify(response.body, null, 2)
+      : String(response.body);
+    const bodyLines = bodyStr.split("\n");
+    for (const line of bodyLines) {
+      printLine(`  ${line}`);
+    }
+
+    outro("API Execution Completed");
   }
 
   dispose(): void {
@@ -475,8 +549,8 @@ export class BerryTableAdapter implements IOAdapter {
   // ─── Rendering ────────────────────────────────────────────────────────────────
 
   private render(): void {
-    // Clamp to actual terminal width but never less than 60
-    const W = Math.max(60, process.stdout.columns ?? 100);
+    const cols = process.stdout.columns;
+    const W = Math.max(60, cols ? cols - 2 : 78);
     const lines = this.buildLines(W);
 
     if (this.renderedLines > 0) {
@@ -488,8 +562,8 @@ export class BerryTableAdapter implements IOAdapter {
 
   private buildLines(W: number): string[] {
     const spinner = this.SPINNER[this.spinnerTick];
-    // Info column gets whatever space is left, minimum 8 chars
-    const infoW = Math.max(8, W - FIXED_WIDTH);
+    // Info column gets whatever space is left (allow shrinking for small terminals)
+    const infoW = Math.max(0, W - FIXED_WIDTH);
     const lines: string[] = [];
 
     // ── Top separator ──────────────────────────────────────────────────────────
@@ -503,7 +577,7 @@ export class BerryTableAdapter implements IOAdapter {
       padR("Step", COL.step) + "  " +
       padR("Status", COL.status) + "  " +
       padR("Time", COL.time) + "  " +
-      "Info" +
+      padR("Info", infoW) +
       A.reset
     );
 
@@ -515,7 +589,7 @@ export class BerryTableAdapter implements IOAdapter {
       "─".repeat(COL.step) + "  " +
       "─".repeat(COL.status) + "  " +
       "─".repeat(COL.time) + "  " +
-      "─".repeat(Math.min(infoW, 28)) +
+      "─".repeat(infoW) +
       A.reset
     );
 
@@ -524,36 +598,14 @@ export class BerryTableAdapter implements IOAdapter {
       lines.push(`  ${A.dim}Waiting to start…${A.reset}`);
     }
 
-    // Determine which tasks to show (compact view for many iterations)
-    let activeIteration = 1;
-    if (this.planLength > 0) {
-      for (let i = this.tasks.length - 1; i >= 0; i--) {
-        if (this.tasks[i].status !== "PENDING") {
-          activeIteration = Math.floor(i / this.planLength) + 1;
-          break;
-        }
-      }
-    }
+    const activeIteration = this.activeIteration;
 
     const tasksToRender: LiveTask[] = [];
     if (this.planLength > 0) {
-      // 1. Always show Iteration 1
-      for (let i = 0; i < this.planLength; i++) {
+      // Only show the active iteration to keep the table compact and prevent terminal scrolling/duplication
+      const start = (activeIteration - 1) * this.planLength;
+      for (let i = start; i < start + this.planLength; i++) {
         if (this.tasks[i]) tasksToRender.push(this.tasks[i]);
-      }
-
-      // 2. If we are past iteration 1, show the active one
-      if (activeIteration > 1) {
-        const start = (activeIteration - 1) * this.planLength;
-        for (let i = start; i < start + this.planLength; i++) {
-          if (this.tasks[i]) tasksToRender.push(this.tasks[i]);
-        }
-      } else if (this.totalIterations > 1) {
-        // Show next iteration as pending
-        const start = this.planLength;
-        for (let i = start; i < start + this.planLength; i++) {
-          if (this.tasks[i]) tasksToRender.push(this.tasks[i]);
-        }
       }
     } else {
       // Fallback if no plan length
@@ -597,12 +649,13 @@ export class BerryTableAdapter implements IOAdapter {
           infoAnsi = `${A.dim}${(step.method ?? "?") + " " + step.url.slice(0, infoW)}${A.reset}`;
         } else if (step.httpStatus !== undefined) {
           const httpPart = `HTTP ${step.httpStatus}`;
-          const errPart = step.error ? `  ${step.error}` : "";
+          const errPart = step.error ? `  ${step.error.replace(/\r?\n/g, " ")}` : "";
           const httpColor = step.httpStatus < 300 ? A.green : step.httpStatus < 400 ? A.yellow : A.red;
           const maxErr = infoW - httpPart.length - 2;
           infoAnsi = `${httpColor}${httpPart}${A.reset}${A.gray}${errPart.slice(0, Math.max(0, maxErr))}${A.reset}`;
         } else if (step.error) {
-          infoAnsi = `${A.red}${step.error.slice(0, infoW)}${A.reset}`;
+          const cleanErr = step.error.replace(/\r?\n/g, " ");
+          infoAnsi = `${A.red}${cleanErr.slice(0, infoW)}${A.reset}`;
         }
 
         const taskCol = firstStep ? padR(taskLabel, COL.task) : " ".repeat(COL.task);
@@ -614,7 +667,7 @@ export class BerryTableAdapter implements IOAdapter {
           padR(`${sIcon} ${step.name}`, COL.step) + "  " +
           padR(sLabel, COL.status) + "  " +
           padR(timeStr, COL.time) + "  " +
-          infoAnsi
+          padR(infoAnsi, infoW)
         );
         firstStep = false;
       }
@@ -629,23 +682,26 @@ export class BerryTableAdapter implements IOAdapter {
     lines.push(hr(W));
 
     // ── State / interrupt bar ──────────────────────────────────────────────────
+    const iterInfo = this.totalIterations > 1 ? `  ${A.cyan}${A.bold}[Iteration ${this.activeIteration}/${this.totalIterations}]${A.reset}` : "";
     if (this.adapterState === "PAUSED") {
       lines.push(
         `${A.bgYellow}\x1b[30m  ⏸  PAUSED  ${A.reset}   ` +
         `${A.bold}[C]${A.reset} Resume  ` +
         `${A.bold}[S]${A.reset} Skip  ` +
         `${A.bold}[T]${A.reset} Stop  ` +
-        `${A.bold}[K]${A.reset} Kill`
+        `${A.bold}[K]${A.reset} Kill` +
+        iterInfo
       );
     } else if (this.adapterState === "COMPLETED") {
-      lines.push(`${A.bgGreen}\x1b[30m  ✓  Execution Completed  ${A.reset}`);
+      lines.push(`${A.bgGreen}\x1b[30m  ✓  Execution Completed   ${A.reset}` + iterInfo);
     } else {
       lines.push(
         `${A.dim}Controls:${A.reset}  ` +
         `${A.bold}[P]${A.reset} Pause  ` +
         `${A.bold}[S]${A.reset} Skip  ` +
         `${A.bold}[T]${A.reset} Stop  ` +
-        `${A.bold}[K]${A.reset} Kill`
+        `${A.bold}[K]${A.reset} Kill` +
+        iterInfo
       );
     }
 
