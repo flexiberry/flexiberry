@@ -1,5 +1,11 @@
 # @flexiberry/berrycore
 
+## 0.1.3
+
+### Patch Changes
+
+- Doc update
+
 ## 0.1.2
 
 ### Patch Changes

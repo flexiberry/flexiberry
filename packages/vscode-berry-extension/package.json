@@ -1,6 +1,6 @@
 {
   "name": "vscode-berry-extension",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "",
   "main": "./out/extension.js",
   "scripts": {
