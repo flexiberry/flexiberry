@@ -1,5 +1,13 @@
 # @flexiberry/cli
 
+## 0.1.4
+
+### Patch Changes
+
+- Using Optimized tsup.config.ts
+- Updated dependencies
+  - @flexiberry/berrycore@0.1.4
+
 ## 0.1.3
 
 ### Patch Changes

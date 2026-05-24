@@ -1,11 +1,11 @@
 #!/usr/bin/env node
 
 import { Command } from "commander";
-import { readFile } from "fs/promises";
+import { readFileSync } from "fs";
 
 // Resolve package metadata
 const packageJson = JSON.parse(
-  (await readFile(new URL("../package.json", import.meta.url))).toString()
+  readFileSync(new URL("../package.json", import.meta.url), "utf-8")
 );
 
 import { FileUtility } from "./util/file-utility.js";
