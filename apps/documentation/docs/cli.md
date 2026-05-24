@@ -109,6 +109,12 @@ If your script contains an `Input` statement linking to external data (CSV/JSON)
   - `--start <index>` : 1-based index to start from (requires `--iter custom`).
   - `--end <index>` : 1-based index to end at (requires `--iter custom`).
 
+**Standalone API Execution:**
+Instead of running all test tasks, you can execute a specific API endpoint block directly in isolation.
+- **CLI Flags:**
+  - `--api [name]` : Run a specific API block by its name.
+  - *Note: If `--api` is provided without a name, the CLI will parse the file and display an interactive prompt listing all available API blocks for you to choose from.*
+
 **Examples:**
 ```bash
 # Run all data iterations
@@ -116,6 +122,12 @@ flexiberry run script.berry --iter all
 
 # Run specific iterations (rows 1 to 10)
 flexiberry run script.berry --iter custom --start 1 --end 10
+
+# Interactively select and run a single API from the script
+flexiberry run script.berry --api
+
+# Directly execute a specific API block by its name
+flexiberry run script.berry --api getUser
 ```
 
 ---
