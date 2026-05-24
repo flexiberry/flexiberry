@@ -15,6 +15,7 @@ import { VarUtility } from "./var-utility.js";
 import { EnvUtility } from "./env-utility.js";
 import { TaskUtility } from "./task-utility.js";
 import { StepUtility } from "./step-utility.js";
+import { RunApiUtility } from "./run-api-utility.js";
 
 export class Cli {
   /** Entry point for `flexiberry cli` — shows the branded interactive menu. */
@@ -91,6 +92,12 @@ export class Cli {
         await RunUtility.run("");   // "" → will scan CWD for .berry files
         break;
       }
+ 
+      // ─── Run API Alone ─────────────────────────────────────────────────────
+      case "RunApi": {
+        await RunApiUtility.runApi("");
+        break;
+      }
 
       // ─── Select ────────────────────────────────────────────────────────────
       case "Select": {
@@ -136,6 +143,7 @@ export class Cli {
         { value: "Add", label: "➕  Add components to .berry file" },
         { value: "Create", label: "📝  Create new .berry file" },
         { value: "Run", label: "🚀  Run .berry file" },
+        { value: "RunApi", label: "🌐  Run API alone" },
         { value: "Select", label: "📁  Select .berry file from folder" },
         { value: "View", label: "👁   View selected .berry file" },
       ],

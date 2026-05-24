@@ -150,6 +150,7 @@ export class RunUtility {
     let iterationOffset = 0;
     let planLength = 0;
     let dataRows: Record<string, string>[] | null = null;
+    let totalIterationsToRun = 1;
 
     core.on(InterpreterEvent.DataLoaded, (payload: any) => {
       dataRows = payload.rows;
@@ -158,8 +159,10 @@ export class RunUtility {
     // ── Task lifecycle ─────────────────────────────────────────────────────
     core.on(InterpreterEvent.Start, (payload: any) => {
       planLength = payload.plan.length;
+      // Calculate current 1-based iteration number from iterationOffset
+      const activeIteration = Math.floor(iterationOffset / planLength) + 1;
       // Preliminary plan: 1 (discovery) + potential rows
-      adapter.initPlan(payload.plan, (dataRows?.length || 0));
+      adapter.initPlan(payload.plan, totalIterationsToRun, activeIteration);
     });
 
     core.on(InterpreterEvent.TaskBegin, ({ index }: any) => {
@@ -253,10 +256,13 @@ export class RunUtility {
         process.exit(1);
       }
 
+      totalIterationsToRun = endIndex - startIndex;
+
       // It was a data-loading run, now execute per row
       for (let i = startIndex; i < endIndex; i++) {
+        iterationOffset = (i - startIndex) * planLength;
+        adapter.resetBaseline(); // Reset baseline for each iteration so it prints separately
         await core.run(loadedRows[i]);
-        iterationOffset += planLength;
       }
     }
 

@@ -13,12 +13,13 @@ import {
   type TaskResult,
   type StepResult,
   type IOAdapter,
+  type LogLevel,
   ExecutionCommand,
   ExecutionState,
   ExecutionStatus,
 } from "./interpreter/interpreter.types";
 import { type BerryCoreOptions } from "./berry-core";
-import { NodeType, type BaseNode, type TaskBlockNode, type StepBlockNode, type ParamsBlockNode, type CaptureBlockNode, type CheckBlockNode, type KeyValuePairNode, type ConditionNode, ProgramNode } from "./parser/ast/ast.types";
+import { NodeType, type BaseNode, type TaskBlockNode, type StepBlockNode, type ParamsBlockNode, type CaptureBlockNode, type CheckBlockNode, type KeyValuePairNode, type ConditionNode, ProgramNode, type ApiBlockNode } from "./parser/ast/ast.types";
 
 export {
   // ── High-level facade (recommended entry-point) ──────────────────────
@@ -45,6 +46,7 @@ export {
   ExecutionStatus,
   NodeType,
   type IOAdapter,
+  type LogLevel,
   type CompletedPayload,
   type TaskResult,
   type StepResult,
@@ -56,5 +58,6 @@ export {
   type CheckBlockNode,
   type KeyValuePairNode,
   type ConditionNode,
-  type ProgramNode
+  type ProgramNode,
+  type ApiBlockNode
 };
