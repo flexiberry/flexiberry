@@ -51,9 +51,24 @@
 - **Node.js** `v18+`
 - **npm** or **pnpm**
 
-### FlexiBerry CLI
+### npm Packages
 
-Install the CLI globally to run and manage test suites from anywhere in your terminal:
+You can install the official published packages directly from npm:
+
+* 🌐 **FlexiBerry CLI**: [@flexiberry/cli on npm](https://www.npmjs.com/package/@flexiberry/cli)
+* 🧠 **BerryCore Engine**: [@flexiberry/berrycore on npm](https://www.npmjs.com/package/@flexiberry/berrycore)
+
+```bash
+# Install the CLI globally
+npm install -g @flexiberry/cli
+
+# Or install the core engine to build programmatic test runners
+npm install @flexiberry/berrycore
+```
+
+### Local / Monorepo Installation
+
+Install the CLI globally from the local workspace:
 
 ```bash
 # Step 1 — Build the CLI package

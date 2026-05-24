@@ -1,8 +1,12 @@
 # @flexiberry/cli
 
+
 The official zero-dependency CLI shell for the **FlexiBerry** API Testing Framework, bringing keyboard-driven interactive creation, parsing, validation, and execution of `.berry` DSL scripts straight to your terminal.
 
 `@flexiberry/cli` eliminates the need for heavy API clients and constant context switching. It features a rich terminal-based wizard to generate tasks, steps, endpoints, and environment variables interactively, converts cURL and Swagger definitions into Berry DSL, and executes scripts locally with live execution metrics powered by `@flexiberry/berrycore`.
+
+
+[![NPM Package](https://img.shields.io/badge/npm-%40flexiberry%2Fcli-cb3837?style=flat-square&logo=npm)](https://www.npmjs.com/package/@flexiberry/cli) [![NPM Package](https://img.shields.io/badge/npm-%40flexiberry%2Fberrycore-cb3837?style=flat-square&logo=npm)](https://www.npmjs.com/package/@flexiberry/berrycore)
 
 ---
 
@@ -121,8 +125,9 @@ flexiberry run my-test.berry
 The CLI is part of the broader FlexiBerry monorepo. We warmly welcome contributions!
 
 1. Fork the [main repository](https://github.com/Flexiberry/flexiberry).
-2. Read our contribution guidelines.
-3. Submit a PR!
+2. Ask questions or share feedback in [GitHub Discussions](https://github.com/flexiberry/flexiberry/discussions).
+3. Read our contribution guidelines.
+4. Submit a PR!
 
 ---
 

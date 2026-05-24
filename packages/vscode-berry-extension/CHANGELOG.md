@@ -1,5 +1,12 @@
 # vscode-berry-extension
 
+## 1.0.3
+
+### Patch Changes
+
+- Updated dependencies
+  - @flexiberry/berrycore@0.1.3
+
 ## 1.0.2
 
 ### Patch Changes
