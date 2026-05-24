@@ -4,14 +4,21 @@ Welcome to the **Flexiberry** Quick Start guide! This page will help you install
 
 ## 1. Installation
 
-You can install the Flexiberry CLI globally to use it from any terminal. We recommend using `npm` or `pnpm`.
+Flexiberry is distributed as two packages on npm:
+* 🌐 **FlexiBerry CLI**: [@flexiberry/cli on npm](https://www.npmjs.com/package/@flexiberry/cli) - The interactive command-line interface.
+* 🧠 **BerryCore Engine**: [@flexiberry/berrycore on npm](https://www.npmjs.com/package/@flexiberry/berrycore) - The programmatic test execution engine.
+
+To use the tool from your terminal, you should install the CLI package globally. We recommend using `npm` or `pnpm`.
+
+> [!IMPORTANT]
+> Be sure to install the CLI (`@flexiberry/cli`) and **not** the core engine (`@flexiberry/berrycore`). The CLI provides the `flexiberry` command line tool, whereas the core engine is for programmatic integration inside Node.js applications.
 
 ```bash
 # Using npm
-npm install -g flexiberry
+npm install -g @flexiberry/cli
 
 # Using pnpm
-pnpm install -g flexiberry
+pnpm install -g @flexiberry/cli
 ```
 
 Verify the installation by running:
