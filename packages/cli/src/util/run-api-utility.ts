@@ -7,13 +7,13 @@ import {
   NodeType,
   type ApiBlockNode,
   InterpreterEvent,
-  CliAdapter,
 } from "@flexiberry/berrycore";
 import { FileUtility } from "./file-utility.js";
 import { RunUtility } from "./run-utility.js";
 import { select, isCancel, log, outro, intro } from "../lib/prompts.js";
 import { colors } from "../lib/colors.js";
 import { BerryTableAdapter } from "../adapter/berry-table-adapter.js";
+import { BerryApiAdapter } from "../adapter/berry-api-adapter.js";
 
 export class RunApiUtility {
   /**
@@ -95,13 +95,18 @@ export class RunApiUtility {
     // ── Execute API using BerryCore and CliAdapter ───────────────────────────
     intro(`Executing API Alone: #${chosenApi}`);
 
-    const adapter = new CliAdapter({
-      enableLogging: true,
-      logLevels: ["error", "warn"]
-    });
+    const adapter = new BerryApiAdapter();
     const core = new BerryCore(source, {
       adapter,
       basePath: path.dirname(filePath)
+    });
+
+    core.on(InterpreterEvent.ApiCallBegin, ({ method, url }: any) => {
+      adapter.onApiCallBegin(method, url);
+    });
+
+    core.on(InterpreterEvent.ApiCallDone, () => {
+      adapter.onApiCallDone();
     });
 
     try {
@@ -110,7 +115,7 @@ export class RunApiUtility {
       log.error(`API execution failed: ${e.message}`);
     } finally {
       adapter.dispose();
-      outro("API Execution Completed", true);
+      // outro("API Execution Completed", true);
     }
   }
 }

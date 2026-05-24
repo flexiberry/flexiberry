@@ -410,66 +410,6 @@ export class BerryTableAdapter implements IOAdapter {
     return ans.toLowerCase() === "y" || ans.toLowerCase() === "yes";
   }
 
-  showApiExecution(
-    request: { method: string; url: string; headers: Record<string, string>; body?: string | null },
-    response: { status: number; body: any; headers: Record<string, string> }
-  ): void {
-    intro(`DIRECT API EXECUTION CALL: ${request.method} ${request.url}`);
-
-    const printLine = (msg: string) => {
-      console.log(`${colors.cyan("│")}  ${msg}`);
-    };
-
-    printLine("");
-    printLine(`${colors.cyan(colors.bold("👉 REQUEST HEADERS"))}`);
-    if (Object.keys(request.headers).length === 0) {
-      printLine(`  ${colors.dim("(None)")}`);
-    } else {
-      for (const [key, val] of Object.entries(request.headers)) {
-        printLine(`  ${colors.bold(key)}: ${colors.dim(val)}`);
-      }
-    }
-
-    if (request.body) {
-      printLine("");
-      printLine(`${colors.cyan(colors.bold("👉 REQUEST BODY"))}`);
-      const bodyLines = request.body.split("\n");
-      for (const line of bodyLines) {
-        printLine(`  ${colors.dim(line)}`);
-      }
-    }
-
-    printLine("");
-    printLine(`${colors.cyan("─".repeat(Math.max(40, (process.stdout.columns ?? 80) - 6)))}`);
-    printLine("");
-
-    const isSuccess = response.status < 400;
-    const statusColor = isSuccess ? colors.green : colors.red;
-    const statusIcon = isSuccess ? "✔" : "✖";
-    printLine(`${colors.bold("👈 RESPONSE STATUS:")} ${statusColor(colors.bold(`${statusIcon} ${response.status}`))}`);
-
-    printLine("");
-    printLine(`${colors.magenta(colors.bold("👉 RESPONSE HEADERS"))}`);
-    if (Object.keys(response.headers).length === 0) {
-      printLine(`  ${colors.dim("(None)")}`);
-    } else {
-      for (const [key, val] of Object.entries(response.headers)) {
-        printLine(`  ${colors.bold(key)}: ${colors.dim(val)}`);
-      }
-    }
-
-    printLine("");
-    printLine(`${colors.magenta(colors.bold("👉 RESPONSE BODY"))}`);
-    const bodyStr = typeof response.body === "object"
-      ? JSON.stringify(response.body, null, 2)
-      : String(response.body);
-    const bodyLines = bodyStr.split("\n");
-    for (const line of bodyLines) {
-      printLine(`  ${line}`);
-    }
-
-    outro("API Execution Completed");
-  }
 
   dispose(): void {
     this.stopTicker();
