@@ -43,7 +43,7 @@
       <div class="social-row">
         <!-- GitHub -->
         <a
-          href="https://github.com"
+          href="https://github.com/flexiberry/flexiberry"
           class="social-link"
           aria-label="GitHub"
           target="_blank"
