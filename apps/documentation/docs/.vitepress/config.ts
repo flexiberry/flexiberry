@@ -7,27 +7,25 @@ export default defineConfig({
   description: "FlexiBerry Documentation",
   head: [
     ["link", { rel: "icon", href: "/logo.png" }],
-    ...(GA_ID
-      ? [
-          [
-            "script",
-            {
-              async: "true",
-              src: `https://www.googletagmanager.com/gtag/js?id=${GA_ID}`,
-            },
-          ] as any,
-          [
-            "script",
-            {},
-            `
+    ...([
+      [
+        "script",
+        {
+          async: "true",
+          src: `https://www.googletagmanager.com/gtag/js?id=G-7KCF2JGTV5`,
+        },
+      ] as any,
+      [
+        "script",
+        {},
+        `
               window.dataLayer = window.dataLayer || [];
               function gtag(){dataLayer.push(arguments);}
               gtag('js', new Date());
-              gtag('config', '${GA_ID}');
+              gtag('config', 'G-7KCF2JGTV5');
             `,
-          ] as any,
-        ]
-      : []),
+      ] as any,
+    ]),
   ],
   themeConfig: {
     nav: [
