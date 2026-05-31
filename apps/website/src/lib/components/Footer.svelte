@@ -17,7 +17,7 @@
           label: "CLI Reference",
           href: "https://docs.flexiberry.dev/cli.html",
         },
-        { label: "Examples", href: "/example" },
+        { label: "Examples", href: "/examples" },
         { label: "GitHub", href: "https://github.com/flexiberry/flexiberry" },
       ],
     },
