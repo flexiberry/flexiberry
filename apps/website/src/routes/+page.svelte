@@ -31,6 +31,21 @@
   });
 </script>
 
+<svelte:head>
+  <title>Flexiberry · The Developer-First HTTP Client for Sequential API Workflows</title>
+  <meta
+    name="description"
+    content="Flexiberry is an open-source, lightweight HTTP client and API testing framework designed to chain dependent requests sequentially with ease."
+  />
+  <meta property="og:title" content="Flexiberry · The Developer-First HTTP Client for Sequential API Workflows" />
+  <meta property="og:description" content="Stop writing heavy scripts just to pass response values. Chain dependent API requests with the human-readable .berry syntax." />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://flexiberry.dev" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Flexiberry · The Developer-First HTTP Client for Sequential Workflows" />
+  <meta name="twitter:description" content="Chain dependent API requests sequentially with zero setup. Open-source and blistering fast." />
+</svelte:head>
+
 <div class="min-h-screen bg-gray-900 text-gray-100 font-mono">
   <Navigation />
   <Hero isVisible={isVisible.hero} />
