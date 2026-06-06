@@ -4,37 +4,40 @@
 
   const features = [
     {
-      icon: `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>`,
-      color: "#a78bfa",
-      title: "Custom Scripts",
-      description:
-        "Write API tests in plain Berry syntax. Full control, no limitations, no rigid structure to fight against.",
-      tag: "DSL",
-    },
-    {
-      icon: `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>`,
+      icon: `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg>`,
       color: "#34d399",
-      title: "Automated Testing",
-      description:
-        "Execute test cases seamlessly with real-time feedback. Parallel runs, instant pass/fail reports.",
-      tag: "Runtime",
+      title: "Seamless Request Chaining",
+      description: "Capture variables (like authentication tokens, user IDs, or entity keys) from one API response and inject them directly into subsequent requests.",
+      tag: "Chaining"
     },
     {
-      icon: `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>`,
+      icon: `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M16 18l6-6-6-6M8 6l-6 6 6 6"></path></svg>`,
+      color: "#a78bfa",
+      title: "Human-Readable .berry Syntax",
+      description: "Write your HTTP requests, variable captures, and assertions in a clean, declarative domain-specific language (DSL) that lives right alongside your code.",
+      tag: "DSL"
+    },
+    {
+      icon: `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"></ellipse><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"></path><path d="M3 12c0 1.66 4 3 9 3s9-1.34 9-3"></path></svg>`,
       color: "#38bdf8",
-      title: "Developer-Friendly CLI",
-      description:
-        "One command to run. Flexible config to adapt to any project structure or CI/CD pipeline.",
-      tag: "CLI",
+      title: "True Dual-Purpose Engine",
+      description: "Use it as a quick HTTP Client to scratchpad daily endpoints during development, or scale it into a robust Automated Test Suite with powerful assertions.",
+      tag: "Engine"
     },
     {
-      icon: `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>`,
+      icon: `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>`,
       color: "#fb923c",
-      title: "Fast & Lightweight",
-      description:
-        "Zero runtime bloat. Berrycore starts in milliseconds and scales to hundreds of API tests effortlessly.",
-      tag: "Performance",
+      title: "Zero-Dependency & CI/CD Ready",
+      description: "Designed to be lightweight and blistering fast. Run your .berry workflow files natively in your terminal or embed them cleanly into your GitHub Actions / CI pipelines.",
+      tag: "CI/CD"
     },
+    {
+      icon: `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>`,
+      color: "#f472b6",
+      title: "Environment Variables Support",
+      description: "Easily switch between local, staging, and production environments without rewriting your workflow files.",
+      tag: "Environments"
+    }
   ];
 
   // Section-level reveal driven by IntersectionObserver on the section itself
@@ -65,18 +68,17 @@
       Features
     </div>
     <h2 class="section-heading">
-      Everything you need,<br /><span class="h-accent">nothing you don't</span>
+      Key Features for<br /><span class="h-accent">Sequential API Workflows</span>
     </h2>
     <p class="section-sub">
-      Flexiberry strips away everything that makes API testing painful and keeps
-      only what matters.
+      Flexiberry strips away the bloat and provides a lightning fast environment tailored for multi-API journeys.
     </p>
 
     <div class="feat-cards">
       {#each features as feat, i}
         <a
           href="/features"
-          class="feat-card"
+          class="feat-card feat-card-{i}"
           class:card-in={sectionRevealed || isVisible}
           style="--c:{feat.color}; --delay:{i * 100}ms"
         >
@@ -184,7 +186,7 @@
   /* ── Cards grid ─────────────────────────────────────────────────────── */
   .feat-cards {
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(6, 1fr);
     gap: 1.25rem;
     width: 100%;
     text-align: left;
@@ -207,6 +209,25 @@
       transform 0.5s ease var(--delay),
       border-color 0.3s ease,
       box-shadow 0.3s ease;
+    grid-column: span 6; /* Mobile default: full width */
+  }
+
+  @media (min-width: 650px) and (max-width: 950px) {
+    .feat-card {
+      grid-column: span 3; /* Tablet: 2 columns */
+    }
+    .feat-card-4 {
+      grid-column: span 6; /* Center last card */
+    }
+  }
+
+  @media (min-width: 950px) {
+    .feat-card-0, .feat-card-1, .feat-card-2 {
+      grid-column: span 2;
+    }
+    .feat-card-3, .feat-card-4 {
+      grid-column: span 3;
+    }
   }
   /* Revealed state — added by the class binding */
   .feat-card.card-in {
