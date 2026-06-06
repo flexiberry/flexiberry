@@ -4,7 +4,7 @@
 
 # FlexiBerry
 
-**A powerful, developer-friendly API testing framework built for every team.**
+**The Developer-First HTTP Client Built for Sequential API Workflows.**
 
 [![Website](https://img.shields.io/badge/website-flexiberry.dev-6C63FF?style=for-the-badge&logo=google-chrome&logoColor=white)](https://flexiberry.dev)
 [![Status](https://img.shields.io/badge/status-in%20development-orange?style=for-the-badge&logo=gitbook&logoColor=white)](https://flexiberry.dev)
@@ -24,23 +24,109 @@
 
 <br/>
 
+<video src="./apps/website/src/lib/assets/demo.mp4" width="100%" style="max-width: 800px; border-radius: 8px; border: 1px solid #30363d;" controls muted autoplay loop></video>
+
+<br/>
+
 [🌐 Website](https://flexiberry.dev) · [📖 Docs](https://docs.flexiberry.dev) · [📦 Installation](#-installation) · [⚡ Quick Start](#-quick-start) · [✨ Features](#-features) · [🤝 Contributing](#-contributing) · [💬 Support](#-support)
 
 </div>
 
 ---
 
+## 💡 The Purpose & The Core Problem
+
+### **API Testing shouldn't feel like writing an entire automation app.**
+
+Most API clients either force you into heavy, click-and-point GUIs that make automation a nightmare, or make you write endless JavaScript snippets just to pass an ID from one request to the next.
+
+**Flexiberry fixes this.** It bridges the gap between a standard **HTTP Client** and a full **API Testing Framework**—uniquely specializing in **Sequential, Dependent Multi-API Workflows**. It introduces a clean, readable syntax (`.berry`) designed specifically to track dependencies and chain multi-API sequences straight out of the box.
+
+---
+
+## 🔄 How It Works: Multi-API Sequences
+
+When APIs are connected, your tests should be too. Flexiberry effortlessly pipes data from an upstream response directly into a downstream request.
+
+### **Example: The Petstore Sequence**
+
+To test a "Get Pet By ID" endpoint, you first need to create the pet and catch its generated ID. Here is how easily Flexiberry handles it:
+
+```berry
+Api POST #addPet
+Url https://petstore.swagger.io/v2/pet
+Header
+- Content-Type: 'application/json'
+- Accept: 'application/json'
+Body JSON `
+{
+  "id": 1,
+  "{{category}}": {
+    "id": 1,
+    "name": "dog"
+    },
+    "name": "doggie",
+    "photoUrls": [
+      "http://localhost/"
+      ],
+      "tags": [
+        {
+          "id": 0,
+          "name": "pet"
+        }
+        ],
+        "status": "available"
+}
+`
+Api GET #getPetById
+Url https://petstore.swagger.io/v2/pet/{{petId}}
+Header
+- Accept: 'application/json'
+
+
+
+Task add new pet and find
+Step  Call Api addPet 
+    Capture
+        - id: response.id 
+        - status: response.status
+    Check
+        - $.status == 200 OR $.status == 201
+        - $.body != null
+        - id != null
+        - status != null
+
+Step Call Api getPetById
+    Params
+        - petId: Step.1.id
+
+    Capture
+    - id: response.id
+    - status: response.status
+
+    Check
+    - $.status == 200
+    - $.body != null
+    - id == Step.1.id
+```
+
+---
+
 ## ✨ Features
 
-| Feature | Description |
-|---|---|
-| 🔍 **Comprehensive Testing** | Functional, load, security, data comparison, and end-to-end API testing |
-| 🖥️ **Minimalistic UI** | Clean, distraction-free interface for efficient test management |
-| ⚙️ **Customizable Suites** | Build and organize test suites tailored to your workflows |
-| ⏱️ **Real-Time Feedback** | Instant results and live progress directly in your terminal |
-| 🔗 **CI/CD Integration** | Drop-in support for GitHub Actions, GitLab CI, and more |
-| 📂 **External Data Sources** | Load test data from CSV/JSON files with row-by-row iteration |
-| 🔐 **Encrypted Fields** | Built-in support for decrypting sensitive credential fields at runtime |
+* **🔗 Seamless Request Chaining**: Capture variables (like authentication tokens, user IDs, or entity keys) from one API response and inject them directly into subsequent requests.
+* **✍️ Human-Readable `.berry` Syntax**: Write your HTTP requests, variable captures, and assertions in a clean, declarative domain-specific language (DSL) that lives right alongside your code.
+* **⚙️ True Dual-Purpose Engine**: Use it as a quick **HTTP Client** to scratchpad daily endpoints during development, or scale it into a robust **Automated Test Suite** with powerful assertions.
+* **🚀 Zero-Dependency & CI/CD Ready**: Designed to be lightweight and blistering fast. Run your `.berry` workflow files natively in your terminal or embed them cleanly into your GitHub Actions / CI pipelines.
+* **📁 Environment Variables Support**: Easily switch between `local`, `staging`, and `production` environments without rewriting your workflow files.
+
+---
+
+## 🎯 Who is Flexiberry For?
+
+* **Backend Developers** who want a fast, local HTTP client that can handle modern, state-dependent API flows without the bloat of UI-heavy apps.
+* **QA & Automation Engineers** looking for a zero-boilerplate, git-friendly framework where test logic is transparent, reviewable, and easily merged.
+* **Product Teams** looking to document and validate end-to-end integration flows (e.g., *Signup ➡️ Authenticate ➡️ Create Profile ➡️ Fetch Dashboard*).
 
 ---
 

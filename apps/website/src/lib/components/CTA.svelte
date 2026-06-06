@@ -14,23 +14,22 @@
     </span>
 
     <h2 class="cta-heading">
-      Ready to ship<br />
-      <span class="cta-accent">faster API tests?</span>
+      Ready to unlock<br />
+      <span class="cta-accent">frictionless workflows?</span>
     </h2>
     <p class="cta-sub">
-      Join developers already using Flexiberry to cut their API testing time in
-      half — no credit card, no setup, just Berry.
+      Flexiberry is 100% open-source and community-driven. Take control of your API endpoints today.
     </p>
 
     <!-- Install command -->
     <div class="install-box">
       <span class="install-prompt">$</span>
-      <code class="install-cmd">flexiberry init my-tests</code>
+      <code class="install-cmd">npm install -g flexiberry</code>
       <button
         class="install-copy"
         title="Copy"
-        on:click={() =>
-          navigator.clipboard?.writeText("flexiberry init my-tests")}
+        onclick={() =>
+          navigator.clipboard?.writeText("npm install -g flexiberry")}
         aria-label="Copy install command"
       >
         <svg
@@ -52,8 +51,8 @@
     </div>
 
     <div class="cta-actions">
-      <a href="/playground" class="btn-primary">
-        Start Building
+      <a href="https://github.com/flexiberry/flexiberry" class="btn-primary" target="_blank" rel="noopener noreferrer">
+        Star us on GitHub
         <svg
           width="15"
           height="15"
@@ -70,7 +69,8 @@
           />
         </svg>
       </a>
-      <a href="/example" class="btn-secondary">View Examples</a>
+      <a href="https://docs.flexiberry.dev/" class="btn-secondary" target="_blank">View Documentation</a>
+      <a href="https://github.com/flexiberry/flexiberry/discussions" class="btn-secondary" target="_blank" rel="noopener noreferrer">Join the Community</a>
     </div>
 
     <p class="cta-footnote">Free forever · Open source · MIT License</p>

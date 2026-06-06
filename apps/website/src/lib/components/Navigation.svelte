@@ -25,6 +25,7 @@
     <div class="nav-links">
       <a href="/#features" class="nav-link">Features</a>
       <a href="/#docs" class="nav-link">Docs</a>
+      <a href="/example" class="nav-link">Examples</a>
       <a href="/#get-started" class="nav-link">Get Started</a>
       <a
         href="https://github.com/flexiberry/flexiberry"

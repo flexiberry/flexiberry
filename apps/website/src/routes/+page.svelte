@@ -1,42 +1,33 @@
 <script>
   import { onMount } from "svelte";
-  import { Navigation, Hero, Features, Documentation, CTA, Footer, BerryCodeScroll } from "$lib";
-
-  let features = [
-    {
-      title: "Fast & Lightweight",
-      description:
-        "Built for performance with minimal overhead and optimized rendering.",
-    },
-    {
-      title: "Developer Friendly",
-      description:
-        "Intuitive API designed with developers in mind. Easy to learn, simple to master.",
-    },
-    {
-      title: "Highly Customizable",
-      description:
-        "Flexible configuration options to adapt to your specific project needs.",
-    },
-    {
-      title: "Well Documented",
-      description:
-        "Comprehensive documentation with examples and best practices.",
-    },
-  ];
+  import {
+    Navigation,
+    Hero,
+    ProblemSolution,
+    Features,
+    TargetAudience,
+    Documentation,
+    CTA,
+    Footer,
+    BerryCodeScroll,
+  } from "$lib";
 
   let isVisible = {
     hero: false,
+    problem: false,
     features: false,
+    audience: false,
     docs: false,
     cta: false,
   };
 
   onMount(() => {
     setTimeout(() => { isVisible.hero = true; }, 100);
-    setTimeout(() => { isVisible.features = true; }, 400);
-    setTimeout(() => { isVisible.docs = true; }, 600);
-    setTimeout(() => { isVisible.cta = true; }, 800);
+    setTimeout(() => { isVisible.problem = true; }, 300);
+    setTimeout(() => { isVisible.features = true; }, 500);
+    setTimeout(() => { isVisible.audience = true; }, 700);
+    setTimeout(() => { isVisible.docs = true; }, 900);
+    setTimeout(() => { isVisible.cta = true; }, 1100);
   });
 </script>
 
@@ -44,13 +35,12 @@
   <Navigation />
   <Hero isVisible={isVisible.hero} />
 
-  <!-- Scroll-driven Berry code animation section -->
-  <!-- NOTE: No overflow-hidden here — it breaks position:sticky inside -->
-  <section class="bg-[#0d1117] relative">
-    <BerryCodeScroll />
-  </section>
+  <ProblemSolution isVisible={isVisible.problem} />
+
+  <BerryCodeScroll />
 
   <Features isVisible={isVisible.features} />
+  <TargetAudience isVisible={isVisible.audience} />
   <Documentation isVisible={isVisible.docs} />
   <CTA isVisible={isVisible.cta} />
   <Footer />

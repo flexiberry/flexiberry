@@ -226,20 +226,26 @@
       </span>
 
       <h1 class="hero-heading">
-        API testing, <br />
-        as easy as writing<br />
-        <span class="hero-accent">plain English</span>
+        The Developer-First <br />
+        HTTP Client Built for<br />
+        <span class="hero-accent">Sequential Workflows</span>
       </h1>
 
       <p class="hero-sub">
-        Write expressive <code class="inline-code">.berry</code> scripts, run them
-        via CLI or the online portal, and get instant pass/fail reports — no boilerplate
-        required.
+        Stop jumping between isolated requests or writing heavy boilerplate
+        scripts just to test a single user journey. Flexiberry is an
+        open-source, lightweight HTTP client and API testing framework that lets
+        you chain dependent requests sequentially with ease.
       </p>
 
       <div class="hero-actions">
-        <a href="#get-started" class="btn-primary">
-          Get Started
+        <a
+          href="https://github.com/flexiberry/flexiberry"
+          class="btn-primary"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          Get Started on GitHub
           <svg
             width="15"
             height="15"
@@ -256,9 +262,40 @@
             />
           </svg>
         </a>
-        <a href="https://docs.flexiberry.dev/" class="btn-secondary"
-          >Read Docs</a
+        <a
+          href="https://docs.flexiberry.dev/"
+          class="btn-secondary"
+          target="_blank">Read the Docs</a
         >
+      </div>
+
+      <!-- Install box -->
+      <div class="hero-install-box">
+        <span class="hero-install-prompt">$</span>
+        <code class="hero-install-cmd">npm install -g flexiberry</code>
+        <button
+          class="hero-install-copy"
+          title="Copy"
+          onclick={() =>
+            navigator.clipboard?.writeText("npm install -g flexiberry")}
+          aria-label="Copy install command"
+        >
+          <svg
+            width="14"
+            height="14"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            aria-hidden="true"
+          >
+            <rect x="9" y="9" width="13" height="13" rx="2" /><path
+              d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"
+            />
+          </svg>
+        </button>
       </div>
 
       <div class="hero-stats">
@@ -392,7 +429,7 @@
           <div class="cli-box">
             <span class="cli-prompt">$</span>
             <span class="cli-cmd">
-              flexiberry run <span class="cli-file">demo.berry</span></span
+              flexiberry run <span class="cli-file">petstore.berry</span></span
             >
             <span class="cli-blink">▌</span>
           </div>
@@ -550,8 +587,10 @@
     position: absolute;
     inset: 0;
     z-index: 0;
-    background-image:
-      linear-gradient(rgba(52, 211, 153, 0.05) 1px, transparent 1px),
+    background-image: linear-gradient(
+        rgba(52, 211, 153, 0.05) 1px,
+        transparent 1px
+      ),
       linear-gradient(90deg, rgba(52, 211, 153, 0.05) 1px, transparent 1px);
     background-size: 40px 40px;
   }
@@ -618,7 +657,7 @@
     }
   }
   .hero-heading {
-    font-size: clamp(2.2rem, 4.5vw, 3.5rem);
+    font-size: clamp(1.9rem, 4.5vw, 2.6rem);
     font-weight: 800;
     line-height: 1.18;
     color: #fff;
@@ -686,6 +725,44 @@
     border-color: rgba(52, 211, 153, 0.4);
     transform: translateY(-2px);
   }
+
+  /* ── Hero Install Box ─────────────────────────────────────────────────── */
+  .hero-install-box {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    background: #0a0f1a;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 0.6rem;
+    padding: 0.75rem 1.1rem;
+    font-family: "JetBrains Mono", monospace;
+    font-size: 0.9rem;
+    width: 100%;
+    max-width: 400px;
+    margin-top: 0.5rem;
+  }
+  .hero-install-prompt {
+    color: #34d399;
+    font-weight: 700;
+  }
+  .hero-install-cmd {
+    color: #e2e8f0;
+    flex: 1;
+    text-align: left;
+  }
+  .hero-install-copy {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #4b5563;
+    transition: color 0.2s;
+    padding: 0;
+    display: flex;
+  }
+  .hero-install-copy:hover {
+    color: #34d399;
+  }
+
   .hero-stats {
     display: flex;
     align-items: center;
