@@ -1,0 +1,367 @@
+# FlexiBerry Comprehensive Documentation (Aggregated)
+> The Developer-First HTTP Client for Sequential API Workflows.
+
+This is the full documentation for FlexiBerry, an open-source, lightweight HTTP client and API testing framework designed to chain dependent requests sequentially with ease using the human-readable `.berry` syntax.
+
+---
+
+## 🚀 Quick Start
+
+Welcome to the **Flexiberry** Quick Start guide! This page will help you install the CLI, initialize your first API test script, and run it locally in just a few minutes.
+
+### 1. Installation
+Flexiberry is distributed as two packages on npm:
+* 🌐 **FlexiBerry CLI**: [@flexiberry/cli on npm](https://www.npmjs.com/package/@flexiberry/cli) - The interactive command-line interface.
+* 🧠 **BerryCore Engine**: [@flexiberry/berrycore on npm](https://www.npmjs.com/package/@flexiberry/berrycore) - The programmatic test execution engine.
+
+To use the tool from your terminal, install the CLI package globally:
+```bash
+# Using npm
+npm install -g @flexiberry/cli
+
+# Using pnpm
+pnpm install -g @flexiberry/cli
+```
+Verify the installation by running:
+```bash
+flexiberry --version
+```
+
+> [!IMPORTANT]
+> Be sure to install the CLI (`@flexiberry/cli`) and **not** the core engine (`@flexiberry/berrycore`). The CLI provides the `flexiberry` command line tool, whereas the core engine is for programmatic integration inside Node.js applications.
+
+### 2. Create Your First Test Script
+Create a new `.berry` script by using the `create` command:
+```bash
+flexiberry create my-first-api.berry
+```
+This will scaffold an empty `.berry` script in your current directory. 
+
+### 3. Selecting a File (Interactive Mode)
+Select a script locally to serve as your active workspace:
+```bash
+flexiberry select my-first-api.berry
+```
+Any subsequent commands you execute using the CLI will automatically target this active file!
+
+### 4. Add an API Endpoint
+Add a new API definition to your active file. We'll use a sample JSON-based GET request:
+```bash
+flexiberry add api getSampleData -u "https://jsonplaceholder.typicode.com/todos/1" -m "GET"
+```
+Or import existing configurations quickly from a curl command:
+```bash
+flexiberry add api fromCurl -c "curl -X GET https://jsonplaceholder.typicode.com/todos/1"
+```
+
+### 5. Add a Test Task
+Next, add a task containing a step that calls the newly created API. Open `my-first-api.berry` and add the task block:
+```berry
+Task Verify Sample Data
+Step Call Api getSampleData
+Capture
+- id: response.id
+Check
+- $.status == 200
+- $.body != null
+```
+
+### 6. Run Your Tests
+Execute your test engine:
+```bash
+flexiberry run my-first-api.berry
+```
+If your tests are successful, the engine will display a table of passes. Any invalid assertions will be flagged for investigation. 
+
+---
+
+## 🧰 CLI Commands Reference
+
+Ensure you have Flexiberry installed globally or configured via your package manager. Once installed, the `flexiberry` command will be available in your terminal.
+
+### `flexiberry cli`
+Launches the interactive FlexiBerry CLI menu. This command provides an easy-to-use terminal user interface (TUI) where you can navigate and execute tasks interactively.
+```bash
+flexiberry cli
+```
+
+### `flexiberry create <file> [template]`
+Creates a new `.berry` script file with an optional template. This is the starting point for writing your API tests.
+```bash
+flexiberry create <file> [template] [options]
+```
+**Options:**
+- `-f, --force`: Overwrite the existing file if it is already present.
+- `-s, --secret`: Create a secret file for storing sensitive data (like environment variables and tokens).
+
+**Examples:**
+```bash
+# Create a blank script
+flexiberry create testmyapi.berry
+
+# Create a script using a default template
+flexiberry create mytest.berry api-template
+
+# Force overwrite if the file already exists
+flexiberry create mytest.berry -f
+```
+
+### `flexiberry select [file]`
+Select a `*.berry` file from the currently working directory. This file becomes the "active" file that actions like `add` will modify.
+```bash
+flexiberry select [file]
+```
+*Note: If no file is provided, an interactive prompt will allow you to pick one.*
+
+### `flexiberry add <type> [name]`
+Adds a new configuration item (such as an API request, environment block, task, step, or variable) to the currently selected `.berry` file.
+```bash
+flexiberry add <type> [name] [options]
+```
+**Types:**
+- `api`: Declare a new API endpoint definition.
+- `env`: Add a new environment block.
+- `task`: Create a test task block.
+- `step`: Append a testing step.
+- `var`: Add a definition for local variables.
+
+**Options:**
+- `-c, --curl <curl...>`: Import an API configuration from a cURL command.
+- `-s, --swagger <url>`: Import endpoints from a Swagger / OpenAPI URL.
+- `-p, --postman <filePath>`: Import configurations from a Postman collection.
+- `-u, --url <url>`: Specify the API URL.
+- `-m, --method <method>`: HTTP method (e.g., `GET`, `POST`, `PUT`, `PATCH`, `DELETE`).
+- `-h, --headers <headers>`: Request headers as comma-separated key:value pairs.
+- `-b, --body <body>`: Request body content.
+- `-e, --env <env>`: Environment name.
+- `-v, --var <var>`: Variables as comma-separated key:value pairs.
+
+**Examples:**
+```bash
+# Add an endpoint using a URL and Method
+flexiberry add api getUser -u "https://api.example.com/user" -m "GET"
+```
+
+### `flexiberry run [file]`
+Executes all tasks defined within a `.berry` script file. It runs through the script sequentially, executes API calls, evaluates standard assertions, and outputs results via the live table adapter.
+```bash
+flexiberry run [file] [options]
+```
+*If `[file]` is omitted, it will attempt to run the currently selected file.*
+
+**Data Iteration Options:**
+If your script contains an `Input` statement linking to external data (CSV/JSON), the CLI provides flexible execution options:
+- **Interactive Prompt:** By default, you'll be asked whether to run **All iterations** or a **Custom range**.
+- **CLI Flags:**
+  - `--iter <all|custom>` : Set the iteration mode directly.
+  - `--start <index>` : 1-based index to start from (requires `--iter custom`).
+  - `--end <index>` : 1-based index to end at (requires `--iter custom`).
+
+**Standalone API Execution:**
+Instead of running all test tasks, you can execute a specific API endpoint block directly in isolation.
+- **CLI Flags:**
+  - `--api [name]` : Run a specific API block by its name.
+  - *Note: If `--api` is provided without a name, the CLI will parse the file and display an interactive prompt listing all available API blocks for you to choose from.*
+
+**Examples:**
+```bash
+# Run all data iterations
+flexiberry run script.berry --iter all
+
+# Run specific iterations (rows 1 to 10)
+flexiberry run script.berry --iter custom --start 1 --end 10
+
+# Interactively select and run a single API from the script
+flexiberry run script.berry --api
+
+# Directly execute a specific API block by its name
+flexiberry run script.berry --api getUser
+```
+
+### `flexiberry test [file]`
+Debug command that parses the `.berry` script and prints the generated Abstract Syntax Tree (AST). It does **not** execute any API calls or testing tasks.
+```bash
+flexiberry test [file]
+```
+*If `[file]` is omitted, it will attempt to test the currently selected file.*
+
+### State Persistence
+Operations like `flexiberry select` save the active configuration context locally to speed up your workflow. Your active context and settings are stored safely inside your system's `Documents/flexiberry/data.json` folder so it persists across multiple terminal sessions.
+
+---
+
+## 📝 The `.berry` Language Specification
+
+The `.berry` language is a custom Domain Specific Language (DSL) tailored specifically for defining, testing, and asserting API workflows. Its syntax is designed to be highly readable, modular, and declarative, resembling plain English while internally running on a strict compiler architecture.
+
+### 1. Global Variables (`Var`)
+Define sets of environment-specific or global variables using the `Var` keyword.
+- **Syntax**:
+  ```berry
+  Var @<EnvironmentName> [optional description]
+  - <key>: '<value>'
+  ```
+- **Example**:
+  ```berry
+  Var @UAT global variable
+  - name: 'rintu'
+  - age: '10'
+  ```
+
+### 2. API Definitions (`Api`)
+The `Api` block is used to declare an HTTP endpoint. It encapsulates the request method, URL, headers, and body payload. Once defined, these APIs are reusable across multiple tasks and steps.
+- **Syntax**:
+  ```berry
+  Api <METHOD> #<ApiId> [optional description]
+  Url <endpoint_url>
+  Header
+  - <Header-Name>: '<Value>'
+  Body <Type> `<content>`
+  ```
+- **Variables in URLs**: Use `{{variableName}}` to indicate variables in URLs that will be interpolated at runtime.
+- **Example without Body**:
+  ```berry
+  Api GET #getPetById
+  Url https://petstore.swagger.io/v2/pet/{{petId}}
+  Header
+  - Accept: 'application/json'
+  ```
+- **Example with Body (JSON)**:
+  ```berry
+  Api POST #addPet
+  Url https://petstore.swagger.io/v2/pet
+  Header
+  - Content-Type: 'application/json'
+  - Accept: 'application/json'
+  Body JSON `
+  {
+    "id": 1,
+    "name": "doggie",
+    "status": "available"
+  }
+  `
+  ```
+
+### 3. Tasks & Steps (`Task`, `Step`)
+A `Task` is a collection of `Step`s that represent a complete test scenario or usage workflow. Each `Step` executes an `Api`, captures data from the response, and checks predefined assertions.
+- **Syntax**:
+  ```berry
+  Task <description>
+  Step Call Api <ApiId> [optional description]
+  Params
+  - <key>: <value_or_reference>
+  Capture
+  - <variable_name>: <json_path_from_response>
+  Check
+  - <assertion_expression>
+  ```
+- **`Params`**: Pass dynamic parameters (for URL path parameters, query parameters, etc.) to the API call. You can reference variables captured in previous steps.
+- **`Capture`**: Extract values from the JSON response and store them sequentially. You can reference `response.<field>` to extract data.
+- **`Check`**: Validate the response. Supports evaluating HTTP status codes, body payloads, and variables captured in the `Capture` step. Use the special variable `$.status` representing the HTTP status of the response, and `$.body` representing the raw response body.
+
+**Example Scenario:**
+```berry
+Task add new pet and find
+
+Step Call Api addPet 
+Capture
+- id: response.id
+- status: response.status
+Check
+- $.status == 200 OR $.status == 201
+- $.body != null
+- id != null
+
+
+Step Call Api getPetById
+Params
+- petId: Step.1.id
+Capture
+- id: response.id
+- status: response.status
+Check
+- $.status == 200
+- $.body != null
+- id == Step.1.id
+```
+
+### 4. Multi-file Parsing (`Link`)
+The `Link` keyword imports APIs, Variables, and Tasks from external `.berry` files (local files or remote URLs).
+- **Syntax**:
+  ```berry
+  Link <path_or_url>
+  ```
+- **Examples**:
+  ```berry
+  Link ../envs/production.berry
+  Link http://domain.com/apis/user_service.berry
+  ```
+When a file is linked, its contents are flattened and merged into the main file before execution.
+
+### Referencing Values
+You can dynamically reference the output of previous steps using the syntax `Step.<step_index>.<captured_variable>`. For instance, `Step.1.id` fetches the variable `id` captured during the first Step of the current Task.
+
+---
+
+## 💻 CI / CD Integration
+
+Automating API tests ensures that endpoints execute predictably across new pull requests and deployments. Because Flexiberry executes locally using standard Node.js libraries, testing is seamlessly compatible with modern CI / CD platforms.
+
+Flexiberry uses conventional process exit codes:
+- **`0`**: Success (All conditions, assertions, and tasks passed)
+- **`1`**: Failure (A syntax error, connection failure, or failed assertion check occurred)
+
+### Running Tests in CI
+The quickest way to integrate `.berry` test files natively into pipelines is by executing `flexiberry run` inside your run scripts.
+```bash
+# Execute specific script and throw on failure
+npx flexiberry run my-api-tests.berry
+```
+
+### GitHub Actions Workflow Example
+```yaml
+name: API Regression Tests
+
+on:
+  push:
+    branches: [ "main", "staging" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  test-apis:
+    name: Run Flexiberry Testing
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 'lts/*'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Execute .berry Tests
+        run: npx flexiberry run testmyapi.berry
+```
+
+### GitLab CI/CD Pipeline Example
+```yaml
+stages:
+  - test
+
+api_testing:
+  image: node:lts
+  stage: test
+  script:
+    - npm ci
+    - npx flexiberry run testmyapi.berry
+```
+
+### Secret Management
+If you have tokens, API keys, or sensitive backend endpoints, use GitHub Secrets or GitLab CI/CD Variables. Since Flexiberry supports `.berry` variables, you can pipe secrets directly into environment execution variables using `-v` (Vars flag) or populate standard `process.env` structures assuming your setup retrieves them!
+```

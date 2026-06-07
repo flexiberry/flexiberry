@@ -1,0 +1,244 @@
+# FlexiBerry Comprehensive Technical Guide
+> The Developer-First HTTP Client for Sequential API Workflows.
+
+FlexiBerry is an open-source, lightweight HTTP client and API testing framework designed to chain dependent requests sequentially with ease using a human-readable domain-specific language (`.berry`). It bridges the gap between simple HTTP scratchpads and complex, heavy automated testing frameworks.
+
+---
+
+## ⚡ Quick Start & Setup
+
+### Requirements
+- Node.js `v18+`
+- npm, yarn, or pnpm
+
+### Installation
+Install the official command-line interface globally from npm:
+```bash
+npm install -g @flexiberry/cli
+```
+
+Or install the core engine inside your node project:
+```bash
+npm install @flexiberry/berrycore
+```
+
+### CLI Commands
+- `flexiberry`: Launches the interactive terminal application.
+- `flexiberry run <file.berry>`: Runs a specific `.berry` script and outputs the step-by-step logs and validation assertions.
+- `flexiberry init <project-name>`: Bootstraps a pre-configured template directory.
+- `flexiberry format <file.berry>`: Cleans and formats the script's visual indentation.
+
+---
+
+## 📝 The `.berry` Scripting Language Reference
+
+The `.berry` language is a custom declarative grammar compiled step-by-step. A `.berry` file is structured into four main block types: `Var`, `Api`, `Task`, and `Step`.
+
+### 1. Variables (`Var` Block)
+Used to declare static data parameters, configurations, and sensitive credentials.
+- **Static declarations**:
+  ```berry
+  Var UserConfig
+  - name: "John Doe"
+  - age: 30
+  ```
+- **Environment Pointers (`@`)**: Configures settings for specific target environments.
+  ```berry
+  Var @Production Settings
+  - baseUrl: "https://api.flexiberry.dev/v1"
+  - timeout: 5000
+  ```
+- **Secure Decryption (`Decrypt`)**: Securely decrypts Base64 credentials at runtime.
+  ```berry
+  Var @UAT secure
+  - apiKey: "U0ZMVVdFUkJFUlJZMjAyNg==" Decrypt
+  ```
+
+### 2. API Blueprint (`Api` Block)
+Defines HTTP endpoints, methods, headers, and request body payloads.
+- **Signature**: `Api <METHOD> #<identifier> <optional description>`
+- **Methods**: `GET`, `POST`, `PUT`, `DELETE`.
+- **Interpolation**: Reference variables using `{{varName}}`.
+- **Format**:
+  ```berry
+  Api POST #createAccount Register a new user
+  Url {{baseUrl}}/users
+  Header
+  - "Content-Type": "application/json"
+  Body JSON `
+  {
+    "username": "{{username}}",
+    "email": "{{email}}"
+  }
+  `
+  ```
+
+### 3. Task Identifier (`Task` Block)
+Names the overall sequential test suite run.
+```berry
+Task Complete Registration and Profile Setup Flow
+```
+
+### 4. Sequential Steps (`Step` Block)
+Represents a single execution step calling an `Api` blueprint, providing parameters, capturing results, and performing assertion validations.
+- **Signature**: `Step Call Api <apiIdentifier>`
+- **`Params`**: Inject variables into the request template.
+  ```berry
+  Params
+  - username: UserConfig.name
+  - email: "john@example.com"
+  ```
+- **`Capture`**: Save properties from the API response to be used in subsequent steps.
+  - Can capture status, headers, or body attributes (e.g., `response.body.token` or `response.status`).
+  - Shortcut syntax: `response.id` (checks root response).
+  ```berry
+  Capture
+  - token: response.body.token
+  - userId: response.body.id
+  ```
+- **`Check` (Assertions)**: List conditions that must evaluate to true.
+  - Supports comparison operators: `==`, `!=`, `>=`, `<=`, `>`, `<`.
+  - Supports logical operators: `OR`, `AND`.
+  - Special symbols: `$.status` (shortcut for request HTTP status code), `$.body` (shortcut for response body).
+  ```berry
+  Check
+  - $.status == 200 OR $.status == 201
+  - token != null
+  ```
+
+---
+
+## 🛠️ Complete Syntax Examples
+
+### Scenario 1: Kitchen Sink Capabilities
+Showcases all syntax nodes, multi-line string bodies, variables, and cross-step dependencies:
+```berry
+Var @EnvironmentConfig Production Settings
+- envName: "production"
+- timeout_ms: 5000
+- isDebug: false
+- multilineNote: `
+  This spans multiple lines
+  and is parsed natively.
+`
+
+Var DefaultUser
+- "username": "admin_rintu"
+- "password": "super_secret_password"
+
+Api POST #authenticateUser Login to the system
+Url https://api.example.com/v1/auth/login
+Header
+- "Content-Type": "application/json"
+Body JSON `
+{
+  "username": "{{username}}",
+  "password": "{{password}}"
+}
+`
+
+Api GET #getUserProfile Fetch the user data
+Url https://api.example.com/v1/users/{{userId}}
+Header
+- "Authorization": "Bearer {{authToken}}"
+
+Task Complete User Lifecycle Flow
+
+Step Call Api authenticateUser
+Params
+- username: DefaultUser.username
+- password: DefaultUser.password
+Capture
+- authToken: response.body.token
+- returnedUserId: response.body.user.id
+Check
+- $.status == 200 OR $.status == 201
+- authToken != null
+
+Step Call Api getUserProfile
+Params
+- userId: Step.1.returnedUserId
+- authToken: Step.1.authToken
+Capture
+- currentStatus: response.body.status
+Check
+- $.status == 200
+- response.body.username == DefaultUser.username
+```
+
+### Scenario 2: Petstore Integration Test (Standard API flow)
+```berry
+Var @UAT Petstore Settings
+- baseUrl: "https://petstore.swagger.io/v2"
+- petId: "987654321"
+
+Api POST #addPet Add a new pet to the store
+Url {{baseUrl}}/pet
+Header
+- "Content-Type": "application/json"
+Body JSON `
+{
+  "id": {{petId}},
+  "name": "BerryDoggie",
+  "status": "available"
+}
+`
+
+Api GET #getPetById Find pet by ID
+Url {{baseUrl}}/pet/{{petId}}
+Header
+- "Accept": "application/json"
+
+Task Add Pet and Find Sequence
+
+Step Call Api addPet
+Capture
+- createdId: response.id
+- createdName: response.name
+Check
+- $.status == 200 OR $.status == 201
+- createdId != null
+- createdName == "BerryDoggie"
+
+Step Call Api getPetById
+Params
+- petId: Step.1.createdId
+Capture
+- petName: response.name
+Check
+- $.status == 200
+- petName == Step.1.createdName
+```
+
+### Scenario 3: Secure Auth Flow with Decryption
+```berry
+Var @UAT secure credentials
+- name: "Integrator"
+- apiKeyEncrypted: "U0ZMVVdFUkJFUlJZMjAyNg==" Decrypt
+
+Api POST #validateSecureGateway Secure connection
+Url https://httpbin.org/post
+Header
+- "Content-Type": "application/json"
+- "X-API-KEY": "{{apiKeyEncrypted}}"
+Body JSON `
+{
+  "sender": "{{name}}",
+  "secure": true
+}
+`
+
+Task Secure Endpoint Verification
+
+Step Call Api validateSecureGateway
+Params
+- name: secure.name
+- apiKeyEncrypted: secure.apiKeyEncrypted
+Capture
+- parsedKey: response.json.headers.X-Api-Key
+- receivedSender: response.json.json.sender
+Check
+- $.status == 200
+- parsedKey == secure.apiKeyEncrypted
+- receivedSender == "Integrator"
+```

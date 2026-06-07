@@ -1,0 +1,23 @@
+# FlexiBerry
+> The Developer-First HTTP Client for Sequential API Workflows.
+
+FlexiBerry is an open-source, lightweight HTTP client and API testing framework designed to chain dependent requests sequentially with ease using the human-readable `.berry` syntax.
+
+## Main Links
+- [Website](https://flexiberry.dev)
+- [GitHub Repository](https://github.com/flexiberry/flexiberry)
+- [NPM CLI Package](https://www.npmjs.com/package/@flexiberry/cli)
+- [Playground](https://flexiberry.dev/playground)
+- [Documentation](https://docs.flexiberry.dev)
+
+## Core Capabilities
+- **Seamless Request Chaining**: Capture variables (like authentication tokens, user IDs, or API keys) from one HTTP response and automatically inject them into subsequent requests.
+- **Human-Readable .berry Syntax**: Write API sequence steps, parameters, variable captures, and assertions in a clean, declarative domain-specific language (DSL).
+- **Environment Context Support**: Define and load environment-specific values (e.g., local, staging, production) to parameterize workflows easily.
+- **Zero-Dependency & CI/CD Ready**: Run your tests natively via a lightweight CLI or integrate them directly in GitHub Actions pipelines.
+
+## Navigation Reference
+- [Features](/features): Complete details on grammar capabilities, CLI tooling, and double execution modes (Dry/Live Run).
+- [Examples](/example): Predefined code templates showing kitchen sink syntax, petstore integration flow, and secure authentication flows.
+- [Playground](/playground): Interactive web IDE to execute and debug `.berry` files directly in the browser.
+- [Changelog](/changelog): The chronological development timeline and feature release notes.
