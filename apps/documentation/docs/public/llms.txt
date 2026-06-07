@@ -1,0 +1,22 @@
+# FlexiBerry Documentation
+> The Developer-First HTTP Client for Sequential API Workflows.
+
+This is the official documentation for FlexiBerry, an open-source, lightweight HTTP client and API testing framework designed to chain dependent requests sequentially with ease using the human-readable `.berry` syntax.
+
+## Main Links
+- [Documentation Home](https://docs.flexiberry.dev)
+- [Website](https://flexiberry.dev)
+- [GitHub Repository](https://github.com/flexiberry/flexiberry)
+- [NPM CLI Package](https://www.npmjs.com/package/@flexiberry/cli)
+
+## Core Capabilities
+- **Seamless Request Chaining**: Capture variables from one HTTP response and inject them directly into downstream requests.
+- **Human-Readable .berry Syntax**: A custom DSL (`.berry`) that resembles plain English but compiles step-by-step.
+- **Zero-Dependency CLI & CI/CD**: Standard exit codes (`0` for success, `1` for failure) for integration with GitHub Actions, GitLab CI/CD, etc.
+- **Secure Decryption**: Securely store base64-encrypted credentials with the runtime `Decrypt` pipeline operator.
+
+## Documentation Navigation
+- [Quick Start](/quick-start): Install the CLI, select workspaces, declare APIs, write tasks, and run tests.
+- [CLI Commands](/cli): Complete CLI command references (`cli`, `create`, `select`, `add`, `run`, `test`) and parameters.
+- [Language Reference](/berry-language): Syntax guide for variables, API blueprints, tasks, steps, capturing response fields, checks, and multi-file imports with `Link`.
+- [CI/CD Integration](/ci-cd): Setting up runners, exit codes, variables, and GitHub/GitLab pipeline integration examples.

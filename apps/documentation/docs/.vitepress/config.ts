@@ -7,6 +7,17 @@ export default defineConfig({
   description: "FlexiBerry Documentation",
   head: [
     ["link", { rel: "icon", href: "/logo.png" }],
+    [
+      "script",
+      { type: "application/ld+json" },
+      `{
+        "@context": "https://schema.org",
+        "@type": "WebSite",
+        "name": "Flexiberry Documentation",
+        "url": "https://docs.flexiberry.dev",
+        "description": "Official documentation, installation guides, CLI command manuals, and language reference specifications for the Flexiberry sequential API workflow runner."
+      }`
+    ],
     ...([
       [
         "script",

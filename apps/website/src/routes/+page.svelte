@@ -44,6 +44,33 @@
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="Flexiberry · The Developer-First HTTP Client for Sequential Workflows" />
   <meta name="twitter:description" content="Chain dependent API requests sequentially with zero setup. Open-source and blistering fast." />
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "SoftwareApplication",
+      "name": "Flexiberry",
+      "operatingSystem": "All",
+      "applicationCategory": "DeveloperApplication",
+      "offers": {
+        "@type": "Offer",
+        "price": "0.00",
+        "priceCurrency": "USD"
+      },
+      "description": "Flexiberry is an open-source, lightweight HTTP client and API testing framework designed to chain dependent requests sequentially with ease.",
+      "softwareVersion": "1.0.0",
+      "license": "https://opensource.org/licenses/MIT",
+      "applicationSubCategory": "HTTP Client & API Testing Framework",
+      "releaseNotes": "https://flexiberry.dev/changelog",
+      "downloadUrl": "https://www.npmjs.com/package/@flexiberry/cli",
+      "featureList": [
+        "Seamless Request Chaining",
+        "Human-Readable .berry Syntax",
+        "Environment Variables Support with Base64 Decryption",
+        "Zero-Dependency CLI & CI/CD Ready",
+        "Stateful execution step-by-step with assertion checks"
+      ]
+    }
+  </script>
 </svelte:head>
 
 <div class="min-h-screen bg-gray-900 text-gray-100 font-mono">

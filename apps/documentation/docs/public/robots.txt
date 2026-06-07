@@ -1,0 +1,21 @@
+User-agent: *
+Allow: /
+
+# Specifically point LLM crawlers to llms.txt and sitemap
+User-agent: GPTBot
+Allow: /
+Allow: /llms.txt
+
+User-agent: ClaudeBot
+Allow: /
+Allow: /llms.txt
+
+User-agent: Google-Extended
+Allow: /
+Allow: /llms.txt
+
+User-agent: PerplexityBot
+Allow: /
+Allow: /llms.txt
+
+Sitemap: https://docs.flexiberry.dev/sitemap.xml
