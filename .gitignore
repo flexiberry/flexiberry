@@ -1,3 +1,8 @@
 node_modules
 sample
 .outputs
+
+# Env files
+.env
+.env.local
+.env.*.local

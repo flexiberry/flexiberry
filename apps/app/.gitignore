@@ -1,3 +1,8 @@
 node_modules
 .svelte-kit
 build
+
+# Env files
+.env
+.env.local
+.env.*.local
