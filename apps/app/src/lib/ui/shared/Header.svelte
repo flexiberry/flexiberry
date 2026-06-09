@@ -18,6 +18,7 @@
   import { LayoutDashboard, Terminal } from "lucide-svelte";
   import { user } from "$lib/writable/auth.store";
   import { auth } from "$lib/firebase";
+  import { goto } from "$app/navigation";
 
   // ─── Props ────────────────────────────────────────────────────────
   export let mode: "visual" | "assistant" = "visual";
@@ -196,7 +197,7 @@
         </DropdownMenu.Label>
         <DropdownMenu.Separator />
         <DropdownMenu.Group>
-          <DropdownMenu.Item>Profile</DropdownMenu.Item>
+          <DropdownMenu.Item class="cursor-pointer" on:click={() => goto("/profile")}>Profile</DropdownMenu.Item>
           <DropdownMenu.Item>Billing</DropdownMenu.Item>
           <DropdownMenu.Item>Settings</DropdownMenu.Item>
         </DropdownMenu.Group>
