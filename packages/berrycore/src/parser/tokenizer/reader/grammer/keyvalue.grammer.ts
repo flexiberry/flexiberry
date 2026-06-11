@@ -3,7 +3,7 @@ import { LexerGrammer } from "../lexer.types";
 
 export const keyValueGrammer: LexerGrammer = {
   name: "keyValue",
-  regex: /^\s*(-)\s*['"a-zA-Z\-]*\s*:/, // Matches the leading dash and optional spaces
+  regex: /^\s*(-)\s*['"`a-zA-Z0-9_\.\-]*\s*:/, // Matches the leading dash and optional spaces
   groups: [
     {
       tokenType: TokenType.Hyphen,
@@ -102,7 +102,7 @@ export const keyValueGrammer: LexerGrammer = {
         },
         {
           name: "unquotedValue",
-          regex: /(?<!['"])([a-zA-Z_.\-][a-zA-Z0-9_.\-]*)(?!['"])/,
+          regex: /(?<!['"])([a-zA-Z0-9_.\-\$/]+)(?!['"])/,
           groups: [
             {
               tokenType: TokenType.Identifier,
@@ -209,7 +209,7 @@ export const keyValueGrammer: LexerGrammer = {
         },
         {
           name: "unquotedValue",
-          regex: /\s*([a-zA-Z_\.\-][a-zA-Z0-9_\.\-]*)/,
+          regex: /\s*([a-zA-Z0-9_\.\-\$/]+)/,
           groups: [
             {
               tokenType: TokenType.Identifier,
@@ -236,7 +236,7 @@ export const keyValueGrammer: LexerGrammer = {
       isOptional: true,
     },
   ],
-  loopUntil: /^\s*(-)\s*['"a-zA-Z\-]*\s*:/,
+  loopUntil: /^\s*(-)\s*['"`a-zA-Z0-9_\.\-]*\s*:/,
   isMultiline: false,
   moveNextLine: true,
 };
