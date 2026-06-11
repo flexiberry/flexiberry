@@ -94,7 +94,7 @@ export interface VarDeclarationNode extends BaseNode {
   readonly type: NodeType.VarDeclaration;
   readonly title: string | null;
   readonly pointer: PointerReferenceNode | null;
-  readonly entries: ReadonlyArray<KeyValuePairNode>;
+  readonly entries: ReadonlyArray<KeyValuePairNode | CommentNode>;
 }
 
 /**
@@ -170,7 +170,7 @@ export interface UrlStatementNode extends BaseNode {
  */
 export interface HeaderBlockNode extends BaseNode {
   readonly type: NodeType.HeaderBlock;
-  readonly entries: ReadonlyArray<KeyValuePairNode>;
+  readonly entries: ReadonlyArray<KeyValuePairNode | CommentNode>;
 }
 
 /**
@@ -196,7 +196,7 @@ export interface BodyBlockNode extends BaseNode {
 export interface TaskBlockNode extends BaseNode {
   readonly type: NodeType.TaskBlock;
   readonly title: string | null;
-  readonly steps: ReadonlyArray<StepBlockNode>;
+  readonly steps: ReadonlyArray<StepBlockNode | CommentNode>;
 }
 
 /**
@@ -225,7 +225,7 @@ export interface StepBlockNode extends BaseNode {
  */
 export interface ParamsBlockNode extends BaseNode {
   readonly type: NodeType.ParamsBlock;
-  readonly entries: ReadonlyArray<KeyValuePairNode>;
+  readonly entries: ReadonlyArray<KeyValuePairNode | CommentNode>;
 }
 
 /**
@@ -236,7 +236,7 @@ export interface ParamsBlockNode extends BaseNode {
  */
 export interface CaptureBlockNode extends BaseNode {
   readonly type: NodeType.CaptureBlock;
-  readonly entries: ReadonlyArray<KeyValuePairNode>;
+  readonly entries: ReadonlyArray<KeyValuePairNode | CommentNode>;
 }
 
 /**
@@ -247,7 +247,7 @@ export interface CaptureBlockNode extends BaseNode {
  */
 export interface CheckBlockNode extends BaseNode {
   readonly type: NodeType.CheckBlock;
-  readonly conditions: ReadonlyArray<ConditionNode>;
+  readonly conditions: ReadonlyArray<ConditionNode | CommentNode>;
 }
 
 // ─── Shared Primitives ──────────────────────────────────────────────────────

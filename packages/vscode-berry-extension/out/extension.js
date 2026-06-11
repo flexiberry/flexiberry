@@ -35,74 +35,47 @@ var __importStar = (this && this.__importStar) || (function () {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.activate = activate;
 exports.deactivate = deactivate;
+const path = __importStar(require("path"));
 const vscode = __importStar(require("vscode"));
-const formatter_1 = require("./formatter");
-const berrycore_1 = require("@flexiberry/berrycore");
+const node_1 = require("vscode-languageclient/node");
+let client;
 function activate(context) {
-    // Register the formatter
-    (0, formatter_1.registerFormatter)(context);
-    // Set up Diagnostic Collection for Language Service
-    const diagnosticCollection = vscode.languages.createDiagnosticCollection("berry");
-    context.subscriptions.push(diagnosticCollection);
-    // Update diagnostics for a specific document
-    const updateDiagnostics = (document) => {
-        if (document.languageId !== "berry")
-            return;
-        const text = document.getText();
-        const diagnostics = [];
-        try {
-            const tokens = new berrycore_1.LexerEngine(text).tokenize();
-            new berrycore_1.AstEngine(tokens).build();
-            // If parsing succeeds, clear any previous diagnostics
-            diagnosticCollection.set(document.uri, []);
-        }
-        catch (e) {
-            if (e.name === "LexerError" || e.name === "ParserError") {
-                // e.line and e.column are 0-indexed in our errors
-                let line = e.line ?? 0;
-                let col = e.column ?? 0;
-                // Ensure bounds are safe
-                if (line >= document.lineCount) {
-                    line = document.lineCount > 0 ? document.lineCount - 1 : 0;
-                }
-                // Use the current word range or fallback to a 1-character length
-                let range = new vscode.Range(line, col, line, col + 1);
-                try {
-                    const docLine = document.lineAt(line);
-                    const wordRange = document.getWordRangeAtPosition(new vscode.Position(line, col));
-                    if (wordRange) {
-                        range = wordRange;
-                    }
-                    else {
-                        // Provide a sensible default fallback, clamped to line length
-                        const safeCol = Math.min(col, docLine.text.length);
-                        const safeEndCol = Math.min(safeCol + 1, docLine.text.length || 1);
-                        range = new vscode.Range(line, safeCol, line, safeEndCol);
-                    }
-                }
-                catch (err) {
-                    // Ignore range creation errors if line/col is completely malformed
-                }
-                const diagnostic = new vscode.Diagnostic(range, e.message, vscode.DiagnosticSeverity.Error);
-                diagnostic.source = "Berry Language Service";
-                diagnostics.push(diagnostic);
-            }
-            diagnosticCollection.set(document.uri, diagnostics);
-        }
-    };
-    // Perform check on all currently open Berry documents
-    if (vscode.window.activeTextEditor) {
-        updateDiagnostics(vscode.window.activeTextEditor.document);
+    let serverModule;
+    try {
+        // Attempt to resolve via package dependencies (compiled and linked by pnpm)
+        serverModule = require.resolve("@flexiberry/language-server");
     }
-    vscode.workspace.textDocuments.forEach(doc => updateDiagnostics(doc));
-    // Trigger diagnostics on doc open and changes
-    context.subscriptions.push(vscode.workspace.onDidOpenTextDocument((document) => {
-        updateDiagnostics(document);
-    }), vscode.workspace.onDidChangeTextDocument((event) => {
-        updateDiagnostics(event.document);
-    }), vscode.workspace.onDidCloseTextDocument((document) => {
-        diagnosticCollection.delete(document.uri);
-    }));
+    catch (e) {
+        // Fallback relative path in local development context
+        serverModule = context.asAbsolutePath(path.join("..", "language-server", "dist", "index.js"));
+    }
+    // If the extension is launched in debug mode then the debug server options are used
+    // Otherwise the run options are used
+    const serverOptions = {
+        run: { module: serverModule, transport: node_1.TransportKind.ipc },
+        debug: {
+            module: serverModule,
+            transport: node_1.TransportKind.ipc,
+            options: { execArgv: ["--nolazy", "--inspect=6009"] },
+        },
+    };
+    // Options to control the language client
+    const clientOptions = {
+        // Register the server for Berry DSL files
+        documentSelector: [{ scheme: "file", language: "berry" }],
+        synchronize: {
+            fileEvents: vscode.workspace.createFileSystemWatcher("**/.clientrc"),
+        },
+    };
+    // Create the language client and start the client.
+    client = new node_1.LanguageClient("berryLanguageServer", "Berry Language Server", serverOptions, clientOptions);
+    // Start the client. This will also launch the server
+    client.start();
 }
-function deactivate() { }
+function deactivate() {
+    if (!client) {
+        return undefined;
+    }
+    return client.stop();
+}
 //# sourceMappingURL=extension.js.map

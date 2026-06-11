@@ -27,6 +27,7 @@ import {
   StepBlockNode,
   KeyValuePairNode,
   ConditionNode,
+  CommentNode,
 } from "../parser/ast/ast.types";
 
 import {
@@ -234,7 +235,9 @@ export class Interpreter {
 
     const plan = tasks.map(t => ({
       title: t.title ?? null,
-      steps: t.steps.map(s => ({ targetName: s.targetName }))
+      steps: t.steps
+        .filter((s): s is StepBlockNode => s.type !== NodeType.Comment)
+        .map(s => ({ targetName: s.targetName }))
     }));
 
     // Emit start event
@@ -286,6 +289,7 @@ export class Interpreter {
   private async visitVarDeclaration(node: VarDeclarationNode): Promise<void> {
     // Store each key-value entry as a global variable
     for (const entry of node.entries) {
+      if (entry.type === NodeType.Comment) continue;
       let value: string = entry.value;
 
       // Handle Input mapping
@@ -327,7 +331,7 @@ export class Interpreter {
       name: node.name,
       title: node.title ?? null,
       url: node.url?.value ?? null,
-      headers: node.headers?.entries ?? [],
+      headers: (node.headers?.entries.filter(e => e.type !== NodeType.Comment) as KeyValuePairNode[]) ?? [],
       bodyType: node.body?.bodyType ?? null,
       bodyContent: node.body?.content ?? null,
     };
@@ -356,7 +360,11 @@ export class Interpreter {
     const taskEnv = this.globalEnv.createChild();
     let overallStatus = ExecutionStatus.Pass;
 
+    let actualStepIndex = 0;
     for (let i = 0; i < node.steps.length; i++) {
+      const step = node.steps[i];
+      if (step.type === NodeType.Comment) continue;
+
       // Check kill
       if (this.isKilled()) {
         overallStatus = ExecutionStatus.Killed;
@@ -372,7 +380,7 @@ export class Interpreter {
 
       // Check stop (stop current task, skip remaining steps)
       if (this.pendingCommand === ExecutionCommand.Stop) {
-        this.pushLog("info", `Stopping task — skipping step ${i + 1} and remaining`);
+        this.pushLog("info", `Stopping task — skipping step ${actualStepIndex + 1} and remaining`);
         overallStatus = ExecutionStatus.Stopped;
         this.pendingCommand = ExecutionCommand.Continue; // reset for next task
         break;
@@ -380,9 +388,9 @@ export class Interpreter {
 
       // Check skip (skip this step, continue to next)
       if (this.pendingCommand === ExecutionCommand.Skip) {
-        this.pushLog("info", `Skipping step ${i + 1}: ${node.steps[i].targetName}`);
+        this.pushLog("info", `Skipping step ${actualStepIndex + 1}: ${step.targetName}`);
         stepResults.push({
-          targetName: node.steps[i].targetName,
+          targetName: step.targetName,
           status: ExecutionStatus.Skipped,
           startTime: new Date(),
           endTime: new Date(),
@@ -391,10 +399,11 @@ export class Interpreter {
           checksPassed: null,
         });
         this.pendingCommand = ExecutionCommand.Continue; // reset after skip
+        actualStepIndex++;
         continue;
       }
 
-      const stepResult = await this.visitStep(node.steps[i], i, taskIndex, taskEnv);
+      const stepResult = await this.visitStep(step, actualStepIndex, taskIndex, taskEnv);
       stepResults.push(stepResult);
 
       if (stepResult.status === ExecutionStatus.Failed) {
@@ -403,6 +412,7 @@ export class Interpreter {
           break;
         }
       }
+      actualStepIndex++;
     }
 
     const result: TaskResult = {
@@ -620,11 +630,12 @@ export class Interpreter {
   // ── Params Resolution ───────────────────────────────────────────────────
 
   private resolveParams(
-    entries: ReadonlyArray<KeyValuePairNode>,
+    entries: ReadonlyArray<KeyValuePairNode | CommentNode>,
     stepEnv: Environment,
     taskEnv: Environment
   ): void {
     for (const entry of entries) {
+      if (entry.type === NodeType.Comment) continue;
       // Check if the value references another variable (e.g., "Step.1.id")
       const resolved = taskEnv.tryLookup(entry.value);
       stepEnv.declare(entry.key, resolved !== undefined ? resolved : entry.value);
@@ -634,12 +645,13 @@ export class Interpreter {
   // ── Capture Processing ──────────────────────────────────────────────────
 
   private processCapture(
-    entries: ReadonlyArray<KeyValuePairNode>,
+    entries: ReadonlyArray<KeyValuePairNode | CommentNode>,
     response: FetchResponse,
     stepIndex: number,
     taskEnv: Environment
   ): void {
     for (const entry of entries) {
+      if (entry.type === NodeType.Comment) continue;
       const value = this.resolveResponsePath(response.data, entry.value);
       // Store as Step.<1-based index>.<key>
       taskEnv.declare(`Step.${stepIndex + 1}.${entry.key}`, value as RuntimeValue);
@@ -649,11 +661,12 @@ export class Interpreter {
   // ── Check Processing ────────────────────────────────────────────────────
 
   private processCheck(
-    conditions: ReadonlyArray<ConditionNode>,
+    conditions: ReadonlyArray<ConditionNode | CommentNode>,
     stepEnv: Environment,
     taskEnv: Environment
   ): boolean {
     for (const condition of conditions) {
+      if (condition.type === NodeType.Comment) continue;
       const result = this.evaluateCondition(condition, stepEnv, taskEnv);
       if (!result) return false;
     }

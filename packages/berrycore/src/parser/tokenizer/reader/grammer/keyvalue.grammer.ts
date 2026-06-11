@@ -13,7 +13,7 @@ export const keyValueGrammer: LexerGrammer = {
   next: [
     {
       name: "quotedKey",
-      regex: /^-\s*(['"`])(.*?)(\1)\s*(:)/, // Matches 'key' or "key" followed by colon
+      regex: /^\s*(['"`])(.*?)(\1)\s*(:)/, // Matches 'key' or "key" followed by colon
       groups: [
         {
           tokenType: TokenType.Quote,

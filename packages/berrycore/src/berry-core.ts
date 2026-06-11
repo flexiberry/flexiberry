@@ -386,6 +386,7 @@ export class BerryCore {
     for (const node of ast.body) {
       if (node.type === NodeType.VarDeclaration) {
         for (const entry of node.entries) {
+          if (entry.type === NodeType.Comment) continue;
           declaredVars.add(entry.key);
         }
       }
@@ -512,6 +513,7 @@ export class BerryCore {
     const reqHeaders: Record<string, string> = {};
     if (targetApi.headers?.entries) {
       for (const entry of targetApi.headers.entries) {
+        if (entry.type === NodeType.Comment) continue;
         reqHeaders[entry.key] = interpolateString(entry.value, mergedVariables);
       }
     }
@@ -554,6 +556,7 @@ export class BerryCore {
 
     if (api.headers?.entries) {
       for (const entry of api.headers.entries) {
+        if (entry.type === NodeType.Comment) continue;
         regex.lastIndex = 0;
         let match;
         while ((match = regex.exec(entry.value)) !== null) {

@@ -50,12 +50,7 @@ export class LexerEngine {
     return this.lines[this.lineIndex];
   }
   private next() {
-    do {
-      this.lineIndex++;
-    } while (
-      comment.regex.test(this.at()) &&
-      this.lineIndex < this.lines.length
-    );
+    this.lineIndex++;
     this.columnIndex = 0;
     return this.at();
   }

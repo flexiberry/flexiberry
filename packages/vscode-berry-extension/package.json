@@ -63,7 +63,9 @@
     }
   },
   "dependencies": {
-    "@flexiberry/berrycore": "workspace:*"
+    "@flexiberry/berrycore": "workspace:*",
+    "@flexiberry/language-server": "workspace:*",
+    "vscode-languageclient": "^9.0.1"
   },
   "devDependencies": {
     "@types/node": "^22.14.1",

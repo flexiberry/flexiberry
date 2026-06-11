@@ -250,8 +250,13 @@ export class AstEngine {
     while (
       this.check(TokenType.Url) ||
       this.check(TokenType.Header) ||
-      this.check(TokenType.Body)
+      this.check(TokenType.Body) ||
+      this.check(TokenType.Comment)
     ) {
+      if (this.check(TokenType.Comment)) {
+        this.parseComment();
+        continue;
+      }
       if (this.check(TokenType.Url)) {
         url = this.parseUrlStatement();
       } else if (this.check(TokenType.Header)) {
@@ -350,8 +355,12 @@ export class AstEngine {
     }
 
     // Collect Step blocks that follow this Task
-    const steps: StepBlockNode[] = [];
-    while (this.check(TokenType.Step)) {
+    const steps: Array<StepBlockNode | CommentNode> = [];
+    while (this.check(TokenType.Step) || this.check(TokenType.Comment)) {
+      if (this.check(TokenType.Comment)) {
+        steps.push(this.parseComment());
+        continue;
+      }
       steps.push(this.parseStepBlock());
     }
 
@@ -396,8 +405,13 @@ export class AstEngine {
     while (
       this.check(TokenType.Params) ||
       this.check(TokenType.Capture) ||
-      this.check(TokenType.Check)
+      this.check(TokenType.Check) ||
+      this.check(TokenType.Comment)
     ) {
+      if (this.check(TokenType.Comment)) {
+        this.parseComment();
+        continue;
+      }
       if (this.check(TokenType.Params)) {
         params = this.parseParamsBlock();
       } else if (this.check(TokenType.Capture)) {
@@ -491,10 +505,14 @@ export class AstEngine {
    * Grammar: (- key: value)*
    * Loops while Hyphen tokens appear
    */
-  private parseKeyValuePairs(): KeyValuePairNode[] {
-    const entries: KeyValuePairNode[] = [];
+  private parseKeyValuePairs(): Array<KeyValuePairNode | CommentNode> {
+    const entries: Array<KeyValuePairNode | CommentNode> = [];
 
-    while (this.check(TokenType.Hyphen)) {
+    while (this.check(TokenType.Hyphen) || this.check(TokenType.Comment)) {
+      if (this.check(TokenType.Comment)) {
+        entries.push(this.parseComment());
+        continue;
+      }
       const hyphenToken = this.advance(); // consume '-'
       const position = this.positionOf(hyphenToken);
 
@@ -573,10 +591,14 @@ export class AstEngine {
    * Grammar: (- lhs operator rhs (OR lhs operator rhs)*)*
    * Loops while Hyphen tokens appear
    */
-  private parseConditions(): ConditionNode[] {
-    const conditions: ConditionNode[] = [];
+  private parseConditions(): Array<ConditionNode | CommentNode> {
+    const conditions: Array<ConditionNode | CommentNode> = [];
 
-    while (this.check(TokenType.Hyphen)) {
+    while (this.check(TokenType.Hyphen) || this.check(TokenType.Comment)) {
+      if (this.check(TokenType.Comment)) {
+        conditions.push(this.parseComment());
+        continue;
+      }
       const hyphenToken = this.advance(); // consume '-'
       const position = this.positionOf(hyphenToken);
 
