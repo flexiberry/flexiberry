@@ -1,22 +1,52 @@
 {
   "name": "vscode-berry-extension",
+  "displayName": "FlexiBerry",
+  "publisher": "flexiberry",
   "version": "1.0.4",
-  "description": "",
+  "description": "Interactive developer extension for the FlexiBerry DSL. Write, validate, and execute API test scripts with real-time visual feedback.",
+  "icon": "icon.png",
+  "galleryBanner": {
+    "color": "#0f121a",
+    "theme": "dark"
+  },
+  "categories": [
+    "Programming Languages",
+    "Linters",
+    "Formatters",
+    "Testing"
+  ],
+  "keywords": [
+    "berry",
+    "api",
+    "testing",
+    "rest",
+    "assertion"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/flexiberry/flexiberry"
+  },
+  "homepage": "https://flexiberry.dev",
+  "bugs": {
+    "url": "https://github.com/flexiberry/flexiberry/issues"
+  },
   "main": "./out/extension.js",
   "scripts": {
     "compile": "tsc -p .",
     "watch": "tsc -watch -p .",
+    "build": "pnpm run compile",
     "package": "vsce package",
     "test": "pnpm run compile && node ./out/extension.js"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "author": "FlexiBerry Team",
+  "license": "MIT",
   "engines": {
     "vscode": ">=1.50.0"
   },
   "activationEvents": [
-    "onLanguage:berry"
+    "onLanguage:berry",
+    "onCommand:berry.runFile",
+    "onCommand:berry.runApiAlone"
   ],
   "contributes": {
     "languages": [
@@ -46,6 +76,35 @@
         "path": "./themes/berry-color-theme.json"
       }
     ],
+    "commands": [
+      {
+        "command": "berry.runFile",
+        "title": "Run Berry File",
+        "category": "Berry",
+        "icon": "$(play)"
+      },
+      {
+        "command": "berry.runApiAlone",
+        "title": "Run API Standalone",
+        "category": "Berry"
+      }
+    ],
+    "menus": {
+      "editor/title": [
+        {
+          "command": "berry.runFile",
+          "when": "resourceLangId == berry",
+          "group": "navigation"
+        }
+      ],
+      "editor/context": [
+        {
+          "command": "berry.runFile",
+          "when": "resourceLangId == berry",
+          "group": "1_run"
+        }
+      ]
+    },
     "configuration": {
       "title": "Berry Formatting",
       "properties": {

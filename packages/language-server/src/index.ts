@@ -1,19 +1,19 @@
 import {
   createConnection,
   TextDocuments,
-  Diagnostic,
-  DiagnosticSeverity,
   ProposedFeatures,
   InitializeParams,
   TextDocumentSyncKind,
   InitializeResult,
   DocumentFormattingParams,
   TextEdit,
-  Range,
-  Position
+  CompletionItem,
+  TextDocumentPositionParams
 } from 'vscode-languageserver/node.js';
 import { TextDocument } from 'vscode-languageserver-textdocument';
-import { LexerEngine, AstEngine, BerryFormatter } from '@flexiberry/berrycore';
+import { validateTextDocument } from './features/diagnostics.js';
+import { formatTextDocument } from './features/formatting.js';
+import { getCompletions } from './features/completion.js';
 
 // Create a connection for the server, using Node's IPC as a transport.
 const connection = createConnection(ProposedFeatures.all);
@@ -25,60 +25,37 @@ connection.onInitialize((params: InitializeParams): InitializeResult => {
   return {
     capabilities: {
       textDocumentSync: TextDocumentSyncKind.Incremental,
-      documentFormattingProvider: true
+      documentFormattingProvider: true,
+      completionProvider: {
+        resolveProvider: true,
+        triggerCharacters: [' ', '#', '@', ':']
+      }
     }
   };
 });
 
 // The content of a text document has changed.
-documents.onDidChangeContent(change => {
-  validateTextDocument(change.document);
+documents.onDidChangeContent(async (change) => {
+  const diagnostics = await validateTextDocument(change.document);
+  connection.sendDiagnostics({ uri: change.document.uri, diagnostics });
 });
 
-async function validateTextDocument(textDocument: TextDocument): Promise<void> {
-  const text = textDocument.getText();
-  const diagnostics: Diagnostic[] = [];
-
-  try {
-    const tokens = new LexerEngine(text).tokenize();
-    new AstEngine(tokens).build();
-  } catch (e: any) {
-    if (e.name === 'LexerError' || e.name === 'ParserError') {
-      let line = e.line ?? 0;
-      let col = e.column ?? 0;
-
-      // Ensure bounds are safe
-      if (line >= textDocument.lineCount) {
-        line = textDocument.lineCount > 0 ? textDocument.lineCount - 1 : 0;
-      }
-
-      // Check the line length to avoid range boundary issues
-      let lineText = '';
-      try {
-        const lines = text.split(/\r?\n/);
-        lineText = lines[line] || '';
-      } catch (err) {}
-
-      const safeCol = Math.min(col, lineText.length);
-      const safeEndCol = Math.min(safeCol + 1, lineText.length || 1);
-
-      const diagnostic: Diagnostic = {
-        severity: DiagnosticSeverity.Error,
-        range: {
-          start: { line, character: safeCol },
-          end: { line, character: safeEndCol }
-        },
-        message: e.message || 'Syntax Error',
-        source: 'Berry Language Server'
-      };
-
-      diagnostics.push(diagnostic);
+// Support Auto-complete / IntelliSense suggestions
+connection.onCompletion(
+  (textDocumentPosition: TextDocumentPositionParams): CompletionItem[] => {
+    const document = documents.get(textDocumentPosition.textDocument.uri);
+    if (!document) {
+      return [];
     }
+    return getCompletions(document, textDocumentPosition.position);
   }
+);
 
-  // Send the computed diagnostics to client.
-  connection.sendDiagnostics({ uri: textDocument.uri, diagnostics });
-}
+connection.onCompletionResolve(
+  (item: CompletionItem): CompletionItem => {
+    return item;
+  }
+);
 
 // Support formatting
 connection.onDocumentFormatting((params: DocumentFormattingParams): TextEdit[] => {
@@ -86,25 +63,10 @@ connection.onDocumentFormatting((params: DocumentFormattingParams): TextEdit[] =
   if (!document) {
     return [];
   }
-
-  const text = document.getText();
   try {
-    const tokens = new LexerEngine(text).tokenize();
-    const ast = new AstEngine(tokens).build();
-    const formatter = new BerryFormatter({
-      indentSize: params.options.tabSize ?? 4,
-    });
-    const formattedText = formatter.format(ast);
-
-    // Full document range replacement
-    const fullRange = Range.create(
-      Position.create(0, 0),
-      document.positionAt(text.length)
-    );
-
-    return [TextEdit.replace(fullRange, formattedText)];
+    return formatTextDocument(document, params);
   } catch (e: any) {
-    connection.console.warn(`Berry formatting skipped due to error: ${e.message}`);
+    connection.console.warn(e.message);
     return [];
   }
 });
