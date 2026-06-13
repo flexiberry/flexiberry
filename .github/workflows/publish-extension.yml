@@ -1,0 +1,51 @@
+name: Publish VS Code Extension
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - 'packages/vscode-berry-extension/**'
+      - '.github/workflows/publish-extension.yml'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  publish:
+    name: Build and Publish Extension
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup PNPM
+        uses: pnpm/action-setup@v3
+        with:
+          version: 9
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'pnpm'
+
+      - name: Install Dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build Dependencies and Extension
+        run: |
+          pnpm --filter @flexiberry/berrycore build
+          pnpm --filter @flexiberry/language-server build
+          pnpm --filter vscode-berry-extension build
+
+      - name: Publish to Marketplace
+        run: |
+          cd packages/vscode-berry-extension
+          npx @vscode/vsce publish -p ${{ secrets.VSCE_PAT }} --skip-duplicate
+        env:
+          VSCE_PAT: ${{ secrets.VSCE_PAT }}
