@@ -1,6 +1,6 @@
 {
   "name": "@flexiberry/cli",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "description": "The official CLI shell for the FlexiBerry API Testing Framework, enabling keyboard-driven interactive creation, parsing, validation, and execution of Berry DSL scripts.",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",

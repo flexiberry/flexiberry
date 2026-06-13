@@ -50,19 +50,22 @@ export class LexerEngine {
     return this.lines[this.lineIndex];
   }
   private next() {
-    do {
-      this.lineIndex++;
-    } while (
-      comment.regex.test(this.at()) &&
-      this.lineIndex < this.lines.length
-    );
+    return this.moveToNextLine(false);
+  }
+
+  private moveToNextLine(validate: boolean = true) {
+    if (validate && this.currentLine && this.currentLine.trim() !== "") {
+      throw new LexerError("Unexpected trailing characters or syntax error", this.lineIndex, this.columnIndex);
+    }
+    this.lineIndex++;
     this.columnIndex = 0;
     return this.at();
   }
 
   private prev() {
     this.lineIndex--;
-    return this.at();
+    this.currentLine = "";
+    return this.currentLine;
   }
 
   constructor(input: string) {
@@ -73,7 +76,7 @@ export class LexerEngine {
    * Processes a grammar rule against the given line and updates tokens.
    * Optimized for readability and performance.
    */
-  private processGrammer(grammar: LexerGrammer): boolean {
+  private processGrammer(grammar: LexerGrammer, disableLoop: boolean = false): boolean {
     // Handle multi-line grammar start/end
     if (grammar.start && grammar.end && grammar.start.test(this.currentLine)) {
       this.currentLine = this.mergeLinesUntilEnd(grammar, this.currentLine);
@@ -88,14 +91,8 @@ export class LexerEngine {
         if (grammar.next) {
           this.processNextGrammars(grammar.next);
         }
-        if (grammar.loopUntil) {
+        if (grammar.loopUntil && !disableLoop) {
           this.processLoopUntil(grammar);
-          if (
-            grammar.moveNextLine ||
-            grammar.loopUntil.test(this.currentLine)
-          ) {
-            this.currentLine = this.prev();
-          }
         }
       }
       return true;
@@ -156,7 +153,7 @@ export class LexerEngine {
     for (const nextGrammar of nextGrammars) {
       if (isProcessed && nextGrammar.isOptional) continue;
       if (nextGrammar.moveNextLine) {
-        this.currentLine = this.next();
+        this.currentLine = this.moveToNextLine(true);
       }
       isProcessed = this.processGrammer(nextGrammar);
     }
@@ -167,19 +164,32 @@ export class LexerEngine {
    */
   private processLoopUntil(grammar: LexerGrammer): boolean {
     if (!grammar.loopUntil) return true;
-    do {
+
+    const loopUntil = grammar.loopUntil;
+    while (this.lineIndex < this.lines.length) {
+      if (this.lineIndex >= this.lines.length - 1 && grammar.moveNextLine) {
+        break;
+      }
+
+      const lineToTest = grammar.moveNextLine ? this.lines[this.lineIndex + 1] : this.currentLine;
+      if (!lineToTest || !loopUntil.test(lineToTest)) {
+        break;
+      }
+
       this.currentLine = grammar.mergeLines
         ? this.currentLine + this.next()
         : grammar.moveNextLine
-          ? this.next()
+          ? this.moveToNextLine(true)
           : this.currentLine;
-      const isProcessed = this.processGrammer(grammar);
-      if (!isProcessed) return false;
-    } while (
-      grammar.loopUntil &&
-      grammar.loopUntil.test(this.currentLine) &&
-      this.lineIndex < this.lines.length
-    );
+
+      const isProcessed = this.processGrammer(grammar, true);
+      if (!isProcessed) {
+        if (grammar.moveNextLine) {
+          this.currentLine = this.prev();
+        }
+        return false;
+      }
+    }
     return true;
   }
   /**
@@ -192,13 +202,27 @@ export class LexerEngine {
     while (this.lineIndex < totalLines) {
       this.columnIndex = 0;
       this.currentLine = this.at();
+
+      // Skip completely empty or whitespace-only lines
+      if (this.currentLine.trim() === "") {
+        this.next();
+        continue;
+      }
+
+      let matched = false;
       // Try each grammar rule; break if processed
       for (const grammarRule of grammer) {
         if (this.processGrammer(grammarRule)) {
+          matched = true;
           break;
         }
       }
-      this.next();
+
+      if (!matched) {
+        throw new LexerError("Invalid syntax or grammar at current line", this.lineIndex, this.columnIndex);
+      }
+
+      this.moveToNextLine(true);
     }
     // Add EOF token at the end
     this.tokens.push(

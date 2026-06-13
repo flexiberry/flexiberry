@@ -2,189 +2,190 @@
   "$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
   "name": "Berry",
   "scopeName": "source.berry",
-  "fileTypes": ["berry", "be"],
+  "fileTypes": [
+    "berry",
+    "be"
+  ],
   "patterns": [
-    { "include": "#surroundingPairs" },
-    { "include": "#comments" },
-    { "include": "#task-definition" },
-    { "include": "#api-definitions" },
-    { "include": "#scalar-types" },
-    { "include": "#keyvalue-pairs" },
-    { "include": "#variables-definitions" },
-    { "include": "#step-definitions" },
-    { "include": "#operators" }
+    {
+      "include": "#comments"
+    },
+    {
+      "include": "#surroundingPairs"
+    },
+    {
+      "include": "#link-input-definitions"
+    },
+    {
+      "include": "#task-definition"
+    },
+    {
+      "include": "#api-definitions"
+    },
+    {
+      "include": "#variables-definitions"
+    },
+    {
+      "include": "#step-definitions"
+    },
+    {
+      "include": "#keyvalue-pairs"
+    },
+    {
+      "include": "#check-conditions"
+    },
+    {
+      "include": "#operators"
+    },
+    {
+      "include": "#constants"
+    },
+    {
+      "include": "#numbers"
+    },
+    {
+      "include": "#scalar-types"
+    }
   ],
   "repository": {
-    "operators": {
+    "comments": {
       "patterns": [
         {
-          "name": "keyword.operator.arithmetic.berry",
-          "match": "[+\\-*/%]|\\*\\*"
+          "name": "comment.line.double-number-sign.berry",
+          "match": "\\s*##.*$"
+        }
+      ]
+    },
+    "surroundingPairs": {
+      "patterns": [
+        {
+          "name": "meta.interpolation.berry",
+          "match": "(\\{\\{)([^}]*)(\\}\\})",
+          "captures": {
+            "1": {
+              "name": "punctuation.section.embedded.begin.berry"
+            },
+            "2": {
+              "name": "variable.other.readwrite.berry"
+            },
+            "3": {
+              "name": "punctuation.section.embedded.end.berry"
+            }
+          }
+        }
+      ]
+    },
+    "link-input-definitions": {
+      "patterns": [
+        {
+          "name": "meta.link.berry",
+          "match": "^\\s*(Link)\\s+(.+)$",
+          "captures": {
+            "1": {
+              "name": "keyword.control.berry"
+            },
+            "2": {
+              "name": "string.unquoted.path.berry"
+            }
+          }
         },
         {
-          "name": "keyword.operator.comparison.berry",
-          "match": "==|!=|<=|>=|<|>"
+          "name": "meta.input.berry",
+          "match": "^\\s*(Input)\\s+(.+)$",
+          "captures": {
+            "1": {
+              "name": "keyword.control.berry"
+            },
+            "2": {
+              "name": "string.unquoted.path.berry"
+            }
+          }
         },
         {
-          "name": "keyword.operator.logical.berry",
-          "match": "!|&&|\\|\\||Or|OR|AND|And"
-        },
-        {
-          "name": "keyword.operator.assignment.berry",
-          "match": "[+\\-*/%]?="
-        },
-        {
-          "name": "keyword.operator.bitwise.berry",
-          "match": "&|\\||\\^|~|<<|>>"
-        },
-        {
-          "name": "keyword.operator.misc.berry",
-          "match": "\\?|:|\\.{2,3}|=>"
+          "name": "meta.skip.berry",
+          "match": "^\\s*(Skip)\\s+(.+)$",
+          "captures": {
+            "1": {
+              "name": "keyword.control.berry"
+            },
+            "2": {
+              "name": "string.unquoted.expression.berry"
+            }
+          }
         }
       ]
     },
     "task-definition": {
       "patterns": [
         {
-          "name": "keyword.task",
-          "match": "^Task\\s+(.+)$",
+          "name": "meta.task.berry",
+          "match": "^\\s*(Task)\\s+(.+)$",
           "captures": {
-            "1": { "name": "task.title" }
-          }
-        }
-      ]
-    },
-    "comments": {
-      "patterns": [
-        {
-          "name": "comment.line.double-hash.berry",
-          "match": "^##.*$"
-        }
-      ]
-    },
-
-    "surroundingPairs": {
-      "patterns": [
-        {
-          "name": "meta.interpolation",
-          "match": "(\\{\\{)([^}]*)(\\}\\})",
-
-          "captures": {
-            "1": { "name": "keyword.interpolation-open" },
-            "2": { "name": "variable.other.interpolation" },
-            "3": { "name": "keyword.interpolation-close" }
-          }
-        }
-      ]
-    },
-    "keyvalue-pairs": {
-      "patterns": [
-        {
-          "name": "meta.keyvalue.header",
-          "match": "^\\s*(Header|Check|Capture|Params)\\s*",
-          "captures": {
-            "1": { "name": "keyword.keyvalue.header" }
-          }
-        },
-        {
-          "name": "meta.keyvalue-pairs",
-          "match": "^\\s*(-)\\s*(['\"a-zA-Z\\-]*)\\s*(:)\\s*(?:\\s*(.*))?$",
-          "captures": {
-            "1": { "name": "keyvalue-pairs.hash" },
-            "2": { "name": "keyvalue-pairs.key" },
-            "3": { "name": "keyvalue-pairs.separator" },
-            "4": { "name": "keyvalue-pairs.value" }
-          }
-        }
-      ]
-    },
-    "scalar-types": {
-      "patterns": [
-        {
-          "name": "meta.scalar.singlequote",
-          "begin": "'|\"",
-          "beginCaptures": {
-            "0": { "name": "scalar.start" }
-          },
-          "end": "'|\"",
-          "endCaptures": {
-            "0": { "name": "scalar.end" }
-          },
-          "patterns": [
-            {
-              "name": "scalar.content",
-              "match": "[^('|\")]+"
+            "1": {
+              "name": "keyword.control.berry"
+            },
+            "2": {
+              "name": "comment.line.double-number-sign.berry"
             }
-          ]
-        },
-        {
-          "name": "meta.scalar.multiline",
-          "begin": "`",
-          "beginCaptures": {
-            "0": { "name": "scalar.multiline.start" }
-          },
-          "end": "`",
-          "endCaptures": {
-            "0": { "name": "scalar.multiline.end" }
-          },
-          "patterns": [
-            {
-              "name": "scalar.multiline.content",
-              "match": "[^`]+"
-            }
-          ]
+          }
         }
       ]
     },
     "api-definitions": {
       "patterns": [
         {
-          "name": "meta.api",
+          "name": "meta.api.berry",
           "match": "^\\s*(Api)(?:\\s+(GET|POST|PUT|DELETE|PATCH))?\\s+((#)(\\S+))(?:\\s+(.*))?$",
           "captures": {
-            "1": { "name": "keyword.api" },
-            "2": { "name": "keyword.api.method" },
-            "4": { "name": "api.identifier" },
-            "5": { "name": "api.identifier" },
-            "6": { "name": "api.title" }
+            "1": {
+              "name": "keyword.control.berry"
+            },
+            "2": {
+              "name": "keyword.other.api-method.berry"
+            },
+            "3": {
+              "name": "entity.name.function.api.berry"
+            },
+            "4": {
+              "name": "punctuation.definition.entity.berry"
+            },
+            "5": {
+              "name": "entity.name.function.api.berry"
+            },
+            "6": {
+              "name": "string.quoted.api.title.berry"
+            }
           }
         },
         {
-          "name": "meta.api.url",
-          "match": "^(Url)\\s+(.+)$",
-          "captures": {
-            "1": { "name": "keyword.url" },
-            "2": { "name": "string.url" }
-          }
+          "name": "meta.api.url.berry",
+          "begin": "^\\s*(Url)\\s+",
+          "beginCaptures": {
+            "1": {
+              "name": "keyword.control.berry"
+            }
+          },
+          "end": "$",
+          "patterns": [
+            {
+              "include": "#surroundingPairs"
+            },
+            {
+              "name": "string.unquoted.url.berry",
+              "match": "\\S+"
+            }
+          ]
         },
         {
-          "name": "meta.api.body",
-          "match": "^\\s*(Body)\\s(\\w+)\\s*",
+          "name": "meta.api.body.berry",
+          "match": "^\\s*(Body)\\s+(\\w+)\\s*",
           "captures": {
-            "1": { "name": "keyword.api.body" },
-            "2": { "name": "type.api.body" }
-          }
-        },
-        {
-          "name": "meta.api.header",
-          "match": "^\\s*(Header)\\s*",
-          "captures": {
-            "1": { "name": "keyword.api.header" }
-          }
-        }
-      ]
-    },
-    "step-definitions": {
-      "patterns": [
-        {
-          "name": "meta.step",
-          "match": "^\\s*(Step)\\s+(Call|CALL)?\\s+(\\S+)\\s*(\\S+)(?:\\s+(.*))?$",
-          "captures": {
-            "1": { "name": "keyword.step" },
-            "2": { "name": "keyword.step.action" },
-            "3": { "name": "step.function" },
-            "4": { "name": "step.function.name" },
-            "5": { "name": "step.title" }
+            "1": {
+              "name": "keyword.control.berry"
+            },
+            "2": {
+              "name": "storage.type.body.berry"
+            }
           }
         }
       ]
@@ -192,13 +193,234 @@
     "variables-definitions": {
       "patterns": [
         {
-          "name": "meta.variables",
-          "match": "^\\s*(Var)(?:\\s+(@\\w+))?\\s+(.*)",
+          "name": "meta.variables.berry",
+          "match": "^\\s*(Var)(?:\\s+(@)(\\w+))?\\s+(.*)?$",
           "captures": {
-            "1": { "name": "keyword.variable" },
-            "2": { "name": "variable.pointer" },
-            "3": { "name": "variable.name" }
+            "1": {
+              "name": "keyword.control.berry"
+            },
+            "2": {
+              "name": "punctuation.definition.variable.berry"
+            },
+            "3": {
+              "name": "variable.other.readwrite.pointer.berry"
+            },
+            "4": {
+              "name": "entity.name.type.berry"
+            }
           }
+        }
+      ]
+    },
+    "step-definitions": {
+      "patterns": [
+        {
+          "name": "meta.step.berry",
+          "match": "^\\s*(Step)\\s+(Call|CALL)?\\s+(\\S+)\\s*(\\S+)(?:\\s+(.*))?$",
+          "captures": {
+            "1": {
+              "name": "keyword.control.berry"
+            },
+            "2": {
+              "name": "keyword.other.step-action.berry"
+            },
+            "3": {
+              "name": "keyword.control.berry"
+            },
+            "4": {
+              "name": "entity.name.function.berry"
+            },
+            "5": {
+              "name": "string.quoted.step.title.berry"
+            }
+          }
+        }
+      ]
+    },
+    "keyvalue-pairs": {
+      "patterns": [
+        {
+          "name": "meta.block.header.berry",
+          "match": "^\\s*(Header|Params|Capture|Check)\\s*$",
+          "captures": {
+            "1": {
+              "name": "keyword.control.berry"
+            }
+          }
+        },
+        {
+          "name": "meta.keyvalue-pair.berry",
+          "begin": "^\\s*(-)\\s*(?:(['\"a-zA-Z\\-_]+)|([a-zA-Z\\-_]+))\\s*(:)",
+          "beginCaptures": {
+            "1": {
+              "name": "punctuation.definition.list.item.berry keyvalue-pairs.hash.berry"
+            },
+            "2": {
+              "name": "entity.name.tag.berry support.type.property-name.berry keyvalue-pairs.key.berry"
+            },
+            "3": {
+              "name": "entity.name.tag.berry support.type.property-name.berry keyvalue-pairs.key.berry"
+            },
+            "4": {
+              "name": "punctuation.separator.key-value.berry keyvalue-pairs.separator.berry"
+            }
+          },
+          "end": "$",
+          "patterns": [
+            {
+              "include": "#scalar-types"
+            },
+            {
+              "include": "#surroundingPairs"
+            },
+            {
+              "include": "#operators"
+            },
+            {
+              "include": "#constants"
+            },
+            {
+              "include": "#numbers"
+            },
+            {
+              "include": "#variables"
+            }
+          ]
+        }
+      ]
+    },
+    "check-conditions": {
+      "patterns": [
+        {
+          "name": "meta.condition.berry",
+          "begin": "^\\s*(-)\\s*",
+          "beginCaptures": {
+            "1": {
+              "name": "punctuation.definition.list.item.berry"
+            }
+          },
+          "end": "$",
+          "patterns": [
+            {
+              "include": "#operators"
+            },
+            {
+              "include": "#scalar-types"
+            },
+            {
+              "include": "#constants"
+            },
+            {
+              "include": "#numbers"
+            },
+            {
+              "include": "#variables"
+            }
+          ]
+        }
+      ]
+    },
+    "operators": {
+      "patterns": [
+        {
+          "name": "keyword.operator.logical.berry",
+          "match": "\\b(Or|OR|AND|And)\\b"
+        },
+        {
+          "name": "keyword.other.decrypt.berry",
+          "match": "\\b(Decrypt|decrypt)\\b"
+        },
+        {
+          "name": "keyword.operator.comparison.berry",
+          "match": "==|!=|<=|>=|<|>"
+        }
+      ]
+    },
+    "constants": {
+      "patterns": [
+        {
+          "name": "constant.language.berry",
+          "match": "\\b(null|true|false)\\b"
+        }
+      ]
+    },
+    "numbers": {
+      "patterns": [
+        {
+          "name": "constant.numeric.berry",
+          "match": "\\b\\d+(\\.\\d+)?\\b"
+        }
+      ]
+    },
+    "variables": {
+      "patterns": [
+        {
+          "name": "variable.other.readwrite.berry",
+          "match": "\\$[a-zA-Z0-9_$.-]*|[a-zA-Z_][a-zA-Z0-9_$.-]*"
+        }
+      ]
+    },
+    "scalar-types": {
+      "patterns": [
+        {
+          "name": "string.quoted.single.berry",
+          "begin": "'",
+          "beginCaptures": {
+            "0": {
+              "name": "punctuation.definition.string.begin.berry"
+            }
+          },
+          "end": "'",
+          "endCaptures": {
+            "0": {
+              "name": "punctuation.definition.string.end.berry"
+            }
+          },
+          "patterns": [
+            {
+              "include": "#surroundingPairs"
+            }
+          ]
+        },
+        {
+          "name": "string.quoted.double.berry",
+          "begin": "\"",
+          "beginCaptures": {
+            "0": {
+              "name": "punctuation.definition.string.begin.berry"
+            }
+          },
+          "end": "\"",
+          "endCaptures": {
+            "0": {
+              "name": "punctuation.definition.string.end.berry"
+            }
+          },
+          "patterns": [
+            {
+              "include": "#surroundingPairs"
+            }
+          ]
+        },
+        {
+          "name": "string.quoted.other.backtick.berry",
+          "begin": "`",
+          "beginCaptures": {
+            "0": {
+              "name": "punctuation.definition.string.begin.berry"
+            }
+          },
+          "end": "`",
+          "endCaptures": {
+            "0": {
+              "name": "punctuation.definition.string.end.berry"
+            }
+          },
+          "patterns": [
+            {
+              "include": "#surroundingPairs"
+            }
+          ]
         }
       ]
     }

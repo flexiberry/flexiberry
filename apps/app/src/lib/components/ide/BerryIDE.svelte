@@ -3,7 +3,18 @@
   import { goto } from "$app/navigation";
   import { toast } from "svelte-sonner";
   import Header from "$lib/ui/shared/Header.svelte";
-  import { ArrowLeft, Code2, Save, Download, Copy, Check, Plus, FileText, LayoutList } from "lucide-svelte";
+  import { 
+    ArrowLeft, 
+    Code2, 
+    Save, 
+    Download, 
+    Copy, 
+    Check, 
+    Plus, 
+    FileText, 
+    LayoutList,
+    Play
+  } from "lucide-svelte";
   import BerryBlockComponent from "$lib/components/ide/BerryBlock.svelte";
   import BlockAdder from "$lib/components/ide/BlockAdder.svelte";
   import { berryBlocks } from "$lib/writable/berry.store";
@@ -12,8 +23,29 @@
   import CodeMirror from "svelte-codemirror-editor";
   import { oneDark } from "@codemirror/theme-one-dark";
   import { mode } from "mode-watcher";
+  import { onDestroy } from "svelte";
+  import { Button } from "$lib/components/ui/button";
+  import type { RunInstance } from "./execution/execution.types";
+  import ExecutionOverlay from "./execution/ExecutionOverlay.svelte";
+  import {
+    executions,
+    runBerryFile,
+    killExecution,
+    closeExecution,
+    toggleMinimize,
+    toggleFullscreen,
+    submitPromptInput
+  } from "./execution/executionRunner";
 
   export let ctx: FileContext;
+
+  onDestroy(() => {
+    $executions.forEach(exec => {
+      if (exec.timerInterval) clearInterval(exec.timerInterval);
+    });
+  });
+
+
 
   let isLoading = true;
   let isSaving = false;
@@ -283,9 +315,41 @@
   </div>
 
   <!-- Bottom Command Bar -->
-  <div class="shrink-0 w-full border-t border-border/50 bg-card z-30">
-    <BerryChat />
+  <div class="shrink-0 w-full border-t border-border/50 bg-card z-30 flex items-center bg-muted/20">
+    <div class="flex-grow min-w-0">
+      <BerryChat />
+    </div>
+    <div class="pr-4 py-3 shrink-0 flex items-center">
+      <Button
+        variant="default"
+        size="sm"
+        class="gap-1.5 h-9 px-4 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-xs tracking-wider uppercase rounded-lg shadow-lg shadow-emerald-950/20"
+        on:click={() => runBerryFile(ctx.fileName, viewMode === 'raw' ? rawContent : stringifyBerryBlocks($berryBlocks))}
+      >
+        <Play class="w-3.5 h-3.5 fill-current" />
+        <span>Run File</span>
+      </Button>
+    </div>
   </div>
+
+  <!-- Floating Execution Overlay Component -->
+  <ExecutionOverlay
+    executions={$executions}
+    on:toggleMinimize={(e) => toggleMinimize(e.detail.id)}
+    on:toggleFullscreen={(e) => toggleFullscreen(e.detail.id)}
+    on:kill={(e) => killExecution(e.detail.id)}
+    on:close={(e) => closeExecution(e.detail.id)}
+    on:submitPrompt={(e) => {
+      const exec = $executions.find(ex => ex.id === e.detail.id);
+      if (exec) {
+        if (!exec.promptValue.trim()) {
+          toast.error("Please enter a value.");
+          return;
+        }
+        submitPromptInput(e.detail.id, exec.promptValue);
+      }
+    }}
+  />
 </div>
 
 <style>

@@ -61,12 +61,24 @@ export class BerryFormatter {
   /** Format an entire AST back into Berry source code */
   format(ast: ProgramNode): string {
     const blocks: string[] = [];
+    let currentCommentBlock: string[] = [];
 
     for (const node of ast.body) {
-      const formatted = this.formatStatement(node);
-      if (formatted !== null) {
-        blocks.push(formatted);
+      if (node.type === NodeType.Comment) {
+        currentCommentBlock.push(this.formatComment(node));
+      } else {
+        if (currentCommentBlock.length > 0) {
+          blocks.push(currentCommentBlock.join("\n"));
+          currentCommentBlock = [];
+        }
+        const formatted = this.formatStatement(node);
+        if (formatted !== null) {
+          blocks.push(formatted);
+        }
       }
+    }
+    if (currentCommentBlock.length > 0) {
+      blocks.push(currentCommentBlock.join("\n"));
     }
 
     const separator = "\n" + "\n".repeat(this.options.blankLinesBetweenBlocks);
@@ -115,7 +127,11 @@ export class BerryFormatter {
 
     // Key-value entries (indented 1 level)
     for (const entry of node.entries) {
-      lines.push(this.formatKeyValuePair(entry, 1));
+      if (entry.type === NodeType.Comment) {
+        lines.push(this.indent(1) + this.formatComment(entry));
+      } else {
+        lines.push(this.formatKeyValuePair(entry, 1));
+      }
     }
 
     return lines.join("\n");
@@ -162,7 +178,11 @@ export class BerryFormatter {
   private formatHeaderBlock(node: HeaderBlockNode): string {
     const lines: string[] = ["Header"];
     for (const entry of node.entries) {
-      lines.push(this.formatKeyValuePair(entry, 0));
+      if (entry.type === NodeType.Comment) {
+        lines.push(this.formatComment(entry));
+      } else {
+        lines.push(this.formatKeyValuePair(entry, 0));
+      }
     }
     return lines.join("\n");
   }
@@ -184,7 +204,11 @@ export class BerryFormatter {
 
     // Steps indented 1 level under Task
     for (const step of node.steps) {
-      lines.push(this.formatStepBlock(step, 1));
+      if (step.type === NodeType.Comment) {
+        lines.push(this.indent(1) + this.formatComment(step));
+      } else {
+        lines.push(this.formatStepBlock(step, 1));
+      }
     }
 
     return lines.join("\n");
@@ -223,7 +247,11 @@ export class BerryFormatter {
     const pad = this.indent(indent);
     const lines: string[] = [`${pad}Params`];
     for (const entry of node.entries) {
-      lines.push(this.formatKeyValuePair(entry, indent));
+      if (entry.type === NodeType.Comment) {
+        lines.push(this.indent(indent) + this.formatComment(entry));
+      } else {
+        lines.push(this.formatKeyValuePair(entry, indent));
+      }
     }
     return lines.join("\n");
   }
@@ -232,7 +260,11 @@ export class BerryFormatter {
     const pad = this.indent(indent);
     const lines: string[] = [`${pad}Capture`];
     for (const entry of node.entries) {
-      lines.push(this.formatKeyValuePair(entry, indent));
+      if (entry.type === NodeType.Comment) {
+        lines.push(this.indent(indent) + this.formatComment(entry));
+      } else {
+        lines.push(this.formatKeyValuePair(entry, indent));
+      }
     }
     return lines.join("\n");
   }
@@ -241,7 +273,11 @@ export class BerryFormatter {
     const pad = this.indent(indent);
     const lines: string[] = [`${pad}Check`];
     for (const condition of node.conditions) {
-      lines.push(this.formatCondition(condition, indent));
+      if (condition.type === NodeType.Comment) {
+        lines.push(this.indent(indent) + this.formatComment(condition));
+      } else {
+        lines.push(this.formatCondition(condition, indent));
+      }
     }
     return lines.join("\n");
   }

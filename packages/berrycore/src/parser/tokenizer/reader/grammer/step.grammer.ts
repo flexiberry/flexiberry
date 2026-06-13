@@ -4,7 +4,7 @@ import { keyValueGrammer } from "./keyvalue.grammer";
 
 export const stepGrammer: LexerGrammer = {
   name: "step",
-  regex: /^\s*(Step)\s*(?:(Call))\s*(?:(Api))\s*(\w*|\W*)/,
+  regex: /^\s*(Step)\s+(Call)\s+(Api)\s+(\S+)\s*$/,
   groups: [
     {
       tokenType: TokenType.Step,

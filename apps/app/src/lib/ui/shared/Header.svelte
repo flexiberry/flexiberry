@@ -16,6 +16,9 @@
   import { toggleMode } from "mode-watcher";
   import berry from "$lib/assets/berry.png";
   import { LayoutDashboard, Terminal } from "lucide-svelte";
+  import { user } from "$lib/writable/auth.store";
+  import { auth } from "$lib/firebase";
+  import { goto } from "$app/navigation";
 
   // ─── Props ────────────────────────────────────────────────────────
   export let mode: "visual" | "assistant" = "visual";
@@ -26,6 +29,19 @@
     if (!onToggle) return;
     onToggle(mode === "visual" ? "assistant" : "visual");
   }
+
+  // Reactive user profile values
+  $: displayName = $user?.isAnonymous 
+    ? "Guest User" 
+    : ($user?.displayName || $user?.email?.split("@")[0] || "Developer");
+  
+  $: email = $user?.isAnonymous 
+    ? "guest@flexiberry.dev" 
+    : ($user?.email || "developer@flexiberry.dev");
+    
+  $: avatarInitial = ($user?.isAnonymous 
+    ? "G" 
+    : (displayName?.[0] || "D")).toUpperCase();
 </script>
 
 <header
@@ -146,17 +162,26 @@
           {...builder}
           class="flex items-center gap-3 pl-2 pr-4 h-12 bg-card border border-border rounded-full shadow-sm hover:bg-muted/50 transition-colors cursor-pointer select-none outline-none"
         >
-          <div
-            class="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-sm shrink-0"
-          >
-            R
-          </div>
+          {#if $user?.photoURL}
+            <img
+              src={$user.photoURL}
+              alt={displayName}
+              class="w-8 h-8 rounded-full object-cover border border-border/80 shrink-0"
+              referrerpolicy="no-referrer"
+            />
+          {:else}
+            <div
+              class="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-sm shrink-0 border border-primary/20"
+            >
+              {avatarInitial}
+            </div>
+          {/if}
           <div class="flex flex-col truncate min-w-[120px] max-w-[150px]">
             <span class="text-sm font-semibold leading-tight truncate"
-              >Rintu Raj</span
+              >{displayName}</span
             >
             <span class="text-[10px] text-muted-foreground truncate"
-              >rintu@flexiberry.com</span
+              >{email}</span
             >
           </div>
         </div>
@@ -164,21 +189,22 @@
       <DropdownMenu.Content class="w-56" align="end" sideOffset={8}>
         <DropdownMenu.Label class="font-normal">
           <div class="flex flex-col space-y-1">
-            <p class="text-sm font-medium leading-none">Rintu Raj</p>
+            <p class="text-sm font-medium leading-none">{displayName}</p>
             <p class="text-xs leading-none text-muted-foreground">
-              rintu@flexiberry.com
+              {email}
             </p>
           </div>
         </DropdownMenu.Label>
         <DropdownMenu.Separator />
         <DropdownMenu.Group>
-          <DropdownMenu.Item>Profile</DropdownMenu.Item>
+          <DropdownMenu.Item class="cursor-pointer" on:click={() => goto("/profile")}>Profile</DropdownMenu.Item>
           <DropdownMenu.Item>Billing</DropdownMenu.Item>
           <DropdownMenu.Item>Settings</DropdownMenu.Item>
         </DropdownMenu.Group>
         <DropdownMenu.Separator />
         <DropdownMenu.Item
-          class="text-red-500 focus:bg-red-500/10 focus:text-red-500"
+          class="text-red-500 focus:bg-red-500/10 focus:text-red-500 cursor-pointer"
+          on:click={() => auth.signOut()}
           >Log out</DropdownMenu.Item
         >
       </DropdownMenu.Content>

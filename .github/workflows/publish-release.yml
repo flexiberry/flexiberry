@@ -1,0 +1,101 @@
+name: Publish & Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  release:
+    name: Build, Publish and Release
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write # Required for creating Github Releases and attaching assets
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup PNPM
+        uses: pnpm/action-setup@v3
+        with:
+          version: 9
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'pnpm'
+          registry-url: 'https://registry.npmjs.org'
+
+      - name: Install Dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build All Packages
+        run: |
+          pnpm --filter @flexiberry/berrycore build
+          pnpm --filter @flexiberry/language-server build
+          pnpm --filter @flexiberry/cli build
+          pnpm --filter vscode-berry-extension build
+
+      - name: Package VS Code Extension
+        run: |
+          cd packages/vscode-berry-extension
+          npx @vscode/vsce package
+          VSIX_NAME=$(ls *.vsix)
+          echo "VSIX_PATH=packages/vscode-berry-extension/$VSIX_NAME" >> $GITHUB_ENV
+          echo "VSIX_NAME=$VSIX_NAME" >> $GITHUB_ENV
+
+      - name: Publish NPM Packages
+        run: |
+          pnpm --filter @flexiberry/berrycore publish --access public --no-git-checks
+          pnpm --filter @flexiberry/language-server publish --access public --no-git-checks
+          pnpm --filter @flexiberry/cli publish --access public --no-git-checks
+        env:
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Verify NPM Packages
+        run: |
+          CLI_VERSION=$(node -p "require('./packages/cli/package.json').version")
+          CORE_VERSION=$(node -p "require('./packages/berrycore/package.json').version")
+          LS_VERSION=$(node -p "require('./packages/language-server/package.json').version")
+          
+          echo "Verifying CLI version: $CLI_VERSION"
+          echo "Verifying Core version: $CORE_VERSION"
+          echo "Verifying Language Server version: $LS_VERSION"
+          
+          # Retry loop to wait for NPM registry replication (up to 5 minutes)
+          for i in {1..30}; do
+            if npm show @flexiberry/cli@$CLI_VERSION version >/dev/null 2>&1; then
+              echo "Package @flexiberry/cli@$CLI_VERSION is available on NPM!"
+              break
+            fi
+            echo "Waiting for @flexiberry/cli@$CLI_VERSION to be available (retry $i)..."
+            sleep 10
+          done
+          
+          # Configure local npm prefix to avoid sudo/permission errors in global scope
+          mkdir -p ~/.npm-global
+          npm config set prefix '~/.npm-global'
+          export PATH=~/.npm-global/bin:$PATH
+          
+          # Install and run verification
+          npm install -g @flexiberry/cli@$CLI_VERSION
+          flexiberry --version
+
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: ${{ env.VSIX_PATH }}
+          draft: false
+          prerelease: false
+          generate_release_notes: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
