@@ -1,5 +1,9 @@
 # FlexiBerry VS Code Extension
 
+**FlexiBerry is an elegant, developer-first API client and testing framework designed to make writing, executing, and validating API workflows as simple as writing plain English.**
+
+[🌐 Official Website](https://flexiberry.dev) | [📖 Documentation Portal](https://docs.flexiberry.dev)
+
 Official developer extension for the **FlexiBerry .berry DSL**—a kid-friendly yet professional scripting language for API orchestration and test automation.
 
 This extension delivers real-time validation, syntax coloring, context-sensitive suggestions, formatting, and a side-by-side execution trace visualizer directly within VS Code.

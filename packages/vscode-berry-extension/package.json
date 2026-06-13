@@ -1,7 +1,7 @@
 {
   "name": "vscode-berry-extension",
   "displayName": "FlexiBerry",
-  "publisher": "flexiberry",
+  "publisher": "flexiberry.dev",
   "version": "1.0.4",
   "description": "Interactive developer extension for the FlexiBerry DSL. Write, validate, and execute API test scripts with real-time visual feedback.",
   "icon": "icon.png",
@@ -20,11 +20,20 @@
     "api",
     "testing",
     "rest",
-    "assertion"
+    "assertion",
+    "api-client",
+    "api-testing",
+    "rest-client",
+    "http-client",
+    "testing-framework",
+    "testing-tools",
+    "api-testing-framework",
+    "automation"
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/flexiberry/flexiberry"
+    "url": "git+https://github.com/flexiberry/flexiberry.git",
+    "directory": "packages/vscode-berry-extension"
   },
   "homepage": "https://flexiberry.dev",
   "bugs": {
