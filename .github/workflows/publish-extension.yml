@@ -17,6 +17,9 @@ jobs:
   publish:
     name: Build and Publish Extension
     runs-on: ubuntu-latest
+    env:
+      VSCE_PAT: ${{ secrets.VSCE_PAT }}
+      OVSX_PAT: ${{ secrets.OVSX_PAT }}
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
@@ -43,9 +46,21 @@ jobs:
           pnpm --filter @flexiberry/language-server build
           pnpm --filter vscode-berry-extension build
 
-      - name: Publish to Marketplace
+      - name: Package VS Code Extension
         run: |
           cd packages/vscode-berry-extension
-          npx @vscode/vsce publish -p ${{ secrets.VSCE_PAT }} --skip-duplicate
-        env:
-          VSCE_PAT: ${{ secrets.VSCE_PAT }}
+          npx @vscode/vsce package
+          VSIX_NAME=$(ls *.vsix)
+          echo "VSIX_NAME=$VSIX_NAME" >> $GITHUB_ENV
+
+      - name: Publish to VS Code Marketplace
+        if: ${{ env.VSCE_PAT != '' }}
+        run: |
+          cd packages/vscode-berry-extension
+          npx @vscode/vsce publish -p ${{ env.VSCE_PAT }} --packagePath ${{ env.VSIX_NAME }} --skip-duplicate
+
+      - name: Publish to Open VSX Registry
+        if: ${{ env.OVSX_PAT != '' }}
+        run: |
+          cd packages/vscode-berry-extension
+          npx ovsx publish ${{ env.VSIX_NAME }} -p ${{ env.OVSX_PAT }}
