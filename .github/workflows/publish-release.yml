@@ -47,7 +47,7 @@ jobs:
       - name: Package VS Code Extension
         run: |
           cd packages/vscode-berry-extension
-          npx @vscode/vsce package
+          npx vsce-pnpm package --pnpm
           VSIX_NAME=$(ls *.vsix)
           echo "VSIX_PATH=packages/vscode-berry-extension/$VSIX_NAME" >> $GITHUB_ENV
           echo "VSIX_NAME=$VSIX_NAME" >> $GITHUB_ENV
