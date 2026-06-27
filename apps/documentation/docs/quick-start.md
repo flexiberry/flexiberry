@@ -4,9 +4,10 @@ Welcome to the **Flexiberry** Quick Start guide! This page will help you install
 
 ## 1. Installation
 
-Flexiberry is distributed as two packages on npm:
+Flexiberry is distributed as two packages on npm, alongside an editor extension:
 * 🌐 **FlexiBerry CLI**: [@flexiberry/cli on npm](https://www.npmjs.com/package/@flexiberry/cli) - The interactive command-line interface.
 * 🧠 **BerryCore Engine**: [@flexiberry/berrycore on npm](https://www.npmjs.com/package/@flexiberry/berrycore) - The programmatic test execution engine.
+* 🔌 **VS Code Extension**: [VS Code Berry Extension on Open VSX](https://open-vsx.org/extension/flexiberry/vscode-berry-extension) - Official editor support providing syntax highlighting, snippets, formatting, and autocomplete.
 
 To use the tool from your terminal, you should install the CLI package globally. We recommend using `npm` or `pnpm`.
 

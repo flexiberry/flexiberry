@@ -42,6 +42,8 @@ export default defineConfig({
     nav: [
       { text: "Home", link: "/" },
       { text: "Quick Start", link: "/quick-start" },
+      { text: "Writing Berry", link: "/guide/writing-berry" },
+      { text: "CLI Tutorial", link: "/guide/cli-tutorial" },
       { text: "CLI", link: "/cli" },
       { text: ".berry Language", link: "/berry-language" },
     ],
@@ -50,6 +52,8 @@ export default defineConfig({
         text: "Guide",
         items: [
           { text: "Quick Start", link: "/quick-start" },
+          { text: "Writing Berry", link: "/guide/writing-berry" },
+          { text: "CLI Tutorial", link: "/guide/cli-tutorial" },
           { text: "CI / CD Integration", link: "/ci-cd" },
         ],
       },
