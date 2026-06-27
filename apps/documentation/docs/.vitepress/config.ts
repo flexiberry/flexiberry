@@ -5,6 +5,9 @@ const GA_ID = process.env.VITE_GA_ID;
 export default defineConfig({
   title: "FlexiBerry",
   description: "FlexiBerry Documentation",
+  sitemap: {
+    hostname: "https://docs.flexiberry.dev",
+  },
   head: [
     ["link", { rel: "icon", href: "/logo.png" }],
     [
