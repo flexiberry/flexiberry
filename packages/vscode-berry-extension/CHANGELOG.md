@@ -1,5 +1,11 @@
 # vscode-berry-extension
 
+## 1.0.6
+
+### Patch Changes
+
+- added icon for berry language file
+
 ## 1.0.5
 
 ### Patch Changes
