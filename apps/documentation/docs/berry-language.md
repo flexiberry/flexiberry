@@ -4,6 +4,12 @@ The `.berry` language is a Domain Specific Language (DSL) designed for defining,
 
 ---
 
+## Editor Support
+
+For syntax highlighting, autocomplete, formatting, and snippets when writing `.berry` scripts, install the official [VS Code Berry Extension on Open VSX](https://open-vsx.org/extension/flexiberry/vscode-berry-extension).
+
+---
+
 ## 1. Syntax Overview
 
 - **Indentation:** Nested blocks (like keys under a `Var` or steps under a `Task`) are grouped by indentation. Use spaces (typically 2 or 4) consistently.
