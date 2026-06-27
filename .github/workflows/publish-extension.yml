@@ -48,8 +48,9 @@ jobs:
       - name: Package VS Code Extension
         run: |
           cd packages/vscode-berry-extension
+          rm -f *.vsix
           npx vsce-pnpm package --pnpm
-          VSIX_NAME=$(ls *.vsix)
+          VSIX_NAME=$(ls *.vsix | tr -d '\r\n')
           echo "VSIX_NAME=$VSIX_NAME" >> $GITHUB_ENV
 
       - name: Publish to Open VSX Registry
