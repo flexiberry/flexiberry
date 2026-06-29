@@ -1,7 +1,7 @@
 <script lang="ts">
   import { onMount } from "svelte";
 
-  export let isVisible = false;
+  let { isVisible = false } = $props<{ isVisible?: boolean }>();
 
   // ── Canvas background ─────────────────────────────────────────────────────
   let bgCanvas: HTMLCanvasElement;
@@ -69,9 +69,9 @@
       baseSize: size,
       scale: 1,
       color: tokenColors[Math.floor(Math.random() * tokenColors.length)],
-      alpha: 0.07 + Math.random() * 0.1,
+      alpha: 0.06 + Math.random() * 0.08,
       rotate: Math.random() * Math.PI * 2,
-      rotateSpeed: -0.004 + Math.random() * 0.008,
+      rotateSpeed: -0.003 + Math.random() * 0.006,
       hoverTick: 0,
       deflectTick: 0,
     };
@@ -82,7 +82,7 @@
     const W = (bgCanvas.width = bgCanvas.offsetWidth);
     const H = (bgCanvas.height = bgCanvas.offsetHeight);
     ctx.clearRect(0, 0, W, H);
-    while (flyingWords.length < 22) flyingWords.push(spawnWord(W, H));
+    while (flyingWords.length < 24) flyingWords.push(spawnWord(W, H));
     for (let i = 0; i < flyingWords.length; i++) {
       const fw = flyingWords[i];
       ctx.save();
@@ -93,12 +93,12 @@
         dy = mouse.y - fw.y;
       const dist = Math.sqrt(dx * dx + dy * dy);
       if (dist < Math.max(fw.size, tw) * 0.8) {
-        fw.scale += (1.5 - fw.scale) * 0.2;
+        fw.scale += (1.4 - fw.scale) * 0.2;
         fw.hoverTick = 8;
         if (fw.deflectTick === 0) {
           const a = Math.atan2(dy, dx) + Math.PI;
-          fw.vx += Math.cos(a) * 0.5;
-          fw.vy += Math.sin(a) * 0.5;
+          fw.vx += Math.cos(a) * 0.4;
+          fw.vy += Math.sin(a) * 0.4;
           fw.deflectTick = 12;
         }
       } else {
@@ -126,40 +126,22 @@
     requestAnimationFrame(animateWords);
   }
 
-  // ── Workflow step reveal ───────────────────────────────────────────────────
-  let stepVisible = [false, false, false];
-  let lineProgress = 0; // 0→1 used to animate the connecting line height
+  // ── Interactive Tabs State (Svelte 5 run-time states) ──────────────────────
+  let activeTab = $state(0);
+  let tabInterval: any;
 
-  // Report counter animation
-  let reportTotal = 0;
-  let reportPassed = 0;
-  let reportFailed = 0;
-  const REPORT_TOTAL = 12;
-  const REPORT_PASSED = 10;
-  const REPORT_FAILED = 2;
-
-  function animateCounters() {
-    const duration = 1400;
-    const start = performance.now();
-    function tick(now: number) {
-      const t = Math.min((now - start) / duration, 1);
-      const ease = 1 - Math.pow(1 - t, 3);
-      reportTotal = Math.round(ease * REPORT_TOTAL);
-      reportPassed = Math.round(ease * REPORT_PASSED);
-      reportFailed = Math.round(ease * REPORT_FAILED);
-      if (t < 1) requestAnimationFrame(tick);
-    }
-    requestAnimationFrame(tick);
+  function selectTab(index: number) {
+    activeTab = index;
+    // Clear auto rotation on user click
+    if (tabInterval) clearInterval(tabInterval);
   }
 
   onMount(() => {
-    setTimeout(() => {
-      isVisible = true;
-    }, 100);
-
-    // Canvas
+    // Canvas background
     if (bgCanvas) {
       ctx = bgCanvas.getContext("2d");
+      bgCanvas.width = bgCanvas.offsetWidth;
+      bgCanvas.height = bgCanvas.offsetHeight;
       bgCanvas.addEventListener("mousemove", (e) => {
         const r = bgCanvas.getBoundingClientRect();
         mouse.x = e.clientX - r.left;
@@ -178,352 +160,315 @@
       }
     });
 
-    // Staggered step reveal
-    const delays = [400, 900, 1400];
-    delays.forEach((ms, i) => {
-      setTimeout(() => {
-        stepVisible[i] = true;
-        stepVisible = [...stepVisible]; // trigger reactivity
-        // Animate the connecting line between steps 0→1, 1→2
-        if (i > 0) {
-          const lineStart = performance.now();
-          const lineDur = 400;
-          (function tickLine(now: number) {
-            lineProgress = Math.min((now - lineStart) / lineDur, 1) * i;
-            if (lineProgress < i) requestAnimationFrame(tickLine);
-            else lineProgress = i;
-          })(performance.now());
-        }
-        // Start counters when last step appears
-        if (i === 2) setTimeout(animateCounters, 200);
-      }, ms);
-    });
+    // Auto-cycle tabs every 7 seconds
+    tabInterval = setInterval(() => {
+      activeTab = (activeTab + 1) % 3;
+    }, 7000);
+
+    return () => {
+      if (tabInterval) clearInterval(tabInterval);
+    };
   });
 </script>
 
-<!-- ── Hero ─────────────────────────────────────────────────────────────── -->
+<!-- ── Hero Section ─────────────────────────────────────────────────────── -->
 <section class="hero-section">
-  <!-- Floating keyword canvas -->
+  <!-- Dynamic floating canvas keywords -->
   <canvas bind:this={bgCanvas} class="hero-canvas"></canvas>
 
-  <!-- Gradient blobs -->
+  <!-- Glowing background gradients -->
   <div class="hero-blobs" aria-hidden="true">
-    <div class="blob blob-a"></div>
-    <div class="blob blob-b"></div>
-    <div class="blob blob-c"></div>
+    <div class="blob blob-emerald"></div>
+    <div class="blob blob-indigo"></div>
+    <div class="blob blob-cyan"></div>
   </div>
 
-  <!-- Grid overlay -->
+  <!-- Micro-grid overlay -->
   <div class="hero-grid" aria-hidden="true"></div>
 
-  <!-- Main content grid -->
+  <!-- Container -->
   <div class="hero-content" class:visible={isVisible}>
-    <!-- ── Left: headline + CTA ──────────────────────────────────────── -->
-    <div class="hero-left">
+    
+    <!-- Left Panel: Brand, Headline & Interactive Selectors -->
+    <div class="hero-left-panel">
+      <!-- Badge -->
       <span class="hero-badge">
         <span class="badge-dot"></span>
-        Berry Language · Open Beta
+        BERRY LANGUAGE · OPEN BETA
       </span>
 
+      <!-- Bold Gradient Headline -->
       <h1 class="hero-heading">
-        The Developer-First <br />
-        HTTP Client Built for<br />
-        <span class="hero-accent">Sequential Workflows</span>
+        One Simple Syntax. <br />
+        <span class="heading-gradient">Three Ways to Run.</span>
       </h1>
 
+      <!-- Description -->
       <p class="hero-sub">
-        Stop jumping between isolated requests or writing heavy boilerplate
-        scripts just to test a single user journey. Flexiberry is an
-        open-source, lightweight HTTP client and API testing framework that lets
-        you chain dependent requests sequentially with ease.
+        Flexiberry is the developer-first HTTP client built for sequential request chains. Stop writing heavy boilerplate scripts. Define your workflows in readable <code class="inline-code">.berry</code> code and execute them anywhere.
       </p>
 
+      <!-- CTA Action Button Row -->
       <div class="hero-actions">
-        <a
-          href="https://github.com/flexiberry/flexiberry"
-          class="btn-primary"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Get Started on GitHub
+        <a href="https://github.com/flexiberry/flexiberry" target="_blank" rel="noopener noreferrer" class="btn-primary">
           <svg
             width="15"
             height="15"
-            viewBox="0 0 15 15"
-            fill="none"
+            viewBox="0 0 16 16"
+            fill="currentColor"
             aria-hidden="true"
+            style="flex-shrink: 0;"
           >
             <path
-              d="M2 7.5h11M9 3.5l4 4-4 4"
-              stroke="currentColor"
-              stroke-width="1.8"
-              stroke-linecap="round"
-              stroke-linejoin="round"
+              d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"
             />
           </svg>
+          <span>Get Started on GitHub</span>
+          <span class="btn-circle-arrow">➔</span>
         </a>
-        <a
-          href="https://docs.flexiberry.dev/"
-          class="btn-secondary"
-          target="_blank">Read the Docs</a
-        >
+        <a href="https://docs.flexiberry.dev" target="_blank" rel="noopener noreferrer" class="btn-secondary">
+          Read the Docs
+        </a>
       </div>
 
-      <!-- Install box -->
-      <div class="hero-install-box">
-        <span class="hero-install-prompt">$</span>
-        <code class="hero-install-cmd">npm install -g flexiberry</code>
-        <button
-          class="hero-install-copy"
-          title="Copy"
-          onclick={() =>
-            navigator.clipboard?.writeText("npm install -g flexiberry")}
-          aria-label="Copy install command"
+      <!-- Vertical Interactive Tab Selectors -->
+      <div class="tab-selectors">
+        <!-- Tab 0: CLI -->
+        <button 
+          class="tab-btn" 
+          class:active={activeTab === 0} 
+          onclick={() => selectTab(0)}
+          style="--accent: #34d399;"
         >
-          <svg
-            width="14"
-            height="14"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            aria-hidden="true"
-          >
-            <rect x="9" y="9" width="13" height="13" rx="2" /><path
-              d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"
-            />
-          </svg>
+          <div class="tab-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="4 17 10 11 4 5" /><line x1="12" y1="19" x2="20" y2="19" />
+            </svg>
+          </div>
+          <div class="tab-btn-content">
+            <span class="tab-btn-title">01 / Command Line Interface</span>
+            <span class="tab-btn-desc">Run workflows in any terminal or integrate into CI/CD pipelines.</span>
+          </div>
+        </button>
+
+        <!-- Tab 1: VS Code -->
+        <button 
+          class="tab-btn" 
+          class:active={activeTab === 1} 
+          onclick={() => selectTab(1)}
+          style="--accent: #a78bfa;"
+        >
+          <div class="tab-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="2" y="3" width="20" height="14" rx="2" ry="2" /><line x1="8" y1="21" x2="16" y2="21" /><line x1="12" y1="17" x2="12" y2="21" />
+            </svg>
+          </div>
+          <div class="tab-btn-content">
+            <span class="tab-btn-title">02 / VS Code & Open-VSX</span>
+            <span class="tab-btn-desc">Write scripts with syntax highlighting, autocomplete & inline runs.</span>
+          </div>
+        </button>
+
+        <!-- Tab 2: Web App -->
+        <button 
+          class="tab-btn" 
+          class:active={activeTab === 2} 
+          onclick={() => selectTab(2)}
+          style="--accent: #fb923c;"
+        >
+          <div class="tab-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M3 3h18v18H3z"/><path d="M21 9H3M21 15H3M12 3v18"/>
+            </svg>
+          </div>
+          <div class="tab-btn-content">
+            <span class="tab-btn-title">03 / Web App Dashboard</span>
+            <span class="tab-btn-desc">Build chains visually, manage environments, and track execution logs.</span>
+          </div>
         </button>
       </div>
-
-      <div class="hero-stats">
-        <div class="stat">
-          <span class="stat-value">~10×</span><span class="stat-label"
-            >less boilerplate</span
-          >
-        </div>
-        <div class="stat-div"></div>
-        <div class="stat">
-          <span class="stat-value">100%</span><span class="stat-label"
-            >readable syntax</span
-          >
-        </div>
-        <div class="stat-div"></div>
-        <div class="stat">
-          <span class="stat-value">0</span><span class="stat-label"
-            >dependencies</span
-          >
-        </div>
-      </div>
     </div>
 
-    <!-- ── Right: workflow chart ──────────────────────────────────────── -->
-    <div class="workflow">
-      <!-- ─── Step 1: Write .berry file ──────────────────────────────── -->
-      <div class="wf-step" class:wf-visible={stepVisible[0]}>
-        <div class="wf-badge" style="--c:#a78bfa">
-          <span class="wf-num">01</span>
+    <!-- Right Panel: High-Fidelity Glassmorphic Device Showcase -->
+    <div class="hero-right-panel">
+      <div 
+        class="showcase-window" 
+        style="--theme-color: {activeTab === 0 ? '#34d399' : activeTab === 1 ? '#a78bfa' : '#fb923c'};"
+      >
+        <!-- Window titlebar -->
+        <div class="window-header">
+          <div class="window-dots">
+            <span class="window-dot red"></span>
+            <span class="window-dot yellow"></span>
+            <span class="window-dot green"></span>
+          </div>
+          <span class="window-title">
+            {activeTab === 0 ? "terminal — flexiberry run" : activeTab === 1 ? "VS Code — auth-flow.berry" : "app.flexiberry.dev"}
+          </span>
         </div>
-        <div class="wf-card" style="--glow:#a78bfa22; --border:#a78bfa33">
-          <div class="wf-card-header">
-            <span class="wf-icon" style="--ic:#a78bfa">
-              <!-- file icon -->
-              <svg
-                width="18"
-                height="18"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="1.8"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-              >
-                <path
-                  d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"
-                /><polyline points="14 2 14 8 20 8" />
-                <line x1="16" y1="13" x2="8" y2="13" /><line
-                  x1="16"
-                  y1="17"
-                  x2="8"
-                  y2="17"
-                /><polyline points="10 9 9 9 8 9" />
-              </svg>
-            </span>
-            <div>
-              <p class="wf-title">
-                Write a <code class="c-code">.berry</code> script
-              </p>
-              <p class="wf-desc">
-                Define APIs, variables, tasks and checks in one readable file.
-              </p>
-            </div>
-          </div>
-          <!-- Mini code preview -->
-          <div class="mini-code">
-            <div class="mc-line">
-              <span class="mc-kw">Api</span><span class="mc-method">
-                POST</span
-              ><span class="mc-id"> #createUser</span>
-            </div>
-            <div class="mc-line">
-              <span class="mc-kw">Url</span><span class="mc-val"
-                >{"  {{baseUrl}}/users"}</span
-              >
-            </div>
-            <div class="mc-line"><span class="mc-kw">Check</span></div>
-            <div class="mc-line">
-              <span class="mc-chk"> - $.status == 201</span>
-            </div>
-          </div>
+
+        <!-- Window viewport -->
+        <div class="window-body">
+          {#key activeTab}
+            {#if activeTab === 0}
+              <!-- CLI Terminal Simulator -->
+              <div class="cli-mockup">
+                <div class="cli-line typing"><span class="cli-prompt">$</span> flexiberry run auth.berry</div>
+                <div class="cli-line loading">Loading script and initializing environment...</div>
+                <div class="cli-line run-step step-1">
+                  <span class="status-badge success">RUN</span> Step 1: User Authentication
+                  <div class="sub-log">✔ POST /api/v1/auth/login <span class="log-meta">200 OK (38ms)</span></div>
+                  <div class="sub-log">✔ Captured variable <span class="log-var">token</span></div>
+                </div>
+                <div class="cli-line run-step step-2">
+                  <span class="status-badge success">RUN</span> Step 2: Fetch Account Profile
+                  <div class="sub-log">✔ GET /api/v1/user/profile <span class="log-meta">200 OK (22ms)</span></div>
+                  <div class="sub-log">✔ Assertion check <span class="log-meta">$.status == 200</span> passed</div>
+                </div>
+                <div class="cli-line finished">
+                  <span class="cli-success-text">✔ Success: All tasks completed successfully in 60ms.</span>
+                </div>
+              </div>
+
+            {:else if activeTab === 1}
+              <!-- VS Code Editor Simulator -->
+              <div class="editor-mockup">
+                <div class="editor-lines">
+                  <div class="code-line"><span class="c-comment"># API Definitions & Task Testing Suite</span></div>
+                  <div class="code-line"><span class="c-keyword">Var</span> Config</div>
+                  <div class="code-line indent-1">- baseUrl: <span class="c-string">"https://api.flexiberry.dev"</span></div>
+                  <div class="code-line"></div>
+                  <div class="code-line"><span class="c-keyword">Api</span> <span class="c-method">POST</span> <span class="c-identifier">#loginUser</span></div>
+                  <div class="code-line indent-1"><span class="c-keyword">Url</span> {"{{Config.baseUrl}}/auth/login"}</div>
+                  <div class="code-line indent-1"><span class="c-keyword">Body</span> JSON `&#123; "username": "admin" &#125;`</div>
+                  <div class="code-line"></div>
+                  <div class="code-line"><span class="c-keyword">Api</span> <span class="c-method">GET</span> <span class="c-identifier">#fetchProfile</span></div>
+                  <div class="code-line indent-1"><span class="c-keyword">Url</span> {"{{Config.baseUrl}}/user/profile"}</div>
+                  <div class="code-line indent-1"><span class="c-keyword">Header</span></div>
+                  <div class="code-line indent-1">- Authorization: <span class="c-string">"Bearer {"{{token}}"}"</span></div>
+                  <div class="code-line"></div>
+                  <div class="code-line"><span class="c-keyword">Task</span> Authenticate and Fetch Profile</div>
+                  <div class="code-line indent-1"><span class="c-keyword">Step</span> Call Api loginUser</div>
+                  <div class="code-line indent-2"><span class="c-keyword">Capture</span></div>
+                  <div class="code-line indent-2">- token: response.token</div>
+                  <div class="code-line indent-2"><span class="c-keyword">Check</span></div>
+                  <div class="code-line indent-2">- $.status == 200</div>
+                </div>
+                <!-- Mini inline run decoration -->
+                <div class="editor-inline-action">
+                  <span class="action-play">▶</span> Run Workflow (Shift+Enter)
+                </div>
+              </div>
+
+            {:else if activeTab === 2}
+              <!-- Web App Dashboard Simulator -->
+              <div class="browser-mockup">
+                <!-- Dashboard metrics top row -->
+                <div class="dash-metrics">
+                  <div class="dash-stat">
+                    <span class="stat-num">99.4%</span>
+                    <span class="stat-title">Success Rate</span>
+                  </div>
+                  <div class="dash-stat">
+                    <span class="stat-num">24ms</span>
+                    <span class="stat-title">Avg Latency</span>
+                  </div>
+                  <div class="dash-stat">
+                    <span class="stat-num">350</span>
+                    <span class="stat-title">Runs Today</span>
+                  </div>
+                </div>
+                
+                <!-- Recent request list feed -->
+                <div class="dash-feed">
+                  <div class="feed-item">
+                    <span class="badge-method post">POST</span>
+                    <span class="feed-path">/auth/login</span>
+                    <span class="feed-time">1s ago</span>
+                    <span class="feed-status ok">200 OK</span>
+                  </div>
+                  <div class="feed-item">
+                    <span class="badge-method get">GET</span>
+                    <span class="feed-path">/user/profile</span>
+                    <span class="feed-time">2s ago</span>
+                    <span class="feed-status ok">200 OK</span>
+                  </div>
+                  <div class="feed-item">
+                    <span class="badge-method put">PUT</span>
+                    <span class="feed-path">/user/settings</span>
+                    <span class="feed-time">5s ago</span>
+                    <span class="feed-status ok">204 No Content</span>
+                  </div>
+                  <div class="feed-item">
+                    <span class="badge-method delete">DEL</span>
+                    <span class="feed-path">/auth/logout</span>
+                    <span class="feed-time">8s ago</span>
+                    <span class="feed-status ok">200 OK</span>
+                  </div>
+                </div>
+              </div>
+            {/if}
+          {/key}
         </div>
       </div>
 
-      <!-- Connector 0→1 -->
-      <div class="wf-connector" class:wf-visible={stepVisible[1]}>
-        <div class="connector-line"></div>
-        <span class="connector-arrow">↓</span>
-      </div>
+      <!-- Redirection Button Group on Right Side (below Mockup) -->
+      <div class="hero-redirect-group">
+        <!-- CLI -->
+        <a
+          href="https://www.npmjs.com/package/@flexiberry/cli"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="redirect-pill cli-pill"
+        >
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="4 17 10 11 4 5" /><line x1="12" y1="19" x2="20" y2="19" />
+          </svg>
+          <span>CLI Client</span>
+        </a>
 
-      <!-- ─── Step 2: Run via CLI / portal ───────────────────────────── -->
-      <div class="wf-step" class:wf-visible={stepVisible[1]}>
-        <div class="wf-badge" style="--c:#34d399">
-          <span class="wf-num">02</span>
-        </div>
-        <div class="wf-card" style="--glow:#34d39922; --border:#34d39933">
-          <div class="wf-card-header">
-            <span class="wf-icon" style="--ic:#34d399">
-              <!-- terminal icon -->
-              <svg
-                width="18"
-                height="18"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="1.8"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-              >
-                <polyline points="4 17 10 11 4 5" /><line
-                  x1="12"
-                  y1="19"
-                  x2="20"
-                  y2="19"
-                />
-              </svg>
-            </span>
-            <div>
-              <p class="wf-title">Run via CLI or Portal</p>
-              <p class="wf-desc">
-                Execute in one command or use the web dashboard — no setup
-                needed.
-              </p>
-            </div>
-          </div>
-          <!-- CLI + portal tabs -->
-          <div class="run-tabs">
-            <div class="run-tab active-tab">CLI</div>
-            <div class="run-tab">Online Portal</div>
-          </div>
-          <div class="cli-box">
-            <span class="cli-prompt">$</span>
-            <span class="cli-cmd">
-              flexiberry run <span class="cli-file">petstore.berry</span></span
-            >
-            <span class="cli-blink">▌</span>
-          </div>
-        </div>
-      </div>
+        <!-- Extension -->
+        <a
+          href="https://open-vsx.org/extension/flexiberry/vscode-berry-extension"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="redirect-pill ext-pill"
+        >
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="2" y="3" width="20" height="14" rx="2" ry="2" /><line x1="8" y1="21" x2="16" y2="21" /><line x1="12" y1="17" x2="12" y2="21" />
+          </svg>
+          <span>VS Code Extension</span>
+        </a>
 
-      <!-- Connector 1→2 -->
-      <div class="wf-connector" class:wf-visible={stepVisible[2]}>
-        <div class="connector-line"></div>
-        <span class="connector-arrow">↓</span>
-      </div>
-
-      <!-- ─── Step 3: Report ──────────────────────────────────────────── -->
-      <div class="wf-step" class:wf-visible={stepVisible[2]}>
-        <div class="wf-badge" style="--c:#fb923c">
-          <span class="wf-num">03</span>
-        </div>
-        <div class="wf-card" style="--glow:#fb923c22; --border:#fb923c33">
-          <div class="wf-card-header">
-            <span class="wf-icon" style="--ic:#fb923c">
-              <!-- bar chart icon -->
-              <svg
-                width="18"
-                height="18"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="1.8"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-              >
-                <line x1="18" y1="20" x2="18" y2="10" /><line
-                  x1="12"
-                  y1="20"
-                  x2="12"
-                  y2="4"
-                />
-                <line x1="6" y1="20" x2="6" y2="14" /><line
-                  x1="2"
-                  y1="20"
-                  x2="22"
-                  y2="20"
-                />
-              </svg>
-            </span>
-            <div>
-              <p class="wf-title">Instant Test Report</p>
-              <p class="wf-desc">
-                Get a per-task breakdown of passed and failed assertions.
-              </p>
-            </div>
-          </div>
-          <!-- Report metrics -->
-          <div class="report-metrics">
-            <div class="metric metric-total">
-              <span class="metric-val">{reportTotal}</span>
-              <span class="metric-lbl">Total Tasks</span>
-            </div>
-            <div class="metric metric-pass">
-              <span class="metric-val">{reportPassed}</span>
-              <span class="metric-lbl">✓ Passed</span>
-            </div>
-            <div class="metric metric-fail">
-              <span class="metric-val">{reportFailed}</span>
-              <span class="metric-lbl">✗ Failed</span>
-            </div>
-          </div>
-          <!-- Progress bar -->
-          <div class="report-bar-wrap">
-            <div
-              class="report-bar-fill"
-              class:bar-animated={stepVisible[2]}
-              style="--pct:{(REPORT_PASSED / REPORT_TOTAL) * 100}%"
-            ></div>
-            <span class="report-bar-label"
-              >{Math.round((REPORT_PASSED / REPORT_TOTAL) * 100)}% pass rate</span
-            >
-          </div>
-        </div>
+        <!-- Dashboard -->
+        <a
+          href="https://app.flexiberry.dev"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="redirect-pill app-pill"
+        >
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 3h18v18H3z"/><path d="M21 9H3M21 15H3M12 3v18"/>
+          </svg>
+          <span>Web Dashboard</span>
+        </a>
       </div>
     </div>
-    <!-- end .workflow -->
+    
   </div>
 </section>
 
 <style>
-  /* ── Section & background ────────────────────────────────────────────── */
+  /* ── Core Section Styles ──────────────────────────────────────────────── */
   .hero-section {
     position: relative;
     min-height: 100vh;
     display: flex;
     align-items: center;
     overflow: hidden;
-    background: #030712;
+    background: #030305;
+    padding-top: 100px;
+    padding-bottom: 60px;
   }
   .hero-canvas {
     position: absolute;
@@ -537,92 +482,81 @@
     position: absolute;
     inset: 0;
     z-index: 0;
+    pointer-events: none;
   }
   .blob {
     position: absolute;
     border-radius: 50%;
-    filter: blur(100px);
-    opacity: 0.16;
+    filter: blur(140px);
+    opacity: 0.15;
   }
-  .blob-a {
-    width: 55vw;
-    height: 55vw;
-    background: radial-gradient(circle, #34d399, transparent 70%);
-    top: -15%;
-    left: -15%;
-    animation: drift-a 14s ease-in-out infinite alternate;
+  .blob-emerald {
+    width: 45vw;
+    height: 45vw;
+    background: radial-gradient(circle, #059669, transparent 70%);
+    top: -10%;
+    left: -10%;
+    animation: drift 15s ease-in-out infinite alternate;
   }
-  .blob-b {
+  .blob-indigo {
     width: 40vw;
     height: 40vw;
-    background: radial-gradient(circle, #a78bfa, transparent 70%);
+    background: radial-gradient(circle, #6366f1, transparent 70%);
     bottom: -10%;
-    right: -10%;
-    animation: drift-b 18s ease-in-out infinite alternate;
+    right: -5%;
+    animation: drift 20s ease-in-out infinite alternate-reverse;
   }
-  .blob-c {
-    width: 28vw;
-    height: 28vw;
-    background: radial-gradient(circle, #38bdf8, transparent 70%);
-    top: 55%;
-    left: 55%;
-    animation: drift-c 12s ease-in-out infinite alternate;
+  .blob-cyan {
+    width: 30vw;
+    height: 30vw;
+    background: radial-gradient(circle, #06b6d4, transparent 70%);
+    top: 50%;
+    left: 40%;
+    animation: drift 12s ease-in-out infinite alternate;
   }
-  @keyframes drift-a {
-    to {
-      transform: translate(6%, 8%) scale(1.08);
-    }
+  @keyframes drift {
+    0% { transform: translate(0, 0) scale(1); }
+    100% { transform: translate(5%, 8%) scale(1.1); }
   }
-  @keyframes drift-b {
-    to {
-      transform: translate(-8%, -6%);
-    }
-  }
-  @keyframes drift-c {
-    to {
-      transform: translate(-48%, -52%) scale(1.05);
-    }
-  }
+
   .hero-grid {
     position: absolute;
     inset: 0;
     z-index: 0;
-    background-image: linear-gradient(
-        rgba(52, 211, 153, 0.05) 1px,
-        transparent 1px
-      ),
-      linear-gradient(90deg, rgba(52, 211, 153, 0.05) 1px, transparent 1px);
-    background-size: 40px 40px;
+    background-image: 
+      linear-gradient(rgba(255, 255, 255, 0.012) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255, 255, 255, 0.012) 1px, transparent 1px);
+    background-size: 60px 60px;
+    mask-image: radial-gradient(circle at 60% 50%, black, transparent 80%);
+    -webkit-mask-image: radial-gradient(circle at 60% 50%, black, transparent 80%);
   }
 
-  /* ── Content grid ────────────────────────────────────────────────────── */
+  /* ── Content Grid ────────────────────────────────────────────────────── */
   .hero-content {
     position: relative;
     z-index: 2;
     width: 100%;
-    max-width: 1200px;
+    max-width: 1240px;
     margin: 0 auto;
-    padding: 5rem 2rem;
+    padding: 0 2rem;
     display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 5rem;
+    grid-template-columns: 1.1fr 0.9fr;
+    gap: 4.5rem;
     align-items: center;
     opacity: 0;
-    transform: translateY(24px);
-    transition:
-      opacity 0.9s ease,
-      transform 0.9s ease;
+    transform: translateY(30px);
+    transition: opacity 1s cubic-bezier(0.16, 1, 0.3, 1), transform 1s cubic-bezier(0.16, 1, 0.3, 1);
   }
   .hero-content.visible {
     opacity: 1;
     transform: none;
   }
 
-  /* ── Left ────────────────────────────────────────────────────────────── */
-  .hero-left {
+  /* ── Left Panel ──────────────────────────────────────────────────────── */
+  .hero-left-panel {
     display: flex;
     flex-direction: column;
-    gap: 1.6rem;
+    align-items: flex-start;
   }
   .hero-badge {
     display: inline-flex;
@@ -630,467 +564,603 @@
     gap: 0.5rem;
     font-size: 0.72rem;
     font-family: "JetBrains Mono", monospace;
-    color: #34d399;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    background: rgba(52, 211, 153, 0.09);
-    border: 1px solid rgba(52, 211, 153, 0.25);
+    font-weight: 700;
+    color: #4ade80;
+    letter-spacing: 0.12em;
+    background: rgba(74, 222, 128, 0.06);
+    border: 1px solid rgba(74, 222, 128, 0.18);
     border-radius: 9999px;
-    padding: 0.3rem 0.9rem;
-    width: fit-content;
+    padding: 0.35rem 0.95rem;
+    margin-bottom: 1.5rem;
   }
   .badge-dot {
     width: 6px;
     height: 6px;
     border-radius: 50%;
-    background: #34d399;
-    box-shadow: 0 0 6px #34d399;
-    animation: pulse-dot 2s ease-in-out infinite;
+    background: #4ade80;
+    box-shadow: 0 0 8px #4ade80;
+    animation: blink-dot 2.5s ease-in-out infinite;
   }
-  @keyframes pulse-dot {
-    0%,
-    100% {
-      opacity: 1;
-    }
-    50% {
-      opacity: 0.4;
-    }
+  @keyframes blink-dot {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.35; }
   }
+
   .hero-heading {
-    font-size: clamp(1.9rem, 4.5vw, 2.6rem);
+    font-size: clamp(2.4rem, 4.8vw, 3.8rem);
     font-weight: 800;
-    line-height: 1.18;
+    line-height: 1.1;
     color: #fff;
-    letter-spacing: -0.02em;
-    margin: 0;
+    letter-spacing: -0.03em;
+    margin: 0 0 1.2rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   }
-  .hero-accent {
-    background: linear-gradient(135deg, #34d399, #a78bfa);
+  .heading-gradient {
+    background: linear-gradient(135deg, #34d399, #38bdf8, #a78bfa);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
   }
+
   .hero-sub {
-    font-size: 1rem;
+    font-size: 1.05rem;
     color: #94a3b8;
-    line-height: 1.78;
-    max-width: 440px;
-    margin: 0;
+    line-height: 1.7;
+    max-width: 580px;
+    margin: 0 0 2rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   }
   .inline-code {
     font-family: "JetBrains Mono", monospace;
     font-size: 0.9em;
-    color: #a78bfa;
-    background: rgba(167, 139, 250, 0.1);
+    color: #34d399;
+    background: rgba(52, 211, 153, 0.08);
     border-radius: 4px;
     padding: 0.05em 0.3em;
+    border: 1px solid rgba(52, 211, 153, 0.12);
   }
+
+  /* CTAs */
   .hero-actions {
     display: flex;
-    gap: 1rem;
+    gap: 1.25rem;
+    margin-bottom: 3rem;
     flex-wrap: wrap;
   }
   .btn-primary {
     display: inline-flex;
     align-items: center;
-    gap: 0.5rem;
-    background: linear-gradient(135deg, #34d399, #059669);
-    color: #0a0f1a;
+    gap: 1rem;
+    background: #fff;
+    color: #030712;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 0.9rem;
     font-weight: 700;
-    padding: 0.75rem 1.75rem;
-    border-radius: 0.5rem;
-    font-size: 0.95rem;
+    padding: 0.45rem 0.45rem 0.45rem 1.5rem;
+    border-radius: 9999px;
     text-decoration: none;
-    transition: all 0.25s ease;
+    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
   }
   .btn-primary:hover {
     transform: translateY(-2px);
-    box-shadow: 0 8px 30px rgba(52, 211, 153, 0.35);
+    background: #f4f4f5;
+    box-shadow: 0 12px 24px rgba(255, 255, 255, 0.15);
   }
+  .btn-circle-arrow {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.2rem;
+    height: 2.2rem;
+    background: #030712;
+    color: #fff;
+    border-radius: 50%;
+    font-size: 0.8rem;
+    transition: transform 0.25s ease;
+  }
+  .btn-primary:hover .btn-circle-arrow {
+    transform: translateX(2px);
+  }
+
   .btn-secondary {
     display: inline-flex;
     align-items: center;
-    background: rgba(255, 255, 255, 0.04);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    color: #e2e8f0;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    color: #f1f5f9;
     font-weight: 600;
-    padding: 0.75rem 1.75rem;
-    border-radius: 0.5rem;
-    font-size: 0.95rem;
+    padding: 0.7rem 1.6rem;
+    border-radius: 9999px;
+    font-size: 0.9rem;
     text-decoration: none;
-    transition: all 0.25s ease;
+    transition: all 0.2s;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   }
   .btn-secondary:hover {
-    background: rgba(255, 255, 255, 0.08);
-    border-color: rgba(52, 211, 153, 0.4);
-    transform: translateY(-2px);
+    background: rgba(255, 255, 255, 0.07);
+    border-color: rgba(255, 255, 255, 0.15);
   }
 
-  /* ── Hero Install Box ─────────────────────────────────────────────────── */
-  .hero-install-box {
+  /* Vertical Tab Selectors */
+  .tab-selectors {
     display: flex;
-    align-items: center;
-    gap: 0.6rem;
-    background: #0a0f1a;
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    border-radius: 0.6rem;
-    padding: 0.75rem 1.1rem;
-    font-family: "JetBrains Mono", monospace;
-    font-size: 0.9rem;
+    flex-direction: column;
+    gap: 0.85rem;
     width: 100%;
-    max-width: 400px;
-    margin-top: 0.5rem;
+    max-width: 480px;
   }
-  .hero-install-prompt {
-    color: #34d399;
-    font-weight: 700;
-  }
-  .hero-install-cmd {
-    color: #e2e8f0;
-    flex: 1;
-    text-align: left;
-  }
-  .hero-install-copy {
-    background: none;
-    border: none;
-    cursor: pointer;
-    color: #4b5563;
-    transition: color 0.2s;
-    padding: 0;
+  .tab-btn {
     display: flex;
+    align-items: flex-start;
+    gap: 1.25rem;
+    background: rgba(255, 255, 255, 0.01);
+    border: 1px solid rgba(255, 255, 255, 0.03);
+    border-radius: 0.85rem;
+    padding: 1.1rem;
+    text-align: left;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    width: 100%;
+    position: relative;
+    overflow: hidden;
   }
-  .hero-install-copy:hover {
-    color: #34d399;
+  .tab-btn:hover {
+    background: rgba(255, 255, 255, 0.03);
+    border-color: rgba(255, 255, 255, 0.08);
+  }
+  .tab-btn.active {
+    background: rgba(255, 255, 255, 0.04);
+    border-color: var(--accent);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25), inset 0 0 12px rgba(255, 255, 255, 0.02);
   }
 
-  .hero-stats {
+  .tab-icon {
+    flex-shrink: 0;
+    width: 2.2rem;
+    height: 2.2rem;
+    border-radius: 0.5rem;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.06);
     display: flex;
     align-items: center;
-    gap: 1.5rem;
-    margin-top: 0.5rem;
+    justify-content: center;
+    color: #94a3b8;
+    transition: all 0.3s;
   }
-  .stat {
+  .tab-btn:hover .tab-icon {
+    color: #fff;
+    border-color: rgba(255, 255, 255, 0.12);
+  }
+  .tab-btn.active .tab-icon {
+    background: var(--accent);
+    color: #030712;
+    border-color: transparent;
+    box-shadow: 0 0 12px var(--accent);
+  }
+
+  .tab-btn-content {
     display: flex;
     flex-direction: column;
     gap: 0.15rem;
   }
-  .stat-value {
-    font-size: 1.25rem;
-    font-weight: 800;
+  .tab-btn-title {
+    font-size: 0.88rem;
+    font-weight: 700;
+    color: #94a3b8;
+    transition: color 0.2s;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  }
+  .tab-btn.active .tab-btn-title {
     color: #fff;
   }
-  .stat-label {
-    font-size: 0.68rem;
+  .tab-btn-desc {
+    font-size: 0.78rem;
     color: #64748b;
-    text-transform: uppercase;
-    letter-spacing: 0.06em;
+    line-height: 1.4;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   }
-  .stat-div {
-    width: 1px;
-    height: 2rem;
-    background: rgba(255, 255, 255, 0.1);
+  .tab-btn.active .tab-btn-desc {
+    color: #94a3b8;
   }
 
-  /* ── Workflow ─────────────────────────────────────────────────────────── */
-  .workflow {
+  /* Redirection Button Group on Right Side */
+  .hero-redirect-group {
+    display: inline-flex;
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba(255, 255, 255, 0.04);
+    border-radius: 9999px;
+    padding: 0.25rem;
+    gap: 0.25rem;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+  }
+  .redirect-pill {
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+    padding: 0.45rem 0.95rem;
+    border-radius: 9999px;
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: #64748b;
+    text-decoration: none;
+    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  }
+  .redirect-pill svg {
+    transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .redirect-pill:hover svg {
+    transform: translate(1px, -1px);
+  }
+
+  .cli-pill:hover {
+    color: #34d399;
+    background: rgba(52, 211, 153, 0.08);
+  }
+  .ext-pill:hover {
+    color: #a78bfa;
+    background: rgba(167, 139, 250, 0.08);
+  }
+  .app-pill:hover {
+    color: #fb923c;
+    background: rgba(251, 146, 60, 0.08);
+  }
+
+  /* ── Right Panel: Devices Frame Showcase ────────────────────────────── */
+  .hero-right-panel {
     display: flex;
     flex-direction: column;
-    align-items: stretch;
-    gap: 0;
+    align-items: center;
+    gap: 1.5rem;
+    position: relative;
+    width: 100%;
   }
 
-  /* Step card */
-  .wf-step {
+  .showcase-window {
+    width: 100%;
+    max-width: 520px;
+    height: 400px;
+    backdrop-filter: blur(25px);
+    -webkit-backdrop-filter: blur(25px);
+    border-radius: 1.25rem;
+    overflow: hidden;
     display: flex;
-    gap: 1rem;
-    align-items: flex-start;
-    opacity: 0;
-    transform: translateX(28px);
-    transition:
-      opacity 0.5s ease,
-      transform 0.5s ease;
-  }
-  .wf-step.wf-visible {
-    opacity: 1;
-    transform: none;
+    flex-direction: column;
+    position: relative;
+    box-shadow: none; /* Removed dropshadow entirely */
+    
+    /* Rounded Gradient Border trick */
+    border: 1px solid transparent;
+    background-image: 
+      linear-gradient(rgba(10, 10, 15, 0.85), rgba(10, 10, 15, 0.85)), 
+      linear-gradient(135deg, var(--theme-color) 0%, rgba(255, 255, 255, 0.04) 100%);
+    background-origin: border-box;
+    background-clip: padding-box, border-box;
+    
+    transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
   }
 
-  .wf-badge {
-    flex-shrink: 0;
-    width: 2.2rem;
-    height: 2.2rem;
+  /* Glass Sheen overlay */
+  .showcase-window::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.05) 0%, transparent 50%);
+    pointer-events: none;
+    z-index: 10;
+  }
+
+  .window-header {
+    display: flex;
+    align-items: center;
+    height: 38px;
+    padding: 0 1.25rem;
+    background: rgba(22, 22, 30, 0.5);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+    position: relative;
+  }
+  .window-dots {
+    display: flex;
+    gap: 0.4rem;
+  }
+  .window-dot {
+    width: 10px;
+    height: 10px;
     border-radius: 50%;
-    background: color-mix(in srgb, var(--c) 15%, transparent);
-    border: 1px solid color-mix(in srgb, var(--c) 40%, transparent);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-top: 0.25rem;
   }
-  .wf-num {
-    font-size: 0.6rem;
+  .window-dot.red { background: #ff5f56; }
+  .window-dot.yellow { background: #ffbd2e; }
+  .window-dot.green { background: #27c93f; }
+  .window-title {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
     font-family: "JetBrains Mono", monospace;
-    font-weight: 700;
-    color: var(--c);
-  }
-
-  .wf-card {
-    flex: 1;
-    background: rgba(255, 255, 255, 0.03);
-    border: 1px solid var(--border);
-    border-radius: 0.85rem;
-    padding: 1rem 1.1rem 1rem;
-    box-shadow: 0 0 0 0 var(--glow);
-    transition: box-shadow 0.4s ease;
-  }
-  .wf-card:hover {
-    box-shadow: 0 0 30px var(--glow);
-  }
-
-  .wf-card-header {
-    display: flex;
-    gap: 0.75rem;
-    align-items: flex-start;
-    margin-bottom: 0.8rem;
-  }
-  .wf-icon {
-    flex-shrink: 0;
-    width: 2rem;
-    height: 2rem;
-    border-radius: 0.45rem;
-    background: color-mix(in srgb, var(--ic) 12%, transparent);
-    border: 1px solid color-mix(in srgb, var(--ic) 25%, transparent);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: var(--ic);
-  }
-  .wf-title {
-    font-size: 0.82rem;
-    font-weight: 700;
-    color: #e2e8f0;
-    margin: 0 0 0.2rem;
-  }
-  .wf-desc {
     font-size: 0.72rem;
     color: #64748b;
-    margin: 0;
-    line-height: 1.5;
+    white-space: nowrap;
   }
 
-  /* Connector */
-  .wf-connector {
+  .window-body {
+    flex: 1;
+    overflow: hidden;
+    padding: 1.5rem;
+    position: relative;
+  }
+
+  /* 💻 CLI Terminal Mockup */
+  .cli-mockup {
     display: flex;
     flex-direction: column;
-    align-items: flex-start;
-    padding-left: calc(2.2rem / 2 + 1rem - 0.5px); /* centres on badge */
-    gap: 0;
-    height: 2.5rem;
+    gap: 0.75rem;
+    font-family: "JetBrains Mono", monospace;
+    font-size: 0.72rem;
+    line-height: 1.5;
+    color: #cbd5e1;
+    text-align: left;
+  }
+  .cli-line {
     opacity: 0;
-    transition: opacity 0.4s ease;
-  }
-  .wf-connector.wf-visible {
-    opacity: 1;
-  }
-  .connector-line {
-    width: 1px;
-    flex: 1;
-    background: linear-gradient(
-      to bottom,
-      rgba(255, 255, 255, 0.08),
-      rgba(255, 255, 255, 0.2)
-    );
-    animation: grow-line 0.4s ease forwards;
-  }
-  .connector-arrow {
-    font-size: 0.75rem;
-    color: rgba(255, 255, 255, 0.3);
-    line-height: 1;
-  }
-  @keyframes grow-line {
-    from {
-      transform: scaleY(0);
-      transform-origin: top;
-    }
-    to {
-      transform: scaleY(1);
-    }
-  }
-
-  /* ── Mini code preview (step 1) ──────────────────────────────────────── */
-  .mini-code {
-    background: #0d1117;
-    border-radius: 0.5rem;
-    padding: 0.6rem 0.8rem;
-    font-family: "JetBrains Mono", monospace;
-    font-size: 11px;
-    line-height: 1.8;
-    border: 1px solid rgba(255, 255, 255, 0.06);
-  }
-  .mc-line {
-    display: flex;
-  }
-  .mc-kw {
-    color: #c084fc;
-  }
-  .mc-method {
-    color: #f97316;
-  }
-  .mc-id {
-    color: #34d399;
-  }
-  .mc-val {
-    color: #fcd34d;
-    white-space: pre;
-  }
-  .mc-chk {
-    color: #4ade80;
-  }
-
-  /* ── CLI preview (step 2) ────────────────────────────────────────────── */
-  .run-tabs {
-    display: flex;
-    gap: 0.5rem;
-    margin-bottom: 0.6rem;
-  }
-  .run-tab {
-    font-size: 0.65rem;
-    font-family: "JetBrains Mono", monospace;
-    padding: 0.2rem 0.65rem;
-    border-radius: 4px;
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    color: #64748b;
-    cursor: pointer;
-    transition: all 0.2s;
-  }
-  .active-tab {
-    color: #34d399;
-    border-color: rgba(52, 211, 153, 0.3);
-    background: rgba(52, 211, 153, 0.07);
-  }
-  .cli-box {
-    background: #0a0f1a;
-    border-radius: 0.45rem;
-    padding: 0.55rem 0.8rem;
-    font-family: "JetBrains Mono", monospace;
-    font-size: 11.5px;
-    display: flex;
-    align-items: center;
-    gap: 0.3rem;
-    border: 1px solid rgba(255, 255, 255, 0.06);
+    animation: fade-in-line 0.3s ease forwards;
   }
   .cli-prompt {
     color: #34d399;
     font-weight: 700;
   }
-  .cli-cmd {
-    color: #e2e8f0;
+  .cli-line.typing {
+    animation-delay: 0.1s;
   }
-  .cli-file {
-    color: #a78bfa;
+  .cli-line.loading {
+    color: #64748b;
+    animation-delay: 0.8s;
   }
-  .cli-blink {
+  .cli-line.run-step.step-1 {
+    animation-delay: 1.8s;
+  }
+  .cli-line.run-step.step-2 {
+    animation-delay: 3.2s;
+  }
+  .cli-line.finished {
+    animation-delay: 4.5s;
+  }
+  
+  .status-badge {
+    font-size: 0.65rem;
+    font-weight: 700;
+    padding: 0.05rem 0.35rem;
+    border-radius: 3px;
+    margin-right: 0.4rem;
+  }
+  .status-badge.success {
+    background: rgba(52, 211, 153, 0.12);
     color: #34d399;
-    animation: blink-cursor 0.85s step-start infinite;
+    border: 1px solid rgba(52, 211, 153, 0.2);
   }
-  @keyframes blink-cursor {
-    0%,
-    49% {
-      opacity: 1;
-    }
-    50%,
-    100% {
-      opacity: 0;
-    }
+  .sub-log {
+    padding-left: 1.25rem;
+    color: #94a3b8;
+    margin-top: 0.15rem;
+  }
+  .log-meta {
+    color: #64748b;
+  }
+  .log-var {
+    color: #a78bfa;
+    background: rgba(167, 139, 250, 0.1);
+    padding: 0 0.25rem;
+    border-radius: 3px;
+  }
+  .cli-success-text {
+    color: #34d399;
+    font-weight: 700;
   }
 
-  /* ── Report metrics (step 3) ─────────────────────────────────────────── */
-  .report-metrics {
-    display: flex;
-    gap: 0.75rem;
-    margin-bottom: 0.75rem;
+  @keyframes fade-in-line {
+    from { opacity: 0; transform: translateY(6px); }
+    to { opacity: 1; transform: none; }
   }
-  .metric {
-    flex: 1;
-    padding: 0.55rem 0.6rem;
-    border-radius: 0.5rem;
-    border: 1px solid rgba(255, 255, 255, 0.06);
-    background: rgba(255, 255, 255, 0.03);
+
+  /* 🔌 VS Code Editor Mockup */
+  .editor-mockup {
     display: flex;
     flex-direction: column;
-    gap: 0.1rem;
-    align-items: center;
+    justify-content: space-between;
+    height: 100%;
+    font-family: "JetBrains Mono", monospace;
+    font-size: 0.72rem;
+    line-height: 1.5;
+    text-align: left;
   }
-  .metric-val {
-    font-size: 1.35rem;
+  .editor-lines {
+    display: flex;
+    flex-direction: column;
+  }
+  .code-line {
+    min-height: 1.1rem;
+    white-space: pre;
+    opacity: 0;
+    animation: slide-in-code 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+  .code-line:nth-child(1) { animation-delay: 0.05s; }
+  .code-line:nth-child(2) { animation-delay: 0.1s; }
+  .code-line:nth-child(4) { animation-delay: 0.2s; }
+  .code-line:nth-child(5) { animation-delay: 0.25s; }
+  .code-line:nth-child(6) { animation-delay: 0.3s; }
+  .code-line:nth-child(7) { animation-delay: 0.35s; }
+  .code-line:nth-child(8) { animation-delay: 0.4s; }
+  .code-line:nth-child(10) { animation-delay: 0.5s; }
+  .code-line:nth-child(11) { animation-delay: 0.55s; }
+  .code-line:nth-child(12) { animation-delay: 0.6s; }
+  .code-line:nth-child(13) { animation-delay: 0.65s; }
+
+  @keyframes slide-in-code {
+    from { opacity: 0; transform: translateX(-8px); }
+    to { opacity: 1; transform: none; }
+  }
+
+  .c-comment { color: #4b5563; }
+  .c-keyword { color: #c084fc; font-weight: 700; }
+  .c-method { color: #34d399; font-weight: 700; }
+  .c-string { color: #fcd34d; }
+  .c-identifier { color: #38bdf8; }
+  .indent-1 { padding-left: 1.25rem; }
+  .indent-2 { padding-left: 2.2rem; }
+
+  .editor-inline-action {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-size: 0.65rem;
+    color: #a78bfa;
+    background: rgba(167, 139, 250, 0.06);
+    border: 1px solid rgba(167, 139, 250, 0.15);
+    border-radius: 4px;
+    padding: 0.25rem 0.5rem;
+    width: fit-content;
+    align-self: flex-start;
+    margin-top: 1rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    opacity: 0;
+    animation: fade-in-line 0.3s ease 1s forwards;
+  }
+  .editor-inline-action:hover {
+    background: rgba(167, 139, 250, 0.12);
+  }
+  .action-play {
+    font-size: 0.55rem;
+  }
+
+  /* 🌐 Web Dashboard Mockup */
+  .browser-mockup {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+    height: 100%;
+    color: #cbd5e1;
+  }
+  .dash-metrics {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.75rem;
+  }
+  .dash-stat {
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 0.6rem;
+    padding: 0.6rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.1rem;
+    opacity: 0;
+    animation: fade-in-line 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+  .dash-stat:nth-child(1) { animation-delay: 0.1s; }
+  .dash-stat:nth-child(2) { animation-delay: 0.2s; }
+  .dash-stat:nth-child(3) { animation-delay: 0.3s; }
+
+  .stat-num {
+    font-size: 1.15rem;
     font-weight: 800;
+    color: #fff;
     font-family: "JetBrains Mono", monospace;
   }
-  .metric-lbl {
+  .stat-title {
     font-size: 0.6rem;
     color: #64748b;
     text-transform: uppercase;
-    letter-spacing: 0.05em;
-  }
-  .metric-total .metric-val {
-    color: #e2e8f0;
-  }
-  .metric-pass .metric-val {
-    color: #4ade80;
-  }
-  .metric-fail .metric-val {
-    color: #f87171;
+    letter-spacing: 0.04em;
+    font-family: -apple-system, BlinkMacSystemFont, sans-serif;
   }
 
-  .report-bar-wrap {
-    height: 6px;
-    background: rgba(255, 255, 255, 0.07);
-    border-radius: 9999px;
-    overflow: hidden;
-    position: relative;
+  .dash-feed {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
   }
-  .report-bar-fill {
-    height: 100%;
-    width: 0;
-    background: linear-gradient(90deg, #34d399, #4ade80);
-    border-radius: 9999px;
-    transition: width 1.4s cubic-bezier(0.22, 1, 0.36, 1);
-  }
-  .report-bar-fill.bar-animated {
-    width: var(--pct);
-  }
-  .report-bar-label {
-    position: absolute;
-    right: 0;
-    top: -1.3rem;
-    font-size: 0.62rem;
-    color: #4ade80;
+  .feed-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: rgba(255, 255, 255, 0.01);
+    border: 1px solid rgba(255, 255, 255, 0.03);
+    border-radius: 0.5rem;
+    padding: 0.5rem 0.75rem;
     font-family: "JetBrains Mono", monospace;
+    font-size: 0.68rem;
+    width: 100%;
+    opacity: 0;
+    animation: slide-in-feed 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+  .feed-item:nth-child(1) { animation-delay: 0.4s; }
+  .feed-item:nth-child(2) { animation-delay: 0.5s; }
+  .feed-item:nth-child(3) { animation-delay: 0.6s; }
+  .feed-item:nth-child(4) { animation-delay: 0.7s; }
+
+  @keyframes slide-in-feed {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: none; }
   }
 
-  /* ── Responsive ──────────────────────────────────────────────────────── */
-  @media (max-width: 860px) {
+  .badge-method {
+    font-size: 0.58rem;
+    font-weight: 800;
+    padding: 0.1rem 0.35rem;
+    border-radius: 3px;
+    width: 42px;
+    text-align: center;
+  }
+  .badge-method.post { background: rgba(52, 211, 153, 0.1); color: #34d399; }
+  .badge-method.get { background: rgba(56, 189, 248, 0.1); color: #38bdf8; }
+  .badge-method.put { background: rgba(167, 139, 250, 0.1); color: #a78bfa; }
+  .badge-method.delete { background: rgba(244, 63, 94, 0.1); color: #f43f5e; }
+
+  .feed-path {
+    flex: 1;
+    text-align: left;
+    margin-left: 0.85rem;
+    color: #94a3b8;
+  }
+  .feed-time {
+    color: #475569;
+    margin-right: 1rem;
+    font-size: 0.62rem;
+  }
+  .feed-status.ok {
+    color: #34d399;
+    font-weight: 700;
+  }
+
+  /* ── Responsive styling ───────────────────────────────────────────────── */
+  @media (max-width: 960px) {
     .hero-content {
       grid-template-columns: 1fr;
-      gap: 3rem;
-      padding: 8rem 1.5rem 4rem;
+      gap: 3.5rem;
+      padding: 2rem 1.5rem 4rem;
     }
-    .hero-left {
+    .hero-left-panel {
       align-items: center;
       text-align: center;
     }
     .hero-sub {
       max-width: 100%;
     }
-    .hero-stats {
-      justify-content: center;
-    }
     .hero-actions {
       justify-content: center;
     }
-    .wf-step {
-      opacity: 1;
-      transform: none;
+    .tab-selectors {
+      max-width: 100%;
+    }
+    .hero-right-panel {
+      max-width: 100%;
+    }
+    .showcase-window {
+      max-width: 100%;
+      height: 380px;
     }
   }
 </style>
