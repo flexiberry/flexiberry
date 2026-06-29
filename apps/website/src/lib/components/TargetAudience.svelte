@@ -1,9 +1,10 @@
 <script lang="ts">
   import { onMount } from "svelte";
-  export let isVisible = false;
+
+  let { isVisible = false } = $props<{ isVisible?: boolean }>();
 
   let sectionEl: HTMLElement;
-  let sectionRevealed = false;
+  let sectionRevealed = $state(false);
 
   onMount(() => {
     const io = new IntersectionObserver(
@@ -22,19 +23,19 @@
   const audiences = [
     {
       title: "Backend Developers",
-      description: "who want a fast, local HTTP client that can handle modern, state-dependent API flows without the bloat of UI-heavy apps.",
+      description: "A lightweight, CLI-first client to scratchpad daily endpoints and test stateful chains without leaving the terminal.",
       icon: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="8" rx="2" ry="2"></rect><rect x="2" y="14" width="20" height="8" rx="2" ry="2"></rect><line x1="6" y1="6" x2="6.01" y2="6"></line><line x1="6" y1="18" x2="6.01" y2="18"></line></svg>`,
       color: "#34d399"
     },
     {
-      title: "QA & Automation Engineers",
-      description: "looking for a zero-boilerplate, git-friendly framework where test logic is transparent, reviewable, and easily merged.",
+      title: "QA & Test Engineers",
+      description: "A git-friendly, text-based test suite that version controls cleanly, integrates natively in CI, and speeds up validations.",
       icon: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>`,
       color: "#a78bfa"
     },
     {
       title: "Product Teams",
-      description: "looking to document and validate end-to-end integration flows (e.g., Signup ➡️ Authenticate ➡️ Create Profile ➡️ Fetch Dashboard).",
+      description: "A transparent, human-readable way to model and verify core user integration stories (e.g. signup ➔ login ➔ profile).",
       icon: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>`,
       color: "#38bdf8"
     }
@@ -46,7 +47,7 @@
   <div class="audience-inner" class:visible={sectionRevealed || isVisible}>
     <div class="section-label">
       <span class="label-dot"></span>
-      Target Audience
+      TARGET AUDIENCE
     </div>
 
     <h2 class="section-heading">
@@ -57,7 +58,7 @@
       {#each audiences as aud, i}
         <div 
           class="aud-card" 
-          style="--c:{aud.color}; --delay:{i * 100}ms"
+          style="--c:{aud.color}; --delay:{i * 100}ms; --glow-c:{aud.color}15;"
           class:card-in={sectionRevealed || isVisible}
         >
           <div class="aud-icon" style="color:{aud.color}">
@@ -74,17 +75,17 @@
 <style>
   .audience-section {
     position: relative;
-    background: #04080f;
-    padding: 6rem 2rem;
+    background: #060608;
+    padding: 7rem 2rem;
     overflow: hidden;
   }
   .aud-grid-bg {
     position: absolute;
     inset: 0;
     background-image:
-      linear-gradient(rgba(56, 189, 248, 0.03) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(56, 189, 248, 0.03) 1px, transparent 1px);
-    background-size: 40px 40px;
+      linear-gradient(rgba(255, 255, 255, 0.01) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255, 255, 255, 0.01) 1px, transparent 1px);
+    background-size: 50px 50px;
     pointer-events: none;
   }
   .audience-inner {
@@ -110,21 +111,15 @@
     gap: 0.5rem;
     font-size: 0.7rem;
     font-family: "JetBrains Mono", monospace;
-    color: #38bdf8;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    background: rgba(56, 189, 248, 0.08);
-    border: 1px solid rgba(56, 189, 248, 0.2);
-    padding: 0.25rem 0.85rem;
-    border-radius: 9999px;
-    margin-bottom: 1.5rem;
+    font-weight: 700;
+    color: #64748b;
+    letter-spacing: 0.12em;
   }
   .label-dot {
     width: 6px;
     height: 6px;
     border-radius: 50%;
-    background: #38bdf8;
-    box-shadow: 0 0 6px #38bdf8;
+    background: #475569;
   }
   .section-heading {
     font-size: clamp(1.9rem, 4vw, 2.8rem);
@@ -132,7 +127,8 @@
     color: #fff;
     line-height: 1.18;
     letter-spacing: -0.02em;
-    margin: 0 0 3.5rem;
+    margin: 1rem 0 3.5rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   }
   .h-accent {
     background: linear-gradient(135deg, #38bdf8, #a78bfa);
@@ -148,13 +144,13 @@
     text-align: left;
   }
   .aud-card {
-    background: rgba(255, 255, 255, 0.02);
-    border: 1px solid rgba(255, 255, 255, 0.06);
-    border-radius: 0.9rem;
-    padding: 2rem;
+    background: rgba(255, 255, 255, 0.015);
+    border: 1px solid rgba(255, 255, 255, 0.04);
+    border-radius: 1rem;
+    padding: 2.25rem 2rem;
     display: flex;
     flex-direction: column;
-    gap: 1rem;
+    gap: 1.1rem;
     opacity: 0;
     transform: translateY(20px);
     transition:
@@ -162,18 +158,20 @@
       transform 0.6s ease var(--delay),
       border-color 0.3s ease,
       box-shadow 0.3s ease;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
   }
   .aud-card.card-in {
     opacity: 1;
     transform: translateY(0);
   }
   .aud-card:hover {
-    border-color: color-mix(in srgb, var(--c) 30%, transparent);
-    box-shadow: 0 0 30px color-mix(in srgb, var(--c) 8%, transparent);
-    transform: translateY(-2px);
+    border-color: rgba(255, 255, 255, 0.08);
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.4), 0 0 30px var(--glow-c);
+    transform: translateY(-4px);
   }
   .aud-card.card-in:hover {
-    transform: translateY(-2px);
+    transform: translateY(-4px);
   }
   .aud-icon {
     width: 2.2rem;
@@ -186,16 +184,19 @@
     justify-content: center;
   }
   .aud-title {
-    font-size: 1.1rem;
+    font-size: 1.2rem;
     font-weight: 700;
-    color: #e2e8f0;
+    color: #fff;
     margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    letter-spacing: -0.01em;
   }
   .aud-desc {
     font-size: 0.88rem;
     color: #64748b;
     line-height: 1.65;
     margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   }
 
   @media (max-width: 868px) {

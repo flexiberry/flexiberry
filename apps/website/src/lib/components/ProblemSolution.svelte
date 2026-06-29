@@ -1,9 +1,10 @@
 <script lang="ts">
   import { onMount } from "svelte";
-  export let isVisible = false;
+  
+  let { isVisible = false } = $props<{ isVisible?: boolean }>();
 
   let sectionEl: HTMLElement;
-  let sectionRevealed = false;
+  let sectionRevealed = $state(false);
 
   onMount(() => {
     const io = new IntersectionObserver(
@@ -25,40 +26,76 @@
   <div class="ps-inner" class:visible={sectionRevealed || isVisible}>
     <div class="section-label">
       <span class="label-dot"></span>
-      The Core Problem
+      THE PROBLEM & SOLUTION
     </div>
 
     <h2 class="section-heading">
-      API Testing shouldn't feel like<br />
+      API Testing shouldn't require <br />
       <span class="h-accent">writing an entire automation app</span>
     </h2>
 
     <div class="ps-content">
-      <!-- Problem Column -->
+      <!-- Problem Column (Pain) -->
       <div class="ps-card problem-card">
-        <div class="card-status-badge problem-badge">The Pain</div>
-        <div class="ps-icon">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
-            <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
-          </svg>
+        <div class="card-status-badge problem-badge">The Pain: Scripting Overload</div>
+        <p class="ps-card-intro">
+          Most API clients require writing custom Javascript wrappers and environment getters/setters just to pass an ID or token to the next request.
+        </p>
+        
+        <!-- Pain Mockup -->
+        <div class="mockup-container">
+          <div class="mockup-header">
+            <span class="mockup-title">postman-scripts.js</span>
+          </div>
+          <div class="mockup-code">
+            <span class="m-comment">// JavaScript Boilerplate</span>
+            <br />
+            <span class="m-keyword">const</span> response = pm.response.json();
+            <br />
+            pm.environment.set(<span class="m-string">"token"</span>, response.token);
+            <br />
+            pm.test(<span class="m-string">"Status is 200"</span>, <span class="m-keyword">function</span>() &#123;
+            <br />
+            &nbsp;&nbsp;pm.response.to.have.status(200);
+            <br />
+            &#125;);
+          </div>
         </div>
+
         <p class="ps-card-text">
-          Most API clients either force you into heavy, click-and-point GUIs that make automation a nightmare, or make you write endless JavaScript snippets just to pass an ID from one request to the next.
+          This results in bloated test scripts, broken environment variable syncs, and tests that are impossible to review in Git.
         </p>
       </div>
 
-      <!-- Solution Column -->
+      <!-- Solution Column (Flexiberry Way) -->
       <div class="ps-card solution-card">
-        <div class="card-status-badge solution-badge">Our Solution</div>
-        <div class="ps-icon">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"></path>
-            <path d="m9 12 2 2 4-4"></path>
-          </svg>
+        <div class="card-status-badge solution-badge">Our Solution: Declarative Chaining</div>
+        <p class="ps-card-intro">
+          Flexiberry uses the human-readable <code class="inline-code">.berry</code> syntax to describe requests, captures, and assertions out-of-the-box.
+        </p>
+
+        <!-- Solution Mockup -->
+        <div class="mockup-container solution-container">
+          <div class="mockup-header">
+            <span class="mockup-title">auth-flow.berry</span>
+          </div>
+          <div class="mockup-code solution-code">
+            <span class="m-comment"># Native Chaining in Task Steps</span>
+            <br />
+            <span class="m-keyword">Step</span> Call Api login
+            <br />
+            &nbsp;&nbsp;<span class="m-keyword">Capture</span>
+            <br />
+            &nbsp;&nbsp;&nbsp;&nbsp;- token: response.token
+            <br />
+            &nbsp;&nbsp;<span class="m-keyword">Check</span>
+            <br />
+            &nbsp;&nbsp;&nbsp;&nbsp;- $.status == 200
+          </div>
         </div>
+
         <p class="ps-card-text">
-          <strong>Flexiberry fixes this.</strong> It introduces a clean, readable syntax (<code class="inline-code">.berry</code>) designed specifically to track dependencies and chain multi-API sequences straight out of the box.
+          Zero dependencies, zero boilerplates. Variables are dynamically bound and passed down the execution chain automatically.
         </p>
       </div>
     </div>
@@ -68,7 +105,7 @@
 <style>
   .ps-section {
     position: relative;
-    background: #030712;
+    background: #060608;
     padding: 7rem 2rem 5rem;
     overflow: hidden;
   }
@@ -76,9 +113,9 @@
     position: absolute;
     inset: 0;
     background-image:
-      linear-gradient(rgba(167, 139, 250, 0.03) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(167, 139, 250, 0.03) 1px, transparent 1px);
-    background-size: 40px 40px;
+      linear-gradient(rgba(255, 255, 255, 0.01) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255, 255, 255, 0.01) 1px, transparent 1px);
+    background-size: 50px 50px;
     pointer-events: none;
   }
   .ps-inner {
@@ -104,21 +141,15 @@
     gap: 0.5rem;
     font-size: 0.7rem;
     font-family: "JetBrains Mono", monospace;
-    color: #a78bfa;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    background: rgba(167, 139, 250, 0.08);
-    border: 1px solid rgba(167, 139, 250, 0.2);
-    padding: 0.25rem 0.85rem;
-    border-radius: 9999px;
-    margin-bottom: 1.5rem;
+    font-weight: 700;
+    color: #64748b;
+    letter-spacing: 0.12em;
   }
   .label-dot {
     width: 6px;
     height: 6px;
     border-radius: 50%;
-    background: #a78bfa;
-    box-shadow: 0 0 6px #a78bfa;
+    background: #475569;
   }
   .section-heading {
     font-size: clamp(1.9rem, 4vw, 2.8rem);
@@ -126,7 +157,8 @@
     color: #fff;
     line-height: 1.18;
     letter-spacing: -0.02em;
-    margin: 0 0 3.5rem;
+    margin: 1rem 0 3.5rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   }
   .h-accent {
     background: linear-gradient(135deg, #a78bfa, #38bdf8);
@@ -143,22 +175,24 @@
   }
   .ps-card {
     position: relative;
-    background: rgba(255, 255, 255, 0.02);
-    border: 1px solid rgba(255, 255, 255, 0.06);
+    background: rgba(255, 255, 255, 0.015);
+    border: 1px solid rgba(255, 255, 255, 0.04);
     border-radius: 1rem;
     padding: 2.5rem 2rem 2rem;
     display: flex;
     flex-direction: column;
     gap: 1.25rem;
-    transition: all 0.3s ease;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
   }
   .problem-card:hover {
-    border-color: rgba(239, 68, 68, 0.25);
-    box-shadow: 0 0 40px rgba(239, 68, 68, 0.05);
+    border-color: rgba(239, 68, 68, 0.15);
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.4), 0 0 20px rgba(239, 68, 68, 0.03);
   }
   .solution-card:hover {
-    border-color: rgba(52, 211, 153, 0.25);
-    box-shadow: 0 0 40px rgba(52, 211, 153, 0.05);
+    border-color: rgba(52, 211, 153, 0.15);
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.4), 0 0 20px rgba(52, 211, 153, 0.03);
   }
   .card-status-badge {
     position: absolute;
@@ -169,43 +203,74 @@
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.05em;
-    padding: 0.2rem 0.75rem;
+    padding: 0.25rem 0.85rem;
     border-radius: 9999px;
     border: 1px solid;
   }
   .problem-badge {
-    color: #f87171;
-    background: rgba(248, 113, 113, 0.1);
-    border-color: rgba(248, 113, 113, 0.2);
+    color: #ef4444;
+    background: rgba(239, 68, 68, 0.06);
+    border-color: rgba(239, 68, 68, 0.18);
   }
   .solution-badge {
-    color: #34d399;
-    background: rgba(52, 211, 153, 0.1);
-    border-color: rgba(52, 211, 153, 0.2);
+    color: #10b981;
+    background: rgba(16, 185, 129, 0.06);
+    border-color: rgba(16, 185, 129, 0.18);
   }
-  .ps-icon {
-    width: 2.5rem;
-    height: 2.5rem;
-    border-radius: 0.6rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-  .problem-card .ps-icon {
-    background: rgba(248, 113, 113, 0.08);
-    border: 1px solid rgba(248, 113, 113, 0.15);
-    color: #f87171;
-  }
-  .solution-card .ps-icon {
-    background: rgba(52, 211, 153, 0.08);
-    border: 1px solid rgba(52, 211, 153, 0.15);
-    color: #34d399;
-  }
-  .ps-card-text {
+  .ps-card-intro {
     font-size: 0.95rem;
     color: #94a3b8;
-    line-height: 1.75;
+    line-height: 1.6;
     margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  }
+
+  /* Mockup Container for Code */
+  .mockup-container {
+    background: #030304;
+    border: 1px solid rgba(255, 255, 255, 0.03);
+    border-radius: 0.6rem;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+  .mockup-header {
+    background: rgba(255, 255, 255, 0.01);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+    padding: 0.4rem 1rem;
+  }
+  .mockup-title {
+    font-family: "JetBrains Mono", monospace;
+    font-size: 0.65rem;
+    color: #475569;
+  }
+  .mockup-code {
+    padding: 1rem;
+    font-family: "JetBrains Mono", monospace;
+    font-size: 0.72rem;
+    line-height: 1.6;
+    color: #94a3b8;
+  }
+  .m-comment { color: #475569; }
+  .m-keyword { color: #f43f5e; font-weight: 700; }
+  .m-string { color: #fbbf24; }
+
+  /* Solution Specific Code Mockup */
+  .solution-container {
+    border-color: rgba(16, 185, 129, 0.1);
+  }
+  .solution-code {
+    color: #e2e8f0;
+  }
+  .solution-code .m-comment { color: #4b5563; }
+  .solution-code .m-keyword { color: #10b981; }
+
+  .ps-card-text {
+    font-size: 0.9rem;
+    color: #64748b;
+    line-height: 1.6;
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   }
   .ps-card-text strong {
     color: #fff;
@@ -213,13 +278,14 @@
   .inline-code {
     font-family: "JetBrains Mono", monospace;
     font-size: 0.9em;
-    color: #a78bfa;
-    background: rgba(167, 139, 250, 0.1);
+    color: #10b981;
+    background: rgba(16, 185, 129, 0.08);
     border-radius: 4px;
     padding: 0.05em 0.3em;
+    border: 1px solid rgba(16, 185, 129, 0.12);
   }
 
-  @media (max-width: 768px) {
+  @media (max-width: 868px) {
     .ps-content {
       grid-template-columns: 1fr;
       gap: 2.5rem;
