@@ -6,7 +6,11 @@ export async function GET() {
     "features",
     "example",
     "playground",
-    "changelog"
+    "changelog",
+    "about",
+    "contact",
+    "privacy",
+    "terms"
   ];
 
   const sitemap = `<?xml version="1.0" encoding="UTF-8"?>
