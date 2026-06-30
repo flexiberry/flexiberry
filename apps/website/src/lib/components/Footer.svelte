@@ -31,6 +31,15 @@
         },
       ],
     },
+    {
+      group: "Legal & Support",
+      items: [
+        { label: "About Us", href: "/about" },
+        { label: "Contact Us", href: "/contact" },
+        { label: "Privacy Policy", href: "/privacy" },
+        { label: "Terms of Service", href: "/terms" },
+      ],
+    },
   ];
 </script>
 
@@ -141,7 +150,7 @@
     margin: 0 auto;
     padding: 4rem 2rem 3rem;
     display: grid;
-    grid-template-columns: 1.8fr 1fr 1fr 1fr;
+    grid-template-columns: 1.8fr 1fr 1fr 1fr 1fr;
     gap: 3rem;
   }
 

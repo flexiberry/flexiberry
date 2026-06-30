@@ -68,5 +68,9 @@ export default defineConfig({
         ],
       },
     ],
+    footer: {
+      message: "Released under the MIT License.",
+      copyright: 'Copyright © 2026 Flexiberry · <a href="https://flexiberry.dev/privacy" target="_blank" rel="noopener noreferrer">Privacy Policy</a> · <a href="https://flexiberry.dev/terms" target="_blank" rel="noopener noreferrer">Terms of Service</a>',
+    },
   },
 });
