@@ -82,7 +82,7 @@ export function runBerryFile(fileName: string, text: string) {
     logs: [],
     core,
     adapter,
-    minimized: false,
+    minimized: true,
     isFullscreen: false,
     completedSteps: 0,
     totalSteps: 0,
@@ -90,6 +90,7 @@ export function runBerryFile(fileName: string, text: string) {
     promptMessage: "",
     promptValue: "",
     plan: [],
+    forceShowPopover: true,
     resolvePrompt: (val: string) => {
       if (resolvePromptFn) {
         resolvePromptFn(val);
@@ -100,6 +101,14 @@ export function runBerryFile(fileName: string, text: string) {
 
   executions.update((list) => [...list, newExecution]);
 
+
+  executions.update((list) => {
+    const idx = list.findIndex(e => e.id === executionId);
+    if (idx !== -1 && list[idx].status === "running") {
+      list[idx].forceShowPopover = true;
+    }
+    return [...list];
+  });
   const log = (msg: string, level: "info" | "warn" | "error" | "system" = "info") => {
     executions.update((list) => {
       const idx = list.findIndex(e => e.id === executionId);
@@ -207,11 +216,11 @@ export function runBerryFile(fileName: string, text: string) {
         const stepIndex = payload.index;
         const stepObj = list[idx].plan[taskIndex]?.steps[stepIndex];
         if (stepObj) {
-          stepObj.status = 
+          stepObj.status =
             payload.status === "PASS" ? "completed" : payload.status === "FAILED" ? "failed" : "skipped";
-          stepObj.duration = 
+          stepObj.duration =
             payload.endTime.getTime() - payload.startTime.getTime();
-          
+
           const url = apiToUrlMap.get(payload.targetName);
           if (url) {
             const reqInfo = requestDetailsMap.get(url);
@@ -262,8 +271,8 @@ export function runBerryFile(fileName: string, text: string) {
         log(`  Headers: ${JSON.stringify(payload.response.headers, null, 2)}`, "info");
       }
       if (payload.response.body) {
-        const bodyStr = typeof payload.response.body === "object" 
-          ? JSON.stringify(payload.response.body, null, 2) 
+        const bodyStr = typeof payload.response.body === "object"
+          ? JSON.stringify(payload.response.body, null, 2)
           : String(payload.response.body);
         log(`  Body: ${bodyStr}`, "info");
       }
@@ -289,7 +298,7 @@ export function runBerryFile(fileName: string, text: string) {
         list[idx].status = "completed";
         list[idx].endTime = payload.endTime;
         list[idx].elapsedTime = Math.round((payload.endTime.getTime() - list[idx].startTime.getTime()) / 100) / 10;
-        
+
         // Mark remaining pending/running tasks in plan as completed
         list[idx].plan.forEach((task) => {
           if (task.status === "running" || task.status === "pending") {
@@ -302,6 +311,16 @@ export function runBerryFile(fileName: string, text: string) {
     log(`Execution completed successfully.`, "system");
     clearInterval(timer);
     cleanupFetch();
+
+    setTimeout(() => {
+      executions.update((list) => {
+        const idx = list.findIndex(e => e.id === executionId);
+        if (idx !== -1) {
+          list[idx].forceShowPopover = false;
+        }
+        return [...list];
+      });
+    }, 3000);
   });
 
   core.run().catch((err) => {
@@ -322,6 +341,16 @@ export function runBerryFile(fileName: string, text: string) {
     log(`Execution failed: ${err.message}`, "error");
     clearInterval(timer);
     cleanupFetch();
+
+    setTimeout(() => {
+      executions.update((list) => {
+        const idx = list.findIndex(e => e.id === executionId);
+        if (idx !== -1) {
+          list[idx].forceShowPopover = false;
+        }
+        return [...list];
+      });
+    }, 3000);
   });
 }
 
@@ -362,7 +391,7 @@ export function closeExecution(id: string) {
       if (exec.status === "running") {
         try {
           exec.core.kill();
-        } catch {}
+        } catch { }
       }
     }
     return list.filter(e => e.id !== id);

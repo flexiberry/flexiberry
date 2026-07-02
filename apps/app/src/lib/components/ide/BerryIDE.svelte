@@ -13,7 +13,14 @@
     Plus, 
     FileText, 
     LayoutList,
-    Play
+    Play,
+    ChevronsDown,
+    ChevronsUp,
+    Database,
+    CheckCircle,
+    Globe,
+    Code,
+    List
   } from "lucide-svelte";
   import BerryBlockComponent from "$lib/components/ide/BerryBlock.svelte";
   import BlockAdder from "$lib/components/ide/BlockAdder.svelte";
@@ -25,6 +32,7 @@
   import { mode } from "mode-watcher";
   import { berryLanguage, berryDarkTheme, berryLightTheme } from "$lib/utils/berryLanguage";
   import { onDestroy } from "svelte";
+  import { scale } from "svelte/transition";
   import { Button } from "$lib/components/ui/button";
   import type { RunInstance } from "./execution/execution.types";
   import ExecutionOverlay from "./execution/ExecutionOverlay.svelte";
@@ -40,7 +48,11 @@
 
   export let ctx: FileContext;
 
+  let runCountdown = 0;
+  let countdownInterval: any = null;
+
   onDestroy(() => {
+    if (countdownInterval) clearInterval(countdownInterval);
     $executions.forEach(exec => {
       if (exec.timerInterval) clearInterval(exec.timerInterval);
     });
@@ -57,6 +69,7 @@
 
   let viewMode: 'blocks' | 'raw' = 'blocks';
   let rawContent = '';
+  let hoveredId: string | null = null;
 
   // Load the .berry file
   $: if (ctx.fileName) loadFile(ctx);
@@ -152,6 +165,111 @@
     newBlocks.splice(index, 0, newBlock);
     $berryBlocks = newBlocks;
   }
+
+  function playClickSound() {
+    try {
+      const audioCtx = new (window.AudioContext || (window as any).webkitAudioContext)();
+      const gainNode = audioCtx.createGain();
+      gainNode.connect(audioCtx.destination);
+      gainNode.gain.setValueAtTime(0.04, audioCtx.currentTime);
+      gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.25);
+      
+      // Glass chime chord: D5 (587.33Hz), A5 (880.00Hz), D6 (1174.66Hz)
+      const freqs = [587.33, 880.00, 1174.66];
+      freqs.forEach(freq => {
+        const osc = audioCtx.createOscillator();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+        osc.connect(gainNode);
+        osc.start();
+        osc.stop(audioCtx.currentTime + 0.25);
+      });
+    } catch (e) {
+      // Ignored if blocked
+    }
+  }
+
+  function playHoverSound() {
+    try {
+      const audioCtx = new (window.AudioContext || (window as any).webkitAudioContext)();
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(1300, audioCtx.currentTime);
+      
+      gain.gain.setValueAtTime(0.012, audioCtx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.035);
+      
+      osc.start();
+      osc.stop(audioCtx.currentTime + 0.035);
+    } catch (e) {
+      // Ignored if blocked
+    }
+  }
+
+  function playBeepSound(frequency = 700, duration = 0.08) {
+    try {
+      const audioCtx = new (window.AudioContext || (window as any).webkitAudioContext)();
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(frequency, audioCtx.currentTime);
+      
+      gain.gain.setValueAtTime(0.04, audioCtx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+      
+      osc.start();
+      osc.stop(audioCtx.currentTime + duration);
+    } catch (e) {
+      // Ignored if blocked
+    }
+  }
+
+  function startCountdown() {
+    if (runCountdown > 0) return;
+    runCountdown = 3;
+    playBeepSound(700, 0.08);
+    
+    countdownInterval = setInterval(() => {
+      runCountdown -= 1;
+      if (runCountdown > 0) {
+        playBeepSound(700, 0.08);
+      } else {
+        clearInterval(countdownInterval);
+        playClickSound();
+        runBerryFile(ctx.fileName, viewMode === 'raw' ? rawContent : stringifyBerryBlocks($berryBlocks));
+      }
+    }, 1000);
+  }
+
+  function collapseAll() {
+    playClickSound();
+    berryBlocks.update(blocks => blocks.map(b => ({ ...b, collapsed: true })));
+  }
+
+  function expandAll() {
+    playClickSound();
+    berryBlocks.update(blocks => blocks.map(b => ({ ...b, collapsed: false })));
+  }
+
+  let activeFilter: BlockType | null = null;
+
+  function toggleFilter(filterType: BlockType) {
+    playClickSound();
+    if (activeFilter === filterType) {
+      activeFilter = null;
+    } else {
+      activeFilter = filterType;
+    }
+  }
 </script>
 
 <svelte:window on:keydown={handleKeydown} />
@@ -246,20 +364,262 @@
       </div>
     {:else}
       {#if viewMode === 'blocks'}
+        <!-- Floating Left Control Sidebar -->
+        {#if $berryBlocks.length > 0}
+          <div 
+            class="fixed left-3 lg:left-auto lg:right-[calc(50vw+464px)] top-1/2 -translate-y-1/2 z-30 flex flex-col items-end gap-2 p-1.5 bg-card/90 dark:bg-[#141b2b]/90 backdrop-blur border border-border/40 dark:border-border/80 rounded-3xl shadow-lg transition-all duration-300"
+            aria-label="Notebook Controls"
+          >
+            <!-- Global actions -->
+            <button 
+              class="group/btn flex flex-row-reverse items-center justify-start gap-0 hover:gap-2 w-9 hover:w-32 h-9 px-2.5 rounded-full hover:bg-primary/10 text-muted-foreground hover:text-primary transition-all duration-300 shadow-sm active:scale-90 border border-transparent hover:border-primary/20 cursor-pointer overflow-hidden whitespace-nowrap"
+              on:click={expandAll}
+              on:mouseenter={playHoverSound}
+              title="Expand All Blocks"
+            >
+              <ChevronsDown class="w-4 h-4 shrink-0" />
+              <span class="text-[10px] font-bold uppercase tracking-wider opacity-0 group-hover/btn:opacity-100 transition-opacity duration-200">
+                Expand All
+              </span>
+            </button>
+            
+            <button 
+              class="group/btn flex flex-row-reverse items-center justify-start gap-0 hover:gap-2 w-9 hover:w-32 h-9 px-2.5 rounded-full hover:bg-primary/10 text-muted-foreground hover:text-primary transition-all duration-300 shadow-sm active:scale-90 border border-transparent hover:border-primary/20 cursor-pointer overflow-hidden whitespace-nowrap"
+              on:click={collapseAll}
+              on:mouseenter={playHoverSound}
+              title="Collapse All Blocks"
+            >
+              <ChevronsUp class="w-4 h-4 shrink-0" />
+              <span class="text-[10px] font-bold uppercase tracking-wider opacity-0 group-hover/btn:opacity-100 transition-opacity duration-200">
+                Collapse All
+              </span>
+            </button>
+
+            <div class="w-5 h-[1px] bg-border/40 mr-2 my-1"></div>
+            
+            <!-- Filters Group -->
+            <button 
+              class="group/btn flex flex-row-reverse items-center justify-start gap-0 hover:gap-2 w-9 hover:w-32 h-9 px-2.5 rounded-full transition-all duration-300 shadow-sm active:scale-90 border border-transparent cursor-pointer overflow-hidden whitespace-nowrap {activeFilter === null ? 'bg-primary/10 text-primary border-primary/30' : 'text-muted-foreground hover:bg-primary/10 hover:text-primary hover:border-primary/20'}"
+              on:click={() => { playClickSound(); activeFilter = null; }}
+              on:mouseenter={playHoverSound}
+              title="Show All Blocks"
+            >
+              <List class="w-4 h-4 shrink-0" />
+              <span class="text-[10px] font-bold uppercase tracking-wider opacity-0 group-hover/btn:opacity-100 transition-opacity duration-200">
+                View All
+              </span>
+            </button>
+            <button 
+              class="group/btn flex flex-row-reverse items-center justify-start gap-0 hover:gap-2 w-9 hover:w-32 h-9 px-2.5 rounded-full transition-all duration-300 shadow-sm active:scale-90 border border-transparent cursor-pointer overflow-hidden whitespace-nowrap {activeFilter === 'Api' ? 'bg-blue-500/10 text-blue-500 border-blue-500/30' : 'text-muted-foreground hover:bg-primary/10 hover:text-primary hover:border-primary/20'}"
+              on:click={() => toggleFilter('Api')}
+              on:mouseenter={playHoverSound}
+              title="Filter API Blocks"
+            >
+              <Database class="w-4 h-4 shrink-0" />
+              <span class="text-[10px] font-bold uppercase tracking-wider opacity-0 group-hover/btn:opacity-100 transition-opacity duration-200">
+                Filter API
+              </span>
+            </button>
+            
+            <button 
+              class="group/btn flex flex-row-reverse items-center justify-start gap-0 hover:gap-2 w-9 hover:w-32 h-9 px-2.5 rounded-full transition-all duration-300 shadow-sm active:scale-90 border border-transparent cursor-pointer overflow-hidden whitespace-nowrap {activeFilter === 'Task' ? 'bg-green-500/10 text-green-500 border-green-500/30' : 'text-muted-foreground hover:bg-primary/10 hover:text-primary hover:border-primary/20'}"
+              on:click={() => toggleFilter('Task')}
+              on:mouseenter={playHoverSound}
+              title="Filter Task Blocks"
+            >
+              <CheckCircle class="w-4 h-4 shrink-0" />
+              <span class="text-[10px] font-bold uppercase tracking-wider opacity-0 group-hover/btn:opacity-100 transition-opacity duration-200">
+                Filter Tasks
+              </span>
+            </button>
+
+            <button 
+              class="group/btn flex flex-row-reverse items-center justify-start gap-0 hover:gap-2 w-9 hover:w-32 h-9 px-2.5 rounded-full transition-all duration-300 shadow-sm active:scale-90 border border-transparent cursor-pointer overflow-hidden whitespace-nowrap {activeFilter === 'Env' ? 'bg-amber-500/10 text-amber-500 border-amber-500/30' : 'text-muted-foreground hover:bg-primary/10 hover:text-primary hover:border-primary/20'}"
+              on:click={() => toggleFilter('Env')}
+              on:mouseenter={playHoverSound}
+              title="Filter Env Blocks"
+            >
+              <Globe class="w-4 h-4 shrink-0" />
+              <span class="text-[10px] font-bold uppercase tracking-wider opacity-0 group-hover/btn:opacity-100 transition-opacity duration-200">
+                Filter Env
+              </span>
+            </button>
+
+            <button 
+              class="group/btn flex flex-row-reverse items-center justify-start gap-0 hover:gap-2 w-9 hover:w-32 h-9 px-2.5 rounded-full transition-all duration-300 shadow-sm active:scale-90 border border-transparent cursor-pointer overflow-hidden whitespace-nowrap {activeFilter === 'Var' ? 'bg-purple-500/10 text-purple-500 border-purple-500/30' : 'text-muted-foreground hover:bg-primary/10 hover:text-primary hover:border-primary/20'}"
+              on:click={() => toggleFilter('Var')}
+              on:mouseenter={playHoverSound}
+              title="Filter Var Blocks"
+            >
+              <Code class="w-4 h-4 shrink-0" />
+              <span class="text-[10px] font-bold uppercase tracking-wider opacity-0 group-hover/btn:opacity-100 transition-opacity duration-200">
+                Filter Var
+              </span>
+            </button>
+          </div>
+        {/if}
+
+        <!-- Floating Right Run Sidebar / Dashboard -->
+        {#if $berryBlocks.length > 0}
+          <div 
+            class="fixed right-3 lg:right-auto lg:left-[calc(50vw+464px)] top-1/2 -translate-y-1/2 z-30 w-28 flex flex-col gap-2 p-2 bg-card/95 dark:bg-[#141b2b]/95 backdrop-blur border border-border/40 dark:border-border/80 rounded-2xl shadow-xl transition-all duration-300"
+            aria-label="Execution Controller"
+          >
+            <!-- Run Button -->
+            <button 
+              class="group/btn flex items-center justify-center gap-1.5 w-full h-8 px-2 rounded-lg text-white font-bold uppercase text-[9px] tracking-wider transition-all duration-300 shadow-sm active:scale-95 border border-transparent cursor-pointer
+                {runCountdown > 0 
+                  ? 'bg-amber-500 hover:bg-amber-600 animate-pulse' 
+                  : 'bg-emerald-600 hover:bg-emerald-700'}"
+              on:click={() => {
+                if (runCountdown > 0) return;
+                startCountdown();
+              }}
+              on:mouseenter={playHoverSound}
+              title={runCountdown > 0 ? `Launching in ${runCountdown}s...` : "Run Notebook File"}
+              disabled={runCountdown > 0}
+            >
+              {#if runCountdown > 0}
+                <span class="text-xs font-black">{runCountdown}</span>
+                <span>Launching…</span>
+              {:else}
+                <Play class="w-3 h-3 fill-current shrink-0" />
+                <span>Run File</span>
+              {/if}
+            </button>
+
+            <!-- Executions Grid -->
+            {#if $executions.length > 0}
+              <div class="w-full h-[1px] bg-border/40 my-0.5"></div>
+              
+              <div class="grid grid-cols-4 gap-1.5 w-full justify-items-center">
+                {#each $executions as exec, i (exec.id)}
+                  <button
+                    transition:scale={{ duration: 250, start: 0.6 }}
+                    class="group relative w-5 h-5 flex items-center justify-center rounded-md border text-[8px] font-black tracking-tighter transition-all duration-200 active:scale-90 cursor-pointer 
+                      {exec.status === 'running' 
+                        ? 'bg-blue-500/10 hover:bg-blue-500/20 text-blue-500 border-blue-500/30' 
+                        : exec.status === 'completed'
+                          ? 'bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-500 border-emerald-500/20'
+                          : exec.status === 'failed'
+                            ? 'bg-rose-500/10 hover:bg-rose-500/20 text-rose-500 border-rose-500/20'
+                            : 'bg-muted hover:bg-muted/80 text-muted-foreground border-border/40'}"
+                    on:click={() => {
+                      playClickSound();
+                      executions.update(list => {
+                        return list.map(e => e.id === exec.id ? { ...e, minimized: false } : e);
+                      });
+                    }}
+                    on:mouseenter={() => {
+                      playHoverSound();
+                      hoveredId = exec.id;
+                    }}
+                    on:mouseleave={() => {
+                      hoveredId = null;
+                    }}
+                  >
+                    {i + 1}
+                    
+                    {#if exec.status === 'running'}
+                      <span class="absolute -top-0.5 -right-0.5 w-1.5 h-1.5 rounded-full bg-blue-500 animate-ping"></span>
+                    {/if}
+
+                    <!-- Hover Popover Status Card -->
+                    <div class="absolute right-[125%] top-1/2 -translate-y-1/2 w-52 p-3 bg-card dark:bg-[#141b2b] border border-border/80 dark:border-border rounded-xl shadow-2xl z-50 pointer-events-none transition-all duration-200 origin-right flex flex-col gap-1.5 text-xs text-foreground font-sans text-left { (hoveredId === exec.id || exec.forceShowPopover) ? 'opacity-100 scale-100' : 'opacity-0 scale-95' }">
+                      <!-- Header -->
+                      <div class="flex items-center justify-between gap-2 border-b border-border/40 pb-1.5">
+                        <span class="font-black text-[10px] tracking-tight truncate max-w-[120px]">{exec.fileName}</span>
+                        <span class="text-[9px] font-mono text-muted-foreground/60">{exec.elapsedTime}s</span>
+                      </div>
+                      
+                      <!-- Status Indicator -->
+                      <div class="flex items-center gap-1.5 mt-0.5">
+                        <span class="w-1.5 h-1.5 rounded-full 
+                          {exec.status === 'completed' ? 'bg-emerald-500 shadow-[0_0_6px_rgba(16,185,129,0.4)]' : 
+                           exec.status === 'failed' ? 'bg-rose-500 shadow-[0_0_6px_rgba(239,68,68,0.4)]' : 
+                           exec.status === 'running' ? 'bg-blue-500 animate-pulse' : 'bg-muted-foreground/50'}"
+                        ></span>
+                        <span class="text-[9px] font-extrabold uppercase tracking-wide
+                          {exec.status === 'completed' ? 'text-emerald-500' : 
+                           exec.status === 'failed' ? 'text-rose-500' : 
+                           exec.status === 'running' ? 'text-blue-500' : 'text-muted-foreground'}"
+                        >
+                          {exec.status}
+                        </span>
+                      </div>
+                      
+                      <!-- Progress Details -->
+                      <div class="text-[10px] text-muted-foreground/80 font-medium flex flex-col gap-1">
+                        {#if exec.plan && exec.plan.length > 0}
+                          {@const totalSteps = exec.plan.reduce((acc, t) => acc + t.steps.length, 0)}
+                          {@const completedSteps = exec.plan.reduce((acc, t) => acc + t.steps.filter(s => s.status === 'completed').length, 0)}
+                          <div class="flex justify-between items-center text-[9px] font-bold">
+                            <span>Steps Progress</span>
+                            <span>{completedSteps}/{totalSteps}</span>
+                          </div>
+                          <!-- Mini Progress Bar -->
+                          <div class="w-full h-1 bg-muted rounded-full overflow-hidden">
+                            <div class="h-full bg-emerald-500 transition-all duration-300" style="width: {(completedSteps / Math.max(totalSteps, 1)) * 100}%"></div>
+                          </div>
+                        {:else}
+                          <span class="italic text-[9px] text-muted-foreground/50">Preparing execution...</span>
+                        {/if}
+                      </div>
+                      
+                      <!-- Footer Hint -->
+                      <div class="border-t border-border/30 pt-1 mt-1 text-[8px] text-muted-foreground/40 font-semibold uppercase tracking-wider text-center">
+                        Click to inspect details
+                      </div>
+                    </div>
+                  </button>
+                {/each}
+              </div>
+            {/if}
+          </div>
+        {/if}
+
         <!-- Blocks Container -->
         <div class="w-full max-w-4xl mx-auto pb-16 px-4 flex flex-col">
-          {#each $berryBlocks as block, i (block.id)}
-            <BlockAdder index={i} on:add={handleInsertBlock} />
-            <BerryBlockComponent 
-              bind:block={block} 
-              index={i} 
-              on:delete={handleDeleteBlock}
-              on:run={handleRunBlock}
-            />
-          {/each}
-          
-          <!-- Final Adder at the bottom -->
-          <BlockAdder index={$berryBlocks.length} on:add={handleInsertBlock} />
+          {#if activeFilter === null}
+            {#each $berryBlocks as block, i (block.id)}
+              <BlockAdder index={i} on:add={handleInsertBlock} />
+              <BerryBlockComponent 
+                bind:block={block} 
+                index={i} 
+                on:delete={handleDeleteBlock}
+                on:run={handleRunBlock}
+                allBlocks={$berryBlocks}
+              />
+            {/each}
+            
+            <!-- Final Adder at the bottom -->
+            <BlockAdder index={$berryBlocks.length} on:add={handleInsertBlock} />
+          {:else}
+            {#each $berryBlocks.filter(b => b.type === activeFilter) as block, i (block.id)}
+              <div class="mb-4">
+                <BerryBlockComponent 
+                  bind:block={block} 
+                  index={i} 
+                  on:delete={handleDeleteBlock}
+                  on:run={handleRunBlock}
+                  allBlocks={$berryBlocks}
+                />
+              </div>
+            {/each}
+            
+            {#if $berryBlocks.filter(b => b.type === activeFilter).length === 0}
+              <div class="text-center py-12 text-muted-foreground bg-card rounded-xl border border-dashed border-border mt-8 flex flex-col items-center">
+                <Code2 class="w-12 h-12 mb-3 opacity-20" />
+                <p class="mb-2">No {activeFilter} blocks found.</p>
+                <button 
+                  class="mt-2 text-xs font-semibold text-primary hover:underline cursor-pointer"
+                  on:click={() => activeFilter = null}
+                >
+                  Clear Filter
+                </button>
+              </div>
+            {/if}
+          {/if}
           
           {#if $berryBlocks.length === 0}
             <div class="text-center py-12 text-muted-foreground bg-card rounded-xl border border-dashed border-border mt-8 flex flex-col items-center">
@@ -319,19 +679,8 @@
 
   <!-- Bottom Command Bar -->
   <div class="shrink-0 w-full border-t border-border/50 bg-card z-30 flex items-center bg-muted/20">
-    <div class="flex-grow min-w-0">
+    <div class="flex-grow min-w-0 pr-4">
       <BerryChat />
-    </div>
-    <div class="pr-4 py-3 shrink-0 flex items-center">
-      <Button
-        variant="default"
-        size="sm"
-        class="gap-1.5 h-9 px-4 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-xs tracking-wider uppercase rounded-lg shadow-lg shadow-emerald-950/20"
-        on:click={() => runBerryFile(ctx.fileName, viewMode === 'raw' ? rawContent : stringifyBerryBlocks($berryBlocks))}
-      >
-        <Play class="w-3.5 h-3.5 fill-current" />
-        <span>Run File</span>
-      </Button>
     </div>
   </div>
 

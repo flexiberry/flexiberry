@@ -5,6 +5,7 @@ export interface BerryBlock {
   type: BlockType;
   content: string;
   viewMode?: 'code' | 'wizard';
+  collapsed?: boolean;
 }
 
 export function parseBerryBlocks(code: string): BerryBlock[] {
@@ -39,7 +40,8 @@ export function parseBerryBlocks(code: string): BerryBlock[] {
       currentBlock = {
         id: Math.random().toString(36).substr(2, 9),
         type,
-        content
+        content,
+        collapsed: false
       };
       pendingLines = [];
     } else if (isComment || isBlank) {

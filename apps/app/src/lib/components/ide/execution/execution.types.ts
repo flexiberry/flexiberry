@@ -54,4 +54,5 @@ export interface RunInstance {
   resolvePrompt?: (val: string) => void;
   error?: string;
   plan: PlanTask[];
+  forceShowPopover?: boolean;
 }

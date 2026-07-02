@@ -156,7 +156,7 @@
 </script>
 
 <Card
-  class="pointer-events-auto transition-all duration-300 flex flex-col bg-card/95 border-border/50 shadow-2xl rounded-2xl overflow-hidden
+  class="pointer-events-auto transition-all duration-300 flex flex-col bg-card/95 dark:bg-[#141b2b]/95 border-border/50 dark:border-border/80 shadow-2xl rounded-2xl overflow-hidden
     {exec.isFullscreen
       ? 'fixed inset-10 z-[70] w-auto h-auto max-h-none max-w-none'
       : `w-96 max-w-[calc(100vw-2rem)] fixed bottom-20 right-6 z-[60] ${exec.minimized ? 'h-auto' : 'h-[32rem]'}`}"
