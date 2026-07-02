@@ -12,9 +12,12 @@ export function parseBerryBlocks(code: string): BerryBlock[] {
   const lines = code.split('\n');
   
   let currentBlock: BerryBlock | null = null;
+  let pendingLines: string[] = [];
   
   for (const line of lines) {
     const trimmed = line.trim();
+    const isComment = trimmed.startsWith('##');
+    const isBlank = trimmed === '';
     const typeMatch = trimmed.match(/^(Env|Api|Var|Task|Step)\b/i);
     
     if (typeMatch) {
@@ -22,34 +25,59 @@ export function parseBerryBlocks(code: string): BerryBlock[] {
         currentBlock.content = currentBlock.content.trimEnd();
         blocks.push(currentBlock);
       }
+      
       const typeStr = typeMatch[1].toLowerCase();
       const type = typeStr === 'api' ? 'Api' : 
                    typeStr === 'var' ? 'Var' : 
                    typeStr === 'env' ? 'Env' :
                    typeStr === 'step' ? 'Step' : 'Task';
+                   
+      const content = pendingLines.length > 0
+        ? pendingLines.join('\n') + '\n' + line
+        : line;
+        
       currentBlock = {
         id: Math.random().toString(36).substr(2, 9),
         type,
-        content: line
+        content
       };
+      pendingLines = [];
+    } else if (isComment || isBlank) {
+      pendingLines.push(line);
     } else {
-      if (!currentBlock) {
-        // If there's content before any keyword (e.g. comments or unknown syntax)
-        if (trimmed === '') continue; // skip leading empty lines
+      if (currentBlock) {
+        if (pendingLines.length > 0) {
+          currentBlock.content += '\n' + pendingLines.join('\n');
+          pendingLines = [];
+        }
+        currentBlock.content += '\n' + line;
+      } else {
+        const content = pendingLines.length > 0
+          ? pendingLines.join('\n') + '\n' + line
+          : line;
+          
         currentBlock = {
           id: Math.random().toString(36).substr(2, 9),
           type: 'Code',
-          content: line
+          content
         };
-      } else {
-        currentBlock.content += '\n' + line;
+        pendingLines = [];
       }
     }
   }
   
   if (currentBlock) {
+    if (pendingLines.length > 0) {
+      currentBlock.content += '\n' + pendingLines.join('\n');
+    }
     currentBlock.content = currentBlock.content.trimEnd();
     blocks.push(currentBlock);
+  } else if (pendingLines.length > 0) {
+    blocks.push({
+      id: Math.random().toString(36).substr(2, 9),
+      type: 'Code',
+      content: pendingLines.join('\n').trimEnd()
+    });
   }
   
   if (blocks.length === 0) {

@@ -23,6 +23,7 @@
   import CodeMirror from "svelte-codemirror-editor";
   import { oneDark } from "@codemirror/theme-one-dark";
   import { mode } from "mode-watcher";
+  import { berryLanguage, berryDarkTheme, berryLightTheme } from "$lib/utils/berryLanguage";
   import { onDestroy } from "svelte";
   import { Button } from "$lib/components/ui/button";
   import type { RunInstance } from "./execution/execution.types";
@@ -300,6 +301,8 @@
           <CodeMirror
             bind:value={rawContent}
             theme={$mode === "dark" ? oneDark : null}
+            lang={berryLanguage}
+            extensions={[$mode === "dark" ? berryDarkTheme : berryLightTheme]}
             lineWrapping={true}
             styles={{
               "&": { height: "100%", backgroundColor: "transparent", fontSize: "14px" },

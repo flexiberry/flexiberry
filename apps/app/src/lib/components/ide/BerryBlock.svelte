@@ -6,6 +6,7 @@
   import { Play, Database, Code, CheckCircle, Trash2, Wand2 } from "lucide-svelte";
   import type { BerryBlock } from "$lib/utils/berryBlocks";
   import InteractiveWizard from "./InteractiveWizard.svelte";
+  import { berryLanguage, berryDarkTheme, berryLightTheme } from "$lib/utils/berryLanguage";
 
   export let block: BerryBlock;
   export let index: number;
@@ -105,6 +106,8 @@
       <CodeMirror
         bind:value={block.content}
         theme={$mode === "dark" ? oneDark : null}
+        lang={berryLanguage}
+        extensions={[$mode === "dark" ? berryDarkTheme : berryLightTheme]}
         lineWrapping={true}
         styles={{
           "&": {
