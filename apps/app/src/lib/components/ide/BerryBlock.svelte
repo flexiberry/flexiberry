@@ -145,7 +145,10 @@
 
 <div 
   id="block-{block.id}"
-  class="berry-block-wrapper group relative flex flex-col w-full rounded-xl border border-border/40 bg-card shadow-sm hover:shadow-md transition-all duration-300"
+  class="berry-block-wrapper group relative flex flex-col rounded-xl border border-border/40 bg-card shadow-sm hover:shadow-md transition-all duration-300"
+  class:w-full={block.type !== 'Step'}
+  class:w-[calc(100%-1rem)]={block.type === 'Step'}
+  class:md:w-[calc(100%-2rem)]={block.type === 'Step'}
   class:ml-4={block.type === 'Step'}
   class:md:ml-8={block.type === 'Step'}
 >

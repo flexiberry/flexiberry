@@ -238,6 +238,12 @@ export function runBerryFile(fileName: string, text: string) {
               body: payload.response.body
             };
           }
+          if (payload?.captures) {
+            stepObj.captures = payload.captures;
+          }
+          if (payload?.checks) {
+            stepObj.checks = payload.checks;
+          }
           if (payload.error) {
             stepObj.error = payload.error;
           }

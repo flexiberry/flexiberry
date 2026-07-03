@@ -95,6 +95,8 @@ export interface StepResult {
   readonly error: string | null;
   readonly response: ApiResponse | null;
   readonly checksPassed: boolean | null;
+  readonly captures: Record<string, unknown> | null;
+  readonly checks?: ReadonlyArray<{ expression: string; pass: boolean; evaluated: string }> | null;
 }
 
 export interface ApiResponse {

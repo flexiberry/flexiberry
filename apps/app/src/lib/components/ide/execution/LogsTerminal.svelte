@@ -27,7 +27,7 @@
   }
 </script>
 
-<div class="w-full md:w-80 lg:w-[26rem] shrink-0 flex flex-col min-h-0 bg-black/30 {isFullscreen ? 'h-auto' : 'h-40 md:h-auto'}">
+<div class="shrink-0 flex flex-col min-h-0 bg-black/30 {isFullscreen ? 'w-full md:w-80 lg:w-[26rem] h-auto' : 'w-full h-36'}">
   <!-- Realtime Task Status Box (Only in Floating view) -->
   {#if !isFullscreen && status === "running" && (currentTask || currentStep)}
     <div class="px-4 py-1.5 border-b border-border/50 bg-black/20 text-[9px] space-y-0.5 shrink-0 flex items-center justify-between gap-4">

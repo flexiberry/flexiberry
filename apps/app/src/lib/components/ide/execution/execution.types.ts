@@ -23,6 +23,8 @@ export interface PlanStep {
     body?: any;
   };
   error?: string;
+  captures?: Record<string, any>;
+  checks?: Array<{ expression: string; pass: boolean; evaluated: string }>;
 }
 
 export interface PlanTask {

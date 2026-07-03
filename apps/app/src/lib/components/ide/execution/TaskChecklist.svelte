@@ -58,7 +58,7 @@
   }
 </script>
 
-<div class="flex flex-col bg-muted/5 shrink-0 {isFullscreen ? 'w-full md:w-80 h-full' : 'w-full max-h-[14rem] border-b border-border/50'} overflow-hidden">
+<div class="flex flex-col bg-muted/5 shrink-0 {isFullscreen ? 'w-full md:w-80 h-full' : 'w-full h-full'} overflow-hidden">
   <ScrollArea class="flex-grow min-h-0">
     <div class="p-3 space-y-2.5">
       {#each plan as task, ti}

@@ -19,7 +19,7 @@ import {
   ExecutionStatus,
 } from "./interpreter/interpreter.types";
 import { type BerryCoreOptions } from "./berry-core";
-import { NodeType, type BaseNode, type TaskBlockNode, type StepBlockNode, type ParamsBlockNode, type CaptureBlockNode, type CheckBlockNode, type KeyValuePairNode, type ConditionNode, ProgramNode, type ApiBlockNode } from "./parser/ast/ast.types";
+import { NodeType, type BaseNode, type TaskBlockNode, type StepBlockNode, type ParamsBlockNode, type CaptureBlockNode, type CheckBlockNode, type KeyValuePairNode, type ConditionNode, ProgramNode, type ApiBlockNode, type VarDeclarationNode } from "./parser/ast/ast.types";
 
 export {
   // ── High-level facade (recommended entry-point) ──────────────────────
@@ -59,5 +59,6 @@ export {
   type KeyValuePairNode,
   type ConditionNode,
   type ProgramNode,
-  type ApiBlockNode
+  type ApiBlockNode,
+  type VarDeclarationNode
 };

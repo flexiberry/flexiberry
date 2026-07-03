@@ -30,6 +30,48 @@
   let selectedStep: { taskIndex: number; stepIndex: number } | null = null;
   let showLogs = true;
 
+  // Draggable State
+  let x = 0;
+  let y = 0;
+  let isDragging = false;
+  let startX = 0;
+  let startY = 0;
+
+  function handlePointerDown(e: PointerEvent) {
+    if (exec.isFullscreen) return;
+    if (e.button !== 0) return; // only left click
+    
+    const target = e.target as HTMLElement;
+    if (target.closest("button") || target.closest("input") || target.closest("select") || target.closest("a")) {
+      return;
+    }
+    
+    isDragging = true;
+    startX = e.clientX - x;
+    startY = e.clientY - y;
+    
+    const header = e.currentTarget as HTMLElement;
+    header.setPointerCapture(e.pointerId);
+  }
+
+  function handlePointerMove(e: PointerEvent) {
+    if (!isDragging) return;
+    x = e.clientX - startX;
+    y = e.clientY - startY;
+  }
+
+  function handlePointerUp(e: PointerEvent) {
+    if (!isDragging) return;
+    isDragging = false;
+    const header = e.currentTarget as HTMLElement;
+    header.releasePointerCapture(e.pointerId);
+  }
+
+  $: if (exec.isFullscreen) {
+    x = 0;
+    y = 0;
+  }
+
   function handleToggleMinimize() {
     dispatch("toggleMinimize", { id: exec.id });
   }
@@ -156,15 +198,18 @@
 </script>
 
 <Card
-  class="pointer-events-auto transition-all duration-300 flex flex-col bg-card/95 dark:bg-[#141b2b]/95 border-border/50 dark:border-border/80 shadow-2xl rounded-2xl overflow-hidden
+  class="pointer-events-auto flex flex-col bg-card/95 dark:bg-[#141b2b]/95 border-border/50 dark:border-border/80 shadow-2xl rounded-2xl overflow-hidden
+    {isDragging ? '' : 'transition-all duration-300'}
     {exec.isFullscreen
       ? 'fixed inset-10 z-[70] w-auto h-auto max-h-none max-w-none'
-      : `w-96 max-w-[calc(100vw-2rem)] fixed bottom-20 right-6 z-[60] ${exec.minimized ? 'h-auto' : 'h-[32rem]'}`}"
-  style={exec.isFullscreen ? "" : `margin-bottom: ${index * 12}px;`}
+      : `w-96 max-w-[calc(100vw-2rem)] fixed bottom-20 right-6 z-[60] ${exec.minimized ? 'h-auto' : 'h-[20rem]'}`}"
+  style={exec.isFullscreen ? "" : `margin-bottom: ${index * 12}px; transform: translate(${x}px, ${y}px);`}
 >
-  <!-- Card Header -->
-  <CardHeader
-    class="px-4 py-3 bg-muted/40 border-b border-border/50 flex flex-row items-center justify-between gap-3 shrink-0 space-y-0"
+  <div
+    on:pointerdown={handlePointerDown}
+    on:pointermove={handlePointerMove}
+    on:pointerup={handlePointerUp}
+    class="px-4 py-3 bg-muted/40 border-b border-border/50 flex flex-row items-center justify-between gap-3 shrink-0 space-y-0 cursor-grab active:cursor-grabbing select-none"
   >
     <div class="flex items-center gap-2 overflow-hidden flex-grow min-w-0">
       {#if exec.status === "running"}
@@ -251,11 +296,11 @@
         </Button>
       {/if}
     </div>
-  </CardHeader>
+  </div>
 
   <!-- Card Body (Only if expanded) -->
   {#if !exec.minimized}
-    <div class="flex-1 min-h-0 flex flex-col md:flex-row divide-y md:divide-y-0 md:divide-x divide-border/50">
+    <div class="flex-1 min-h-0 flex {exec.isFullscreen ? 'flex-col md:flex-row divide-y md:divide-y-0 md:divide-x divide-border/50' : 'flex-col'}">
       
       <!-- Left Pane: Tasks Checklist Widget -->
       <TaskChecklist
@@ -266,86 +311,87 @@
         on:selectStep={handleSelectStep}
       />
 
-      <!-- Right Pane: Step details & Terminal logs -->
-      <div class="flex-grow flex flex-col min-h-0 bg-background/20">
-        <!-- Right Pane Header -->
-        <div class="px-4 py-1.5 bg-muted/15 border-b border-border/50 flex items-center justify-between shrink-0 select-none">
-          <div class="flex items-center gap-2">
-            <span class="text-[9px] font-black uppercase tracking-wider text-muted-foreground">
+      <!-- Right Pane: Step details & Terminal logs (Only in Fullscreen) -->
+      {#if exec.isFullscreen}
+        <div class="flex-grow flex flex-col min-h-0 bg-background/20">
+          <!-- Right Pane Header -->
+          <div class="px-4 py-1.5 bg-muted/15 border-b border-border/50 flex items-center justify-between shrink-0 select-none">
+            <div class="flex items-center gap-2">
+              <span class="text-[9px] font-black uppercase tracking-wider text-muted-foreground">
+                {#if selectedStep}
+                  Step Inspector
+                {:else}
+                  API Details
+                {/if}
+              </span>
               {#if selectedStep}
-                Step Inspector
-              {:else}
-                API Details
+                <span class="w-1.5 h-1.5 rounded-full bg-cyan-500 animate-pulse"></span>
               {/if}
-            </span>
-            {#if selectedStep}
-              <span class="w-1.5 h-1.5 rounded-full bg-cyan-500 animate-pulse"></span>
-            {/if}
-          </div>
+            </div>
 
-          <div class="flex items-center gap-1.5">
-            <!-- Logs Toggle Button -->
-            <Button
-              variant="ghost"
-              size="xs"
-              class="text-[9px] font-black uppercase tracking-wider flex items-center gap-1.5 px-2 py-1 h-7 border border-border/20 rounded
-                {showLogs
-                  ? 'bg-accent text-accent-foreground border-border/60 shadow-sm font-bold'
-                  : 'text-muted-foreground hover:text-foreground bg-transparent font-medium border-transparent'}"
-              on:click={() => (showLogs = !showLogs)}
-            >
-              <span>Logs</span>
-              <span class="w-1.5 h-1.5 rounded-full {showLogs ? 'bg-emerald-500 shadow-[0_0_6px_rgba(16,185,129,0.5)]' : 'bg-zinc-500'}"></span>
-            </Button>
-
-            <!-- Download Report Button -->
-            {#if exec.status !== "running"}
+            <div class="flex items-center gap-1.5">
+              <!-- Logs Toggle Button -->
               <Button
                 variant="ghost"
                 size="xs"
-                class="text-[9px] font-bold text-muted-foreground hover:text-primary transition-colors flex items-center gap-1 h-7 px-2 border border-border/20 rounded-md"
-                on:click={downloadReport}
+                class="text-[9px] font-black uppercase tracking-wider flex items-center gap-1.5 px-2 py-1 h-7 border border-border/20 rounded
+                  {showLogs
+                    ? 'bg-accent text-accent-foreground border-border/60 shadow-sm font-bold'
+                    : 'text-muted-foreground hover:text-foreground bg-transparent font-medium border-transparent'}"
+                on:click={() => (showLogs = !showLogs)}
               >
-                <Download class="w-3 h-3" />
-                <span>Download Report</span>
+                <span>Logs</span>
+                <span class="w-1.5 h-1.5 rounded-full {showLogs ? 'bg-emerald-500 shadow-[0_0_6px_rgba(16,185,129,0.5)]' : 'bg-zinc-500'}"></span>
               </Button>
-            {/if}
 
-            <!-- Reset View Button -->
-            {#if selectedStep}
-              <Button
-                variant="ghost"
-                size="xs"
-                class="text-[9px] font-bold text-muted-foreground hover:text-rose-600 dark:hover:text-rose-400 transition-colors flex items-center gap-1 h-7 px-2"
-                on:click={() => (selectedStep = null)}
-              >
-                <X class="w-3 h-3" />
-                <span>Clear Selection</span>
-              </Button>
-            {/if}
+              <!-- Download Report Button -->
+              {#if exec.status !== "running"}
+                <Button
+                  variant="ghost"
+                  size="xs"
+                  class="text-[9px] font-bold text-muted-foreground hover:text-primary transition-colors flex items-center gap-1 h-7 px-2 border border-border/20 rounded-md"
+                  on:click={downloadReport}
+                >
+                  <Download class="w-3 h-3" />
+                  <span>Download Report</span>
+                </Button>
+              {/if}
+
+              <!-- Reset View Button -->
+              {#if selectedStep}
+                <Button
+                  variant="ghost"
+                  size="xs"
+                  class="text-[9px] font-bold text-muted-foreground hover:text-rose-600 dark:hover:text-rose-400 transition-colors flex items-center gap-1 h-7 px-2"
+                  on:click={() => (selectedStep = null)}
+                >
+                  <X class="w-3 h-3" />
+                  <span>Clear Selection</span>
+                </Button>
+              {/if}
+            </div>
           </div>
-        </div>
 
-        <!-- Right Pane Body: Split panels -->
-        <div class="flex-grow flex flex-col md:flex-row divide-y md:divide-y-0 md:divide-x divide-border/50 min-h-0">
-          
-          <!-- Step Inspector Panel -->
-          <StepInspector
-            step={selectedStep ? (exec.plan[selectedStep.taskIndex]?.steps[selectedStep.stepIndex] || null) : null}
-          />
-
-          <!-- Logs Terminal Panel -->
-          {#if showLogs}
-            <LogsTerminal
-              logs={exec.logs}
-              currentTask={exec.currentTask}
-              currentStep={exec.currentStep}
-              status={exec.status}
-              isFullscreen={exec.isFullscreen}
+          <div class="flex-grow flex {exec.isFullscreen ? 'flex-col md:flex-row divide-y md:divide-y-0 md:divide-x' : 'flex-col divide-y'} divide-border/50 min-h-0">
+            
+            <!-- Step Inspector Panel -->
+            <StepInspector
+              step={selectedStep ? (exec.plan[selectedStep.taskIndex]?.steps[selectedStep.stepIndex] || null) : null}
             />
-          {/if}
+
+            <!-- Logs Terminal Panel -->
+            {#if showLogs}
+              <LogsTerminal
+                logs={exec.logs}
+                currentTask={exec.currentTask}
+                currentStep={exec.currentStep}
+                status={exec.status}
+                isFullscreen={exec.isFullscreen}
+              />
+            {/if}
+          </div>
         </div>
-      </div>
+      {/if}
     </div>
 
     <!-- Interactive Prompt Input -->

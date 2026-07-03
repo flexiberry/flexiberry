@@ -187,13 +187,34 @@ Assertions inside the `Check` block allow you to validate response status codes,
 - **`$.body`:** Refers to the raw response body.
 - **`response.<path>`:** Resolves nested properties from the parsed JSON response payload (e.g. `response.data.id`).
 
-### 7.2 Variable Scopes & Hierarchy
+### 7.2 Response Path Resolution Syntax (Capture and Check)
+
+When extracting values in a `Capture` block or validating them in a `Check` block, the engine normalizes paths to prevent prefix conflicts:
+
+| Target | Recommended Syntax | Alternative / Legacy | Details |
+| :--- | :--- | :--- | :--- |
+| **HTTP Status Code** | `$.status` | `response.status` | Resolves to the HTTP response status integer (e.g., `200`). |
+| **HTTP Headers** | `$.headers.<name>` | `response.headers.<name>` | Resolves to the specified HTTP header value (case-insensitive). |
+| **Response Body** | `$.body` | `response.body` | Resolves to the deserialized response body (object or array). |
+| **Nested Body Property** | `$.body.id` | `response.body.id`, `response.id`, `$.id` | Resolves properties from the JSON response body. |
+| **Array Indexes** | `$.body.items.0.id` | `response.body.items.0.id` | Resolves index elements inside lists/arrays. |
+
+> [!IMPORTANT]
+> **Resolving Naming Conflicts in API Bodies**
+> If your API response body itself contains a field named `"status"` or `"headers"` (e.g., `{ "status": "active" }`), you **must** use the explicit **`$.body.status`** (or `response.body.status`) path syntax to access it. Using `$.status` or `response.status` is strictly reserved for the HTTP status code.
+
+### 7.3 Captured Variable Scope & Referencing
+When you capture a variable (e.g. `- id: $.body.id`):
+1. **Short Reference:** The variable is declared directly in the task scope as `id`, allowing you to reference it as `{{id}}` in subsequent steps or use it in the current step's checks as `id != null`.
+2. **Step Reference:** The variable is also declared as `Step.<index>.<key>` (e.g. `Step.1.id`) where `<index>` is the 1-based index of the step that captured it. This ensures you can access values uniquely across multiple steps even if they capture matching variable keys (e.g. `id == Step.1.id`).
+
+### 7.4 Variable Scopes & Hierarchy
 When resolving expressions and placeholders (`{{varName}}`), the engine searches in the following order:
 1. **Step Environment (`stepEnv`)**: Resolves step parameters and response properties (like `$.status` and `$.body`).
-2. **Task Environment (`taskEnv`)**: Resolves step outputs captured from previous steps using the syntax `Step.<Step-Index>.<Captured-Key>` (e.g. `Step.1.token`).
+2. **Task Environment (`taskEnv`)**: Resolves step outputs captured from previous steps using the syntax `Step.<Step-Index>.<Captured-Key>` (e.g. `Step.1.token`), as well as short-name variables.
 3. **Global Environment (`globalEnv`)**: Resolves variables defined in global `Var` blocks.
 
-### 7.3 Assertions (`Check`) Syntax
+### 7.5 Assertions (`Check`) Syntax
 The check block executes a list of assertions. All assertions must evaluate to `true` for the step to pass.
 
 #### Supported Operators
