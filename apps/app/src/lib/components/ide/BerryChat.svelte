@@ -81,8 +81,38 @@
       return;
     }
 
+    // Add Link
+    if (lower.includes("add link") || lower.includes("new link") || lower.includes("link block")) {
+      berryBlocks.update((blocks) => [
+        ...blocks,
+        {
+          id: createId(),
+          type: "Link",
+          content: "Link ",
+          viewMode: "wizard"
+        },
+      ]);
+      toast.success("Started Link Block Wizard");
+      return;
+    }
+
+    // Add Input
+    if (lower.includes("add input") || lower.includes("new input") || lower.includes("input block")) {
+      berryBlocks.update((blocks) => [
+        ...blocks,
+        {
+          id: createId(),
+          type: "Input",
+          content: "Input ",
+          viewMode: "wizard"
+        },
+      ]);
+      toast.success("Started Input Block Wizard");
+      return;
+    }
+
     toast.info(
-      "Command not recognized. Try 'Add API', 'Add Var', or paste cURL.",
+      "Command not recognized. Try 'Add API', 'Add Link', 'Add Input', or paste cURL.",
     );
   }
 

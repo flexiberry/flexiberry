@@ -3,6 +3,7 @@ import { BerryCore, InterpreterEvent, ExecutionCommand } from "@flexiberry/berry
 import { WebUIAdapter } from "./WebUIAdapter";
 import type { RunInstance, PlanTask, PlanStep } from "./execution.types";
 import { toast } from "svelte-sonner";
+import { db } from "$lib/db/db";
 
 export const executions = writable<RunInstance[]>([]);
 
@@ -20,7 +21,7 @@ function cleanupFetch() {
   });
 }
 
-export function runBerryFile(fileName: string, text: string) {
+export function runBerryFile(fileName: string, text: string, workspaceId: string = "default") {
   if (!text.trim()) {
     toast.error("Cannot run an empty file.");
     return;
@@ -71,7 +72,68 @@ export function runBerryFile(fileName: string, text: string) {
     });
   });
 
-  const core = new BerryCore(text, { adapter });
+  const core = new BerryCore(text, { 
+    adapter,
+    linkResolver: async (linkPath: string) => {
+      // 1. HTTP/HTTPS URLs
+      if (linkPath.startsWith("http://") || linkPath.startsWith("https://")) {
+        const response = await fetch(linkPath);
+        if (!response.ok) {
+          throw new Error(`Failed to fetch URL ${linkPath}: ${response.statusText}`);
+        }
+        return await response.text();
+      }
+
+      // 2. Local workspace files (folderName/fileName or fileName)
+      const parts = linkPath.split("/");
+      let lookupFolderId: string | null = null;
+      let lookupFileName = linkPath;
+
+      if (parts.length >= 2) {
+        const folderName = parts[0];
+        lookupFileName = parts[1];
+        
+        // Resolve folder ID from folder name
+        const allFolders = await db.folderTable
+          .where("workspaceId")
+          .equals(workspaceId)
+          .toArray();
+        const targetFolder = allFolders.find(
+          (f) => f.data?.[0]?.name?.toLowerCase() === folderName.toLowerCase()
+        );
+        if (targetFolder) {
+          lookupFolderId = targetFolder.id;
+        }
+      }
+
+      // Lookup file from db.fileStore
+      let record = await db.fileStore
+        .where("workspaceId")
+        .equals(workspaceId)
+        .and((f) => f.name === lookupFileName && (f.folderId ?? null) === (lookupFolderId ?? null))
+        .first();
+
+      // Fallback: name-only inside workspace
+      if (!record) {
+        record = await db.fileStore
+          .where("workspaceId")
+          .equals(workspaceId)
+          .and((f) => f.name === lookupFileName)
+          .first();
+      }
+
+      if (record?.data) {
+        return new Promise<string>((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onload = () => resolve(reader.result as string);
+          reader.onerror = reject;
+          reader.readAsText(record.data);
+        });
+      }
+
+      throw new Error(`Linked file '${linkPath}' not found in workspace.`);
+    }
+  });
 
   const newExecution: RunInstance = {
     id: executionId,

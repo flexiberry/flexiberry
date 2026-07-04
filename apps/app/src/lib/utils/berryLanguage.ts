@@ -4,7 +4,7 @@ import { tags } from "@lezer/highlight";
 export interface BerryState {
   inBacktickString: boolean;
   inInterpolation: boolean;
-  lineType: 'Api' | 'Var' | 'Step' | 'Task' | 'Url' | null;
+  lineType: 'Api' | 'Var' | 'Step' | 'Task' | 'Url' | 'Link' | 'Input' | null;
   apiHasName: boolean;
   varHasHeader: boolean;
 }
@@ -45,6 +45,10 @@ const streamLanguage = StreamLanguage.define<BerryState>({
         state.lineType = 'Task';
       } else if (stream.match(/^\s*(Url)\b/i, false)) {
         state.lineType = 'Url';
+      } else if (stream.match(/^\s*(Link)\b/i, false)) {
+        state.lineType = 'Link';
+      } else if (stream.match(/^\s*(Input)\b/i, false)) {
+        state.lineType = 'Input';
       }
     }
     
@@ -157,6 +161,22 @@ const streamLanguage = StreamLanguage.define<BerryState>({
       }
       stream.next();
       return "url";
+    }
+    
+    if (state.lineType === 'Link') {
+      if (stream.match(/^Link\b/i)) {
+        return "keyword";
+      }
+      stream.skipToEnd();
+      return "string";
+    }
+    
+    if (state.lineType === 'Input') {
+      if (stream.match(/^Input\b/i)) {
+        return "keyword";
+      }
+      stream.skipToEnd();
+      return "string";
     }
     
     // 7. General Keywords and Types

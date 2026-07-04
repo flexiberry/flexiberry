@@ -52,5 +52,21 @@
     >
       <Plus class="w-3.5 h-3.5" /> Task
     </Button>
+    <Button 
+      variant="outline" 
+      size="sm" 
+      class="h-7 px-3 text-xs font-medium rounded-full bg-card hover:bg-pink-500/10 hover:text-pink-500 hover:border-pink-500/30 border-border shadow-sm flex items-center gap-1.5"
+      on:click={(e) => { e.stopPropagation(); addBlock('Link'); }}
+    >
+      <Plus class="w-3.5 h-3.5" /> Link
+    </Button>
+    <Button 
+      variant="outline" 
+      size="sm" 
+      class="h-7 px-3 text-xs font-medium rounded-full bg-card hover:bg-teal-500/10 hover:text-teal-500 hover:border-teal-500/30 border-border shadow-sm flex items-center gap-1.5"
+      on:click={(e) => { e.stopPropagation(); addBlock('Input'); }}
+    >
+      <Plus class="w-3.5 h-3.5" /> Input
+    </Button>
   </div>
 </div>

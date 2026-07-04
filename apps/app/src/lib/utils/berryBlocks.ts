@@ -1,4 +1,4 @@
-export type BlockType = 'Env' | 'Var' | 'Task' | 'Api' | 'Step' | 'Code';
+export type BlockType = 'Env' | 'Var' | 'Task' | 'Api' | 'Step' | 'Code' | 'Link' | 'Input';
 
 export interface BerryBlock {
   id: string;
@@ -19,7 +19,7 @@ export function parseBerryBlocks(code: string): BerryBlock[] {
     const trimmed = line.trim();
     const isComment = trimmed.startsWith('##');
     const isBlank = trimmed === '';
-    const typeMatch = trimmed.match(/^(Env|Api|Var|Task|Step)\b/i);
+    const typeMatch = trimmed.match(/^(Env|Api|Var|Task|Step|Link|Input)\b/i);
     
     if (typeMatch) {
       if (currentBlock) {
@@ -31,7 +31,9 @@ export function parseBerryBlocks(code: string): BerryBlock[] {
       const type = typeStr === 'api' ? 'Api' : 
                    typeStr === 'var' ? 'Var' : 
                    typeStr === 'env' ? 'Env' :
-                   typeStr === 'step' ? 'Step' : 'Task';
+                   typeStr === 'step' ? 'Step' : 
+                   typeStr === 'link' ? 'Link' :
+                   typeStr === 'input' ? 'Input' : 'Task';
                    
       const content = pendingLines.length > 0
         ? pendingLines.join('\n') + '\n' + line

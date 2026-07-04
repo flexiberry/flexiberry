@@ -11,16 +11,22 @@
     CheckCircle, 
     Trash2, 
     Wand2,
-    ChevronDown
+    ChevronDown,
+    Link2,
+    FileSpreadsheet,
   } from "lucide-svelte";
   import type { BerryBlock } from "$lib/utils/berryBlocks";
   import InteractiveWizard from "./InteractiveWizard.svelte";
   import { berryLanguage, berryDarkTheme, berryLightTheme } from "$lib/utils/berryLanguage";
   import { berryBlocks } from "$lib/writable/berry.store";
+  import LinkBlock from "./LinkBlock.svelte";
+  import InputBlock from "./InputBlock.svelte";
 
   export let block: BerryBlock;
   export let index: number;
   export let allBlocks: BerryBlock[] = [];
+  export let workspaceId = "default";
+  export let currentFileName = "";
 
   const dispatch = createEventDispatcher();
 
@@ -50,6 +56,8 @@
     block.type === 'Var' ? Code :
     block.type === 'Env' ? Code :
     block.type === 'Step' ? CheckCircle :
+    block.type === 'Link' ? Link2 :
+    block.type === 'Input' ? FileSpreadsheet :
     block.type === 'Task' ? CheckCircle : Code;
     
   $: typeColor = 
@@ -57,6 +65,8 @@
     block.type === 'Var' ? 'text-purple-500 bg-purple-500/10' :
     block.type === 'Env' ? 'text-amber-500 bg-amber-500/10' :
     block.type === 'Step' ? 'text-rose-500 bg-rose-500/10' :
+    block.type === 'Link' ? 'text-pink-500 bg-pink-500/10' :
+    block.type === 'Input' ? 'text-teal-500 bg-teal-500/10' :
     block.type === 'Task' ? 'text-green-500 bg-green-500/10' : 'text-primary bg-primary/10';
 
   $: stepHeaderSummary = (() => {
@@ -208,13 +218,15 @@
           <Wand2 class="w-3.5 h-3.5" />
         </button>
       {/if}
-      <button 
-        class="w-7 h-7 flex items-center justify-center rounded text-muted-foreground hover:bg-primary/10 hover:text-primary transition-colors cursor-pointer"
-        title="Run Block"
-        on:click={handleRun}
-      >
-        <Play class="w-3.5 h-3.5" />
-      </button>
+      {#if block.type !== 'Link' && block.type !== 'Step' && block.type !== 'Input'}
+        <button 
+          class="w-7 h-7 flex items-center justify-center rounded text-muted-foreground hover:bg-primary/10 hover:text-primary transition-colors cursor-pointer"
+          title="Run Block"
+          on:click={handleRun}
+        >
+          <Play class="w-3.5 h-3.5" />
+        </button>
+      {/if}
       <button 
         class="w-7 h-7 flex items-center justify-center rounded text-muted-foreground hover:bg-destructive/10 hover:text-destructive transition-colors cursor-pointer"
         title="Delete Block"
@@ -234,11 +246,31 @@
       <div class="p-1 min-h-[40px] text-base">
         {#if block.viewMode === 'wizard' && block.type !== 'Code'}
           <div class="p-2">
-            <InteractiveWizard 
-              type={block.type} 
-              initialAnswers={wizardAnswers}
-              on:complete={handleWizardComplete} 
-            />
+            {#if block.type === 'Link'}
+              <LinkBlock
+                content={block.content}
+                {workspaceId}
+                {currentFileName}
+                onChange={(newVal) => {
+                  block.content = newVal;
+                }}
+              />
+            {:else if block.type === 'Input'}
+              <InputBlock
+                content={block.content}
+                {workspaceId}
+                {currentFileName}
+                onChange={(newVal) => {
+                  block.content = newVal;
+                }}
+              />
+            {:else}
+              <InteractiveWizard 
+                type={block.type} 
+                initialAnswers={wizardAnswers}
+                on:complete={handleWizardComplete} 
+              />
+            {/if}
           </div>
         {:else}
           <CodeMirror
