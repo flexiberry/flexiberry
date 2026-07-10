@@ -156,7 +156,26 @@
   }
 
   function handleDeleteBlock(e: CustomEvent<{ id: string }>) {
-    $berryBlocks = $berryBlocks.filter((b) => b.id !== e.detail.id);
+    const blockId = e.detail.id;
+    const idx = $berryBlocks.findIndex((b) => b.id === blockId);
+    if (idx === -1) return;
+
+    const block = $berryBlocks[idx];
+    if (block.type === "Task") {
+      let countToDelete = 1;
+      for (let i = idx + 1; i < $berryBlocks.length; i++) {
+        if ($berryBlocks[i].type === "Step") {
+          countToDelete++;
+        } else {
+          break;
+        }
+      }
+      const newBlocks = [...$berryBlocks];
+      newBlocks.splice(idx, countToDelete);
+      $berryBlocks = newBlocks;
+    } else {
+      $berryBlocks = $berryBlocks.filter((b) => b.id !== blockId);
+    }
   }
 
   function handleRunBlock(e: CustomEvent<{ id: string }>) {
@@ -179,6 +198,12 @@
     const newBlocks = [...$berryBlocks];
     newBlocks.splice(index, 0, newBlock);
     $berryBlocks = newBlocks;
+  }
+
+  function canShowStep(idx: number, blocks: BerryBlock[]) {
+    if (idx === 0) return false;
+    const prevBlock = blocks[idx - 1];
+    return prevBlock && (prevBlock.type === 'Task' || prevBlock.type === 'Step');
   }
 
   function playClickSound() {
@@ -758,7 +783,7 @@
       <div class="w-full max-w-4xl mx-auto pb-32 px-4 flex flex-col">
         {#if activeFilter === null}
           {#each $berryBlocks as block, i (block.id)}
-            <BlockAdder index={i} on:add={handleInsertBlock} />
+            <BlockAdder index={i} showStep={canShowStep(i, $berryBlocks)} on:add={handleInsertBlock} />
             <BerryBlockComponent
               bind:block
               index={i}
@@ -771,7 +796,7 @@
           {/each}
 
           <!-- Final Adder at the bottom -->
-          <BlockAdder index={$berryBlocks.length} on:add={handleInsertBlock} />
+          <BlockAdder index={$berryBlocks.length} showStep={canShowStep($berryBlocks.length, $berryBlocks)} on:add={handleInsertBlock} />
         {:else}
           {#each $berryBlocks.filter((b) => b.type === activeFilter) as block, i (block.id)}
             <div class="mb-4">

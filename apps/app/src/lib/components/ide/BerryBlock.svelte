@@ -14,6 +14,7 @@
     ChevronDown,
     Link2,
     FileSpreadsheet,
+    Plus,
   } from "lucide-svelte";
   import type { BerryBlock } from "$lib/utils/berryBlocks";
   import InteractiveWizard from "./InteractiveWizard.svelte";
@@ -48,6 +49,25 @@
     block.content = e.detail.code;
     block.viewMode = 'code';
     wizardAnswers = e.detail.answers;
+
+    if (block.type === "Task") {
+      // Auto-insert a new Step block directly after the Task block
+      berryBlocks.update((blocks) => {
+        const myIndex = blocks.findIndex((b) => b.id === block.id);
+        if (myIndex === -1) return blocks;
+
+        const newStepBlock: BerryBlock = {
+          id: Math.random().toString(36).substr(2, 9),
+          type: "Step",
+          content: "",
+          viewMode: "wizard",
+        };
+
+        const newBlocks = [...blocks];
+        newBlocks.splice(myIndex + 1, 0, newStepBlock);
+        return newBlocks;
+      });
+    }
   }
 
   // Icons based on block type
@@ -150,6 +170,20 @@
         });
       });
     }
+  }
+
+  function addStepToTask() {
+    berryBlocks.update(blocks => {
+      const newStepBlock: BerryBlock = {
+        id: Math.random().toString(36).substr(2, 9),
+        type: 'Step',
+        content: 'Step Call Api new_step',
+        viewMode: 'wizard',
+      };
+      const updated = [...blocks];
+      updated.splice(index + 1, 0, newStepBlock);
+      return updated;
+    });
   }
 </script>
 
@@ -265,10 +299,11 @@
                 }}
               />
             {:else}
-              <InteractiveWizard 
-                type={block.type} 
+              <InteractiveWizard
+                type={block.type}
+                blockId={block.id}
                 initialAnswers={wizardAnswers}
-                on:complete={handleWizardComplete} 
+                on:complete={handleWizardComplete}
               />
             {/if}
           </div>
@@ -307,22 +342,35 @@
   {/if}
 
   <!-- Task Steps Footer (always visible for Tasks) -->
-  {#if block.type === 'Task' && associatedSteps.length > 0}
+  {#if block.type === 'Task'}
     <div class="border-t border-border/20 bg-muted/5 px-4 py-2.5 rounded-b-xl flex flex-col gap-1.5">
-      <span class="text-[9px] font-extrabold text-muted-foreground/60 uppercase tracking-widest">
-        Flow Steps:
-      </span>
-      <div class="flex flex-wrap gap-1.5">
-        {#each associatedSteps as step}
+      {#if associatedSteps.length > 0}
+        <span class="text-[9px] font-extrabold text-muted-foreground/60 uppercase tracking-widest">
+          Flow Steps:
+        </span>
+        <div class="flex flex-wrap gap-1.5">
+          {#each associatedSteps as step}
+            <button
+              class="flex items-center gap-1.5 px-3 py-1 text-xs rounded-full border bg-background hover:bg-muted text-foreground font-mono transition-all shadow-sm hover:shadow-md hover:border-primary/30 active:scale-95 cursor-pointer"
+              on:click={() => scrollToAndExpandStep(step.id)}
+            >
+              <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+              {step.name}
+            </button>
+          {/each}
+        </div>
+      {:else}
+        <div class="flex items-center justify-between">
+          <span class="text-[10px] text-muted-foreground/60 font-medium italic">No steps defined</span>
           <button
-            class="flex items-center gap-1.5 px-3 py-1 text-xs rounded-full border bg-background hover:bg-muted text-foreground font-mono transition-all shadow-sm hover:shadow-md hover:border-primary/30 active:scale-95 cursor-pointer"
-            on:click={() => scrollToAndExpandStep(step.id)}
+            class="flex items-center gap-1 px-3 py-1 text-xs rounded-full border border-dashed border-border hover:bg-muted hover:border-primary/30 text-foreground transition-all cursor-pointer font-medium active:scale-95"
+            on:click={addStepToTask}
           >
-            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
-            {step.name}
+            <Plus class="w-3.5 h-3.5" />
+            Add Step
           </button>
-        {/each}
-      </div>
+        </div>
+      {/if}
     </div>
   {/if}
 </div>

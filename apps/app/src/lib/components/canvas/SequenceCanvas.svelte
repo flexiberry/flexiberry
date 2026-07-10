@@ -245,7 +245,7 @@
           <!-- Horizontal Runway Bar (Subtle Track) -->
           <div
             class="absolute top-[40px] left-[80px] h-[100px] border-y border-border/60 dark:border-white/5 bg-card/50 dark:bg-white/[0.02] backdrop-blur-md z-0 shadow-sm dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.05)]"
-            style="width: calc(200px + {task.steps.length * 380}px + 200px);"
+            style="width: calc(200px + {task.steps.length * 380}px + {task.steps.length > 0 ? 200 : 0}px);"
           >
             <div
               class="absolute top-1/2 left-0 w-full h-[1px] bg-border/20 dark:bg-white/[0.02] -translate-y-1/2"
@@ -253,8 +253,14 @@
           </div>
 
           <!-- Start Node -->
-          <div class="relative z-10">
+          <div class="relative z-10 flex flex-col items-center">
             <TaskBlock node={task} on:change={() => (tasks = tasks)} />
+            {#if task.steps.length === 0}
+              <!-- Connection line down to Add Step Button -->
+              <div class="w-[2px] h-[25px] bg-border/40 my-1"></div>
+              <!-- Add Step Button / Block -->
+              <AddStepButton on:click={() => addStep(taskIdx)} />
+            {/if}
             {#if task.steps.length > 0}
               <div
                 class="absolute top-[50px] -right-[100px] w-[100px] h-[2px] bg-border/40 flex items-center justify-center"
@@ -282,9 +288,11 @@
           {/each}
 
           <!-- Add Step Button for this task -->
-          <div class="relative z-10 ml-[100px] pt-[20px]">
-            <AddStepButton on:click={() => addStep(taskIdx)} />
-          </div>
+          {#if task.steps.length > 0}
+            <div class="relative z-10 ml-[100px] pt-[20px]">
+              <AddStepButton on:click={() => addStep(taskIdx)} />
+            </div>
+          {/if}
         </div>
       </div>
     {/each}

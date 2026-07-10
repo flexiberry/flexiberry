@@ -1,17 +1,39 @@
 <script lang="ts">
-  import type { TaskBlockNode } from "@flexiberry/berrycore";
+  import { NodeType, type TaskBlockNode, type StepBlockNode } from "@flexiberry/berrycore";
   import * as Dialog from "$lib/components/ui/dialog";
   import { Input } from "$lib/components/ui/input";
-  import { PlayCircle } from "lucide-svelte";
+  import { Button } from "$lib/components/ui/button";
+  import { PlayCircle, Plus } from "lucide-svelte";
   import { createEventDispatcher } from "svelte";
 
   export let node: TaskBlockNode;
   const dispatch = createEventDispatcher();
 
+  let newStepCallType = "Call";
+  let newStepTargetType = "Api";
+  let newStepTargetName = "";
+
   function handleTitleInput(e: Event) {
     const target = e.currentTarget as HTMLInputElement;
     (node as any).title = target.value;
     dispatch("change");
+  }
+
+  function addFirstStep() {
+    if (!newStepTargetName.trim()) return;
+    const newStep: StepBlockNode = {
+      type: NodeType.StepBlock,
+      position: { line: 0, column: 0 },
+      callType: newStepCallType,
+      targetType: newStepTargetType,
+      targetName: newStepTargetName.trim(),
+      params: null,
+      capture: null,
+      check: null,
+    };
+    (node as any).steps = [newStep];
+    dispatch("change");
+    newStepTargetName = "";
   }
 </script>
 
@@ -76,6 +98,52 @@
             class="h-10 bg-background border-border text-foreground rounded-lg focus:ring-emerald-500/30"
           />
         </div>
+
+        {#if !node.steps || node.steps.length === 0}
+          <div class="space-y-3 pt-3 border-t border-border/40">
+            <span class="text-[10px] font-bold text-muted-foreground uppercase tracking-widest block ml-1">Add First Step Details</span>
+            
+            <div class="grid grid-cols-2 gap-2">
+              <div class="space-y-1">
+                <label for="stepCallType" class="text-[9px] font-bold text-muted-foreground uppercase tracking-widest block ml-0.5">Process (e.g. Call)</label>
+                <Input
+                  id="stepCallType"
+                  bind:value={newStepCallType}
+                  placeholder="Call"
+                  class="h-9 bg-background border-border text-foreground rounded-lg focus:ring-emerald-500/30 text-xs font-medium"
+                />
+              </div>
+              <div class="space-y-1">
+                <label for="stepTargetType" class="text-[9px] font-bold text-muted-foreground uppercase tracking-widest block ml-0.5">Type (e.g. Api)</label>
+                <Input
+                  id="stepTargetType"
+                  bind:value={newStepTargetType}
+                  placeholder="Api"
+                  class="h-9 bg-background border-border text-foreground rounded-lg focus:ring-emerald-500/30 text-xs font-medium"
+                />
+              </div>
+            </div>
+
+            <div class="space-y-1">
+              <label for="stepTargetName" class="text-[9px] font-bold text-muted-foreground uppercase tracking-widest block ml-0.5">Target Name</label>
+              <Input
+                id="stepTargetName"
+                bind:value={newStepTargetName}
+                placeholder="e.g. getUserProfile"
+                class="h-9 bg-background border-border text-foreground rounded-lg focus:ring-emerald-500/30 text-xs font-bold"
+              />
+            </div>
+
+            <Button
+              size="sm"
+              class="w-full bg-violet-600 hover:bg-violet-700 text-white font-bold h-9 mt-2 flex items-center justify-center gap-1.5"
+              on:click={addFirstStep}
+              disabled={!newStepTargetName.trim()}
+            >
+              <Plus class="w-3.5 h-3.5" /> Add First Step
+            </Button>
+          </div>
+        {/if}
       </div>
     </div>
   </Dialog.Content>

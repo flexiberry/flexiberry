@@ -1,74 +1,79 @@
-import { StreamLanguage, LanguageSupport, HighlightStyle, syntaxHighlighting } from "@codemirror/language";
+import {
+  StreamLanguage,
+  LanguageSupport,
+  HighlightStyle,
+  syntaxHighlighting,
+} from "@codemirror/language";
 import { tags } from "@lezer/highlight";
 
 export interface BerryState {
   inBacktickString: boolean;
   inInterpolation: boolean;
-  lineType: 'Api' | 'Var' | 'Step' | 'Task' | 'Url' | 'Link' | 'Input' | null;
+  lineType: "Api" | "Var" | "Step" | "Task" | "Url" | "Link" | "Input" | null;
   apiHasName: boolean;
   varHasHeader: boolean;
 }
 
 const streamLanguage = StreamLanguage.define<BerryState>({
   name: "berry",
-  
+
   startState() {
     return {
       inBacktickString: false,
       inInterpolation: false,
       lineType: null,
       apiHasName: false,
-      varHasHeader: false
+      varHasHeader: false,
     };
   },
-  
+
   token(stream, state) {
     // 1. Handle spaces
     if (stream.eatSpace()) {
       return null;
     }
-    
+
     // Reset line state at sol
     if (stream.sol()) {
       state.lineType = null;
       state.apiHasName = false;
       state.varHasHeader = false;
-      
+
       // Peek ahead to detect line type
       if (stream.match(/^\s*(Api)\b/i, false)) {
-        state.lineType = 'Api';
+        state.lineType = "Api";
       } else if (stream.match(/^\s*(Var)\b/i, false)) {
-        state.lineType = 'Var';
+        state.lineType = "Var";
       } else if (stream.match(/^\s*(Step)\b/i, false)) {
-        state.lineType = 'Step';
+        state.lineType = "Step";
       } else if (stream.match(/^\s*(Task)\b/i, false)) {
-        state.lineType = 'Task';
+        state.lineType = "Task";
       } else if (stream.match(/^\s*(Url)\b/i, false)) {
-        state.lineType = 'Url';
+        state.lineType = "Url";
       } else if (stream.match(/^\s*(Link)\b/i, false)) {
-        state.lineType = 'Link';
+        state.lineType = "Link";
       } else if (stream.match(/^\s*(Input)\b/i, false)) {
-        state.lineType = 'Input';
+        state.lineType = "Input";
       }
     }
-    
+
     // 2. Handle backtick multiline strings
     if (state.inBacktickString) {
       while (!stream.eol()) {
-        if (stream.next() === '`') {
+        if (stream.next() === "`") {
           state.inBacktickString = false;
           break;
         }
       }
       return "string";
     }
-    
-    if (stream.peek() === '`') {
+
+    if (stream.peek() === "`") {
       stream.next();
       state.inBacktickString = true;
       return "string";
     }
-    
+
     // 3. Handle interpolation {{ ... }}
     if (state.inInterpolation) {
       if (stream.match(/^}}/)) {
@@ -76,24 +81,27 @@ const streamLanguage = StreamLanguage.define<BerryState>({
         return "punctuation";
       }
       // Highlight variables inside {{ }}
-      if (stream.match(/^\$[a-zA-Z0-9_$.-]+/) || stream.match(/^[a-zA-Z_][a-zA-Z0-9_$.-]*/)) {
+      if (
+        stream.match(/^\$[a-zA-Z0-9_$.-]+/) ||
+        stream.match(/^[a-zA-Z_][a-zA-Z0-9_$.-]*/)
+      ) {
         return "variable";
       }
       stream.next();
       return "meta";
     }
-    
+
     if (stream.match(/^{{/)) {
       state.inInterpolation = true;
       return "punctuation";
     }
-    
+
     // 4. Handle comments starting with ##
     if (stream.match(/^##/)) {
       stream.skipToEnd();
       return "comment";
     }
-    
+
     // 5. Handle strings
     // Double-quoted strings
     if (stream.match(/^"([^"\\]|\\.)*"/)) {
@@ -111,9 +119,9 @@ const streamLanguage = StreamLanguage.define<BerryState>({
       stream.next();
       return "string";
     }
-    
+
     // 6. Line type parsing
-    if (state.lineType === 'Api') {
+    if (state.lineType === "Api") {
       if (stream.match(/^Api\b/i)) {
         return "keyword";
       }
@@ -132,8 +140,8 @@ const streamLanguage = StreamLanguage.define<BerryState>({
         return "string";
       }
     }
-    
-    if (state.lineType === 'Var') {
+
+    if (state.lineType === "Var") {
       if (stream.match(/^Var\b/i)) {
         state.varHasHeader = true;
         return "keyword";
@@ -147,8 +155,8 @@ const streamLanguage = StreamLanguage.define<BerryState>({
         return "string";
       }
     }
-    
-    if (state.lineType === 'Url') {
+
+    if (state.lineType === "Url") {
       if (stream.match(/^Url\b/i)) {
         return "keyword";
       }
@@ -162,76 +170,80 @@ const streamLanguage = StreamLanguage.define<BerryState>({
       stream.next();
       return "url";
     }
-    
-    if (state.lineType === 'Link') {
+
+    if (state.lineType === "Link") {
       if (stream.match(/^Link\b/i)) {
         return "keyword";
       }
       stream.skipToEnd();
       return "string";
     }
-    
-    if (state.lineType === 'Input') {
+
+    if (state.lineType === "Input") {
       if (stream.match(/^Input\b/i)) {
         return "keyword";
       }
       stream.skipToEnd();
       return "string";
     }
-    
+
     // 7. General Keywords and Types
-    const keywords = /^(Var|Api|Env|Task|Step|Link|Input|Skip|Body|Url|Header|Params|Capture|Check)\b/i;
+    const keywords =
+      /^(Var|Api|Env|Task|Step|Link|Input|Skip|Body|Url|Header|Params|Capture|Check)\b/i;
     if (stream.match(keywords)) {
       return "keyword";
     }
-    
+
     if (stream.match(/^(Call|CALL)\b/)) {
       return "keyword";
     }
-    
+
     // 8. Operators and Constants
     const operators = /^(==|!=|<=|>=|<|>|OR|Or|or|AND|And|and)\b/;
     if (stream.match(operators) || stream.match(/^[\+\-\*\/=<>!]+/)) {
       return "operator";
     }
-    
+
     const constants = /^(null|true|false)\b/i;
     if (stream.match(constants)) {
       return "atom";
     }
-    
+
     // 9. Pointers and variables
     if (stream.match(/^@[a-zA-Z0-9_\-]+/)) {
       return "variable-2";
     }
-    if (stream.match(/^\$[a-zA-Z0-9_$.-]+/) || stream.match(/^[a-zA-Z_][a-zA-Z0-9_$.-]*/)) {
+    if (
+      stream.match(/^\$[a-zA-Z0-9_$.-]+/) ||
+      stream.match(/^[a-zA-Z_][a-zA-Z0-9_$.-]*/)
+    ) {
       return "variable";
     }
-    
+
     // 10. List-item hyphen and Key-value/Check properties
     if (stream.sol() && stream.match(/^\s*-\s*/)) {
       return "punctuation";
     }
-    
+
     // Check if we are at a key-value property name (e.g. `key:` or `"key":` or `'key':`)
     if (stream.match(/^(['"][^'"]+['"]|[a-zA-Z0-9_\-]+)\s*:/, false)) {
       stream.match(/^(['"][^'"]+['"]|[a-zA-Z0-9_\-]+)/);
       return "property";
     }
-    
+
     if (stream.match(/^:/)) {
       return "punctuation";
     }
-    
+
     // 11. Numbers
     if (stream.match(/^\d+(\.\d+)?\b/)) {
       return "number";
     }
-    
+
     // 12. Fallback
     stream.next();
     return null;
-  }
+  },
 });
 
 export const berryLanguage = new LanguageSupport(streamLanguage);
@@ -246,12 +258,15 @@ export const berryDarkHighlightStyle = HighlightStyle.define([
   { tag: tags.atom, color: "#f38ba8" },
   { tag: tags.variableName, color: "#cdd6f4" },
   { tag: tags.definition(tags.variableName), color: "#f38ba8" },
-  { tag: [tags.special(tags.variableName), tags.typeName, tags.className], color: "#f38ba8" }, // pointers @target
+  {
+    tag: [tags.special(tags.variableName), tags.typeName, tags.className],
+    color: "#f38ba8",
+  }, // pointers @target
   { tag: tags.propertyName, color: "#89b4fa" }, // keys in key-value pairs
   { tag: tags.operator, color: "#89dceb" },
   { tag: tags.punctuation, color: "#f38ba8" }, // hyphen, colon, braces
   { tag: tags.meta, color: "#cba6f7" },
-  { tag: tags.url, color: "#78ca70", fontStyle: "italic bold underline" }
+  { tag: tags.url, color: "#78ca70", fontStyle: "italic bold underline" },
 ]);
 
 // Custom Highlight Styles matching VS Code Extension (Catppuccin Latte colors for Light mode)
@@ -264,12 +279,15 @@ export const berryLightHighlightStyle = HighlightStyle.define([
   { tag: tags.atom, color: "#d20f39" },
   { tag: tags.variableName, color: "#4c4f69" },
   { tag: tags.definition(tags.variableName), color: "#d20f39" },
-  { tag: [tags.special(tags.variableName), tags.typeName, tags.className], color: "#d20f39" },
+  {
+    tag: [tags.special(tags.variableName), tags.typeName, tags.className],
+    color: "#d20f39",
+  },
   { tag: tags.propertyName, color: "#1e66f5" },
   { tag: tags.operator, color: "#179287" },
   { tag: tags.punctuation, color: "#d20f39" },
   { tag: tags.meta, color: "#8839ef" },
-  { tag: tags.url, color: "#40a02b", fontStyle: "italic bold underline" }
+  { tag: tags.url, color: "#40a02b", fontStyle: "italic bold underline" },
 ]);
 
 export const berryDarkTheme = syntaxHighlighting(berryDarkHighlightStyle);

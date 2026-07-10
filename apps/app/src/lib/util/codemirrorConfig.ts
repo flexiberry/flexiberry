@@ -52,7 +52,7 @@ export const apiDetectorPlugin = ViewPlugin.fromClass(
   },
   {
     decorations: (v) => v.decorations,
-  }
+  },
 );
 
 // export const myCustomLanguageSupport = new LanguageSupport(customLanguage);

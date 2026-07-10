@@ -3,12 +3,10 @@
   "name": "flexiberryapp",
   "compatibility_date": "2026-05-19",
   "observability": {
-    "enabled": false
+    "enabled": false,
   },
   "assets": {
-    "directory": "build"
+    "directory": "build",
   },
-  "compatibility_flags": [
-    "nodejs_compat"
-  ]
+  "compatibility_flags": ["nodejs_compat"],
 }

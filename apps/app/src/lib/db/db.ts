@@ -62,10 +62,16 @@ db.version(2)
     }
 
     // Tag all existing folders with the default workspace
-    await tx.table("folderTable").toCollection().modify({ workspaceId: "default" });
+    await tx
+      .table("folderTable")
+      .toCollection()
+      .modify({ workspaceId: "default" });
 
     // Tag all existing files with the default workspace
-    await tx.table("fileStore").toCollection().modify({ workspaceId: "default" });
+    await tx
+      .table("fileStore")
+      .toCollection()
+      .modify({ workspaceId: "default" });
   });
 
 export { db };
