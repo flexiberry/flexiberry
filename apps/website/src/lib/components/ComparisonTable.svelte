@@ -7,12 +7,24 @@
   let sectionRevealed = $state(false);
 
   const features = [
-    { name: "API Testing as Code", flexi: "yes", postman: "partial", bruno: "yes" },
-    { name: "Sequential Workflows", flexi: "yes", postman: "partial", bruno: "partial" },
+    {
+      name: "API Testing as Code",
+      flexi: "yes",
+      postman: "partial",
+      bruno: "yes",
+    },
+    {
+      name: "Sequential Workflows",
+      flexi: "yes",
+      postman: "partial",
+      bruno: "partial",
+    },
     { name: "CLI Native", flexi: "yes", postman: "partial", bruno: "yes" },
+    { name: "Web IDE", flexi: "yes", postman: "yes", bruno: "no" },
     { name: "VS Code Extension", flexi: "yes", postman: "no", bruno: "yes" },
     { name: "Load Testing", flexi: "yes", postman: "no", bruno: "no" },
-    { name: "Berry Language", flexi: "yes", postman: "no", bruno: "no" },
+    { name: "Custom Language", flexi: "yes", postman: "no", bruno: "no" },
+    { name: "Git Support", flexi: "yes", postman: "no", bruno: "Yes" },
   ];
 
   onMount(() => {
@@ -23,7 +35,7 @@
           io.disconnect();
         }
       },
-      { threshold: 0.1 }
+      { threshold: 0.1 },
     );
     if (sectionEl) io.observe(sectionEl);
     return () => io.disconnect();
@@ -57,11 +69,21 @@
           {#each features as feat}
             <tr>
               <td class="feature-name">{feat.name}</td>
-              
+
               <!-- Flexiberry Col -->
               <td class="brand-val flexi-val">
                 <span class="indicator-wrap success-glow">
-                  <svg class="icon-check" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                  <svg
+                    class="icon-check"
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="3"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
                     <polyline points="20 6 9 17 4 12" />
                   </svg>
                   <span class="val-text">Yes</span>
@@ -72,8 +94,20 @@
               <td class="brand-val">
                 {#if feat.postman === "partial"}
                   <span class="indicator-wrap warning-glow">
-                    <svg class="icon-warning" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                      <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />
+                    <svg
+                      class="icon-warning"
+                      width="16"
+                      height="16"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2.5"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    >
+                      <path
+                        d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"
+                      />
                       <line x1="12" y1="9" x2="12" y2="13" />
                       <line x1="12" y1="17" x2="12.01" y2="17" />
                     </svg>
@@ -81,8 +115,23 @@
                   </span>
                 {:else}
                   <span class="indicator-wrap danger-glow">
-                    <svg class="icon-close" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
-                      <line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" />
+                    <svg
+                      class="icon-close"
+                      width="14"
+                      height="14"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="3"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    >
+                      <line x1="18" y1="6" x2="6" y2="18" /><line
+                        x1="6"
+                        y1="6"
+                        x2="18"
+                        y2="18"
+                      />
                     </svg>
                     <span class="val-text">No</span>
                   </span>
@@ -93,15 +142,37 @@
               <td class="brand-val">
                 {#if feat.bruno === "yes"}
                   <span class="indicator-wrap success-glow">
-                    <svg class="icon-check" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                    <svg
+                      class="icon-check"
+                      width="16"
+                      height="16"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="3"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    >
                       <polyline points="20 6 9 17 4 12" />
                     </svg>
                     <span class="val-text">Yes</span>
                   </span>
                 {:else if feat.bruno === "partial"}
                   <span class="indicator-wrap warning-glow">
-                    <svg class="icon-warning" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                      <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />
+                    <svg
+                      class="icon-warning"
+                      width="16"
+                      height="16"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2.5"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    >
+                      <path
+                        d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"
+                      />
                       <line x1="12" y1="9" x2="12" y2="13" />
                       <line x1="12" y1="17" x2="12.01" y2="17" />
                     </svg>
@@ -109,8 +180,23 @@
                   </span>
                 {:else}
                   <span class="indicator-wrap danger-glow">
-                    <svg class="icon-close" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
-                      <line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" />
+                    <svg
+                      class="icon-close"
+                      width="14"
+                      height="14"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="3"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    >
+                      <line x1="18" y1="6" x2="6" y2="18" /><line
+                        x1="6"
+                        y1="6"
+                        x2="18"
+                        y2="18"
+                      />
                     </svg>
                     <span class="val-text">No</span>
                   </span>
@@ -136,12 +222,16 @@
     position: absolute;
     inset: 0;
     z-index: 0;
-    background-image: 
+    background-image:
       linear-gradient(rgba(52, 211, 153, 0.008) 1px, transparent 1px),
       linear-gradient(90deg, rgba(52, 211, 153, 0.008) 1px, transparent 1px);
     background-size: 50px 50px;
     mask-image: radial-gradient(circle at 50% 50%, black, transparent 85%);
-    -webkit-mask-image: radial-gradient(circle at 50% 50%, black, transparent 85%);
+    -webkit-mask-image: radial-gradient(
+      circle at 50% 50%,
+      black,
+      transparent 85%
+    );
     pointer-events: none;
   }
   .comp-inner {
@@ -152,7 +242,9 @@
     padding: 0 2rem;
     opacity: 0;
     transform: translateY(30px);
-    transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+    transition:
+      opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1),
+      transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
   }
   .comp-inner.visible {
     opacity: 1;
@@ -189,7 +281,8 @@
     color: #fff;
     letter-spacing: -0.02em;
     margin: 0 0 3.5rem;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-family:
+      -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   }
   .h-accent {
     background: linear-gradient(135deg, #34d399, #38bdf8);
@@ -213,10 +306,12 @@
     width: 100%;
     border-collapse: collapse;
     text-align: left;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-family:
+      -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   }
-  
-  th, td {
+
+  th,
+  td {
     padding: 1.2rem 1.5rem;
     border-bottom: 1px solid rgba(255, 255, 255, 0.04);
   }
@@ -240,7 +335,7 @@
     color: #34d399;
     background: rgba(52, 211, 153, 0.02);
   }
-  
+
   .feature-name {
     font-weight: 600;
     font-size: 0.92rem;
@@ -253,7 +348,7 @@
   .flexi-val {
     background: rgba(52, 211, 153, 0.01);
   }
-  
+
   /* Status Indicators */
   .indicator-wrap {
     display: inline-flex;
@@ -266,7 +361,7 @@
     font-size: 0.72rem;
     font-family: "JetBrains Mono", monospace;
   }
-  
+
   .success-glow {
     background: rgba(52, 211, 153, 0.06);
     border: 1px solid rgba(52, 211, 153, 0.15);
@@ -283,7 +378,7 @@
     border: 1px solid rgba(239, 68, 68, 0.12);
     color: #f87171;
   }
-  
+
   .icon-check {
     stroke-width: 3.5px;
   }

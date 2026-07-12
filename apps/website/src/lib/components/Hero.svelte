@@ -198,8 +198,10 @@
 
       <!-- Bold Gradient Headline -->
       <h1 class="hero-heading">
-        API Testing as Code. <br />
-        <span class="heading-gradient">Chain workflows, not collections.</span>
+        The Declarative HTTP Client. <br />
+        <span class="heading-gradient"
+          >Write your API sequences, run them anywhere.</span
+        >
       </h1>
 
       <!-- Description -->
@@ -798,7 +800,7 @@
   }
 
   .hero-heading {
-    font-size: clamp(2.4rem, 4.8vw, 3.8rem);
+    font-size: clamp(2rem, 4.2vw, 3rem);
     font-weight: 800;
     line-height: 1.1;
     color: #fff;
