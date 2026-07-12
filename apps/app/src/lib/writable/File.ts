@@ -65,7 +65,11 @@ export async function getFile(ctx: FileContext): Promise<string> {
   let record = await db.fileStore
     .where("workspaceId")
     .equals(ctx.workspaceId)
-    .and((f) => f.name === ctx.fileName && (f.folderId ?? null) === (ctx.folderId ?? null))
+    .and(
+      (f) =>
+        f.name === ctx.fileName &&
+        (f.folderId ?? null) === (ctx.folderId ?? null),
+    )
     .first();
 
   // Fallback 1: Fallback to name-only within workspace (if folder movement happened)
@@ -90,12 +94,19 @@ export async function getFile(ctx: FileContext): Promise<string> {
 
 // ─── Save / overwrite a file (workspace-aware) ───────────────────
 
-export async function saveFile(ctx: FileContext, fileBlob: Blob): Promise<void> {
+export async function saveFile(
+  ctx: FileContext,
+  fileBlob: Blob,
+): Promise<void> {
   // 1. Try to find the existing exact record to get its primary key (id)
   const existing = await db.fileStore
     .where("workspaceId")
     .equals(ctx.workspaceId)
-    .and((f) => f.name === ctx.fileName && (f.folderId ?? null) === (ctx.folderId ?? null))
+    .and(
+      (f) =>
+        f.name === ctx.fileName &&
+        (f.folderId ?? null) === (ctx.folderId ?? null),
+    )
     .first();
 
   const fileData = {

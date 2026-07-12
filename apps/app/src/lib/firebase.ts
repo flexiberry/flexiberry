@@ -8,7 +8,7 @@ import {
   PUBLIC_FIREBASE_STORAGE_BUCKET,
   PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
   PUBLIC_FIREBASE_APP_ID,
-  PUBLIC_FIREBASE_MEASUREMENT_ID
+  PUBLIC_FIREBASE_MEASUREMENT_ID,
 } from "$env/static/public";
 
 // Your web app's Firebase configuration
@@ -19,7 +19,7 @@ const firebaseConfig = {
   storageBucket: PUBLIC_FIREBASE_STORAGE_BUCKET,
   messagingSenderId: PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
   appId: PUBLIC_FIREBASE_APP_ID,
-  measurementId: PUBLIC_FIREBASE_MEASUREMENT_ID
+  measurementId: PUBLIC_FIREBASE_MEASUREMENT_ID,
 };
 
 // Initialize Firebase only once

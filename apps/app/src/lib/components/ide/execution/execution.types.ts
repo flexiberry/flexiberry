@@ -23,6 +23,8 @@ export interface PlanStep {
     body?: any;
   };
   error?: string;
+  captures?: Record<string, any>;
+  checks?: Array<{ expression: string; pass: boolean; evaluated: string }>;
 }
 
 export interface PlanTask {
@@ -54,4 +56,5 @@ export interface RunInstance {
   resolvePrompt?: (val: string) => void;
   error?: string;
   plan: PlanTask[];
+  forceShowPopover?: boolean;
 }

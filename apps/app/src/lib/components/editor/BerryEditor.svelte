@@ -3,12 +3,15 @@
     import { oneDark } from "@codemirror/theme-one-dark";
     import { berryCode } from "$lib/writable/berry.store";
     import { mode } from "mode-watcher";
+    import { berryLanguage, berryDarkTheme, berryLightTheme } from "$lib/utils/berryLanguage";
 </script>
 
 <div class="h-full w-full overflow-auto text-base">
     <CodeMirror
         bind:value={$berryCode}
         theme={$mode === "dark" ? oneDark : null}
+        lang={berryLanguage}
+        extensions={[$mode === "dark" ? berryDarkTheme : berryLightTheme]}
         lineWrapping={true}
         styles={{
             "&": { height: "100%", width: "100%", fontSize: "14px" },

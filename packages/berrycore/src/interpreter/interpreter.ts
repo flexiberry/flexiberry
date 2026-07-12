@@ -397,6 +397,8 @@ export class Interpreter {
           error: null,
           response: null,
           checksPassed: null,
+          captures: null,
+          checks: null,
         });
         this.pendingCommand = ExecutionCommand.Continue; // reset after skip
         actualStepIndex++;
@@ -454,6 +456,8 @@ export class Interpreter {
     let error: string | null = null;
     let apiResponse: ApiResponse | null = null;
     let checksPassed: boolean | null = null;
+    let captures: Record<string, unknown> | null = null;
+    let checks: Array<{ expression: string; pass: boolean; evaluated: string }> | null = null;
 
     try {
       // Look up the API definition
@@ -481,15 +485,23 @@ export class Interpreter {
 
       // Process capture
       if (node.capture) {
+        captures = {};
+        for (const entry of node.capture.entries) {
+          if (entry.type === NodeType.Comment) continue;
+          const val = this.resolveResponsePath(response, entry.value);
+          captures[entry.key] = val;
+        }
         this.processCapture(node.capture.entries, response, stepIndex, taskEnv);
       }
 
       // Process check
       if (node.check) {
-        checksPassed = this.processCheck(node.check.conditions, stepEnv, taskEnv);
+        const checkResult = this.processCheck(node.check.conditions, stepEnv, taskEnv);
+        checksPassed = checkResult.success;
+        checks = checkResult.checks;
         if (!checksPassed) {
           status = ExecutionStatus.Failed;
-          error = "Check validation failed";
+          error = checkResult.error || "Check validation failed";
         }
       }
     } catch (err: unknown) {
@@ -517,6 +529,8 @@ export class Interpreter {
       error,
       response: apiResponse,
       checksPassed,
+      captures,
+      checks,
     };
 
     await this.emit(InterpreterEvent.StepDone, { ...result, taskIndex, index: stepIndex });
@@ -652,9 +666,11 @@ export class Interpreter {
   ): void {
     for (const entry of entries) {
       if (entry.type === NodeType.Comment) continue;
-      const value = this.resolveResponsePath(response.data, entry.value);
+      const value = this.resolveResponsePath(response, entry.value);
       // Store as Step.<1-based index>.<key>
       taskEnv.declare(`Step.${stepIndex + 1}.${entry.key}`, value as RuntimeValue);
+      // Also store as <key> in task environment for direct reference
+      taskEnv.declare(entry.key, value as RuntimeValue);
     }
   }
 
@@ -664,37 +680,58 @@ export class Interpreter {
     conditions: ReadonlyArray<ConditionNode | CommentNode>,
     stepEnv: Environment,
     taskEnv: Environment
-  ): boolean {
+  ): {
+    success: boolean;
+    error?: string;
+    checks: Array<{ expression: string; pass: boolean; evaluated: string }>;
+  } {
+    const formatVal = (val: unknown) => val === undefined ? "undefined" : JSON.stringify(val);
+    const checksList: Array<{ expression: string; pass: boolean; evaluated: string }> = [];
+    let success = true;
+    let errorMsg: string | undefined = undefined;
+
     for (const condition of conditions) {
       if (condition.type === NodeType.Comment) continue;
-      const result = this.evaluateCondition(condition, stepEnv, taskEnv);
-      if (!result) return false;
-    }
-    return true;
-  }
 
-  private evaluateCondition(
-    condition: ConditionNode,
-    stepEnv: Environment,
-    taskEnv: Environment
-  ): boolean {
-    const lhs = this.resolveValue(condition.lhs, stepEnv, taskEnv);
-    const rhs = this.resolveValue(condition.rhs, stepEnv, taskEnv);
-    let result = this.compareValues(lhs, condition.operator, rhs);
+      const lhsVal = this.resolveValue(condition.lhs, stepEnv, taskEnv);
+      const rhsVal = this.resolveValue(condition.rhs, stepEnv, taskEnv);
+      let result = this.compareValues(lhsVal, condition.operator, rhsVal);
 
-    // Process OR chains — any one passing makes the condition pass
-    if (!result && condition.orConditions.length > 0) {
-      for (const orExpr of condition.orConditions) {
-        const orLhs = this.resolveValue(orExpr.lhs, stepEnv, taskEnv);
-        const orRhs = this.resolveValue(orExpr.rhs, stepEnv, taskEnv);
-        if (this.compareValues(orLhs, orExpr.operator, orRhs)) {
-          result = true;
-          break;
+      const orDetails: string[] = [];
+      if (!result && condition.orConditions.length > 0) {
+        for (const orExpr of condition.orConditions) {
+          const orLhsVal = this.resolveValue(orExpr.lhs, stepEnv, taskEnv);
+          const orRhsVal = this.resolveValue(orExpr.rhs, stepEnv, taskEnv);
+          const orPass = this.compareValues(orLhsVal, orExpr.operator, orRhsVal);
+          orDetails.push(
+            `OR ${orExpr.lhs} ${orExpr.operator} ${orExpr.rhs} (evaluated: ${formatVal(orLhsVal)} ${orExpr.operator} ${formatVal(orRhsVal)})`
+          );
+          if (orPass) {
+            result = true;
+            break;
+          }
+        }
+      }
+
+      let condStr = `${condition.lhs} ${condition.operator} ${condition.rhs}`;
+      let evalStr = `${formatVal(lhsVal)} ${condition.operator} ${formatVal(rhsVal)}`;
+
+      checksList.push({
+        expression: condStr,
+        pass: result,
+        evaluated: evalStr
+      });
+
+      if (!result && success) {
+        success = false;
+        errorMsg = `Check failed: ${condStr} (evaluated: ${evalStr})`;
+        if (orDetails.length > 0) {
+          errorMsg += " and all OR branches failed:\n- " + orDetails.join("\n- ");
         }
       }
     }
 
-    return result;
+    return { success, error: errorMsg, checks: checksList };
   }
 
   private compareValues(lhs: unknown, operator: string, rhs: unknown): boolean {
@@ -746,6 +783,19 @@ export class Interpreter {
     const globalVal = this.globalEnv.tryLookup(raw);
     if (globalVal !== undefined) return globalVal;
 
+    // Try dot-path lookup for nested properties (e.g. $.body.id or Step.1.data.name)
+    const parts = raw.split(".");
+    if (parts.length > 1) {
+      for (let i = parts.length - 1; i >= 1; i--) {
+        const prefix = parts.slice(0, i).join(".");
+        const val = stepEnv.tryLookup(prefix) ?? taskEnv.tryLookup(prefix) ?? this.globalEnv.tryLookup(prefix);
+        if (val !== undefined) {
+          const subPath = parts.slice(i).join(".");
+          return this.resolvePath(val, subPath);
+        }
+      }
+    }
+
     // If numeric, return as number
     const num = Number(raw);
     if (!isNaN(num)) return num;
@@ -755,21 +805,63 @@ export class Interpreter {
   }
 
   /**
-   * Resolve a dot-separated path from response data.
-   * e.g., "response.id" → data.id
+   * Resolve a dot-separated path from a FetchResponse.
    */
-  private resolveResponsePath(data: unknown, path: string): unknown {
-    // Strip "response." prefix if present
-    const cleanPath = path.startsWith("response.")
-      ? path.substring("response.".length)
-      : path;
+  private resolveResponsePath(response: FetchResponse, path: string): unknown {
+    const cleanPath = path.trim();
 
-    const parts = cleanPath.split(".");
+    // Check HTTP status code access
+    if (cleanPath === "response.status" || cleanPath === "$.status") {
+      return response.status;
+    }
+
+    // Check HTTP headers access
+    if (cleanPath.startsWith("response.headers.")) {
+      const headerName = cleanPath.substring("response.headers.".length);
+      return response.headers[headerName] || response.headers[headerName.toLowerCase()] || null;
+    }
+    if (cleanPath.startsWith("$.headers.")) {
+      const headerName = cleanPath.substring("$.headers.".length);
+      return response.headers[headerName] || response.headers[headerName.toLowerCase()] || null;
+    }
+
+    // Standard body data access
+    let bodyPath = cleanPath;
+    if (bodyPath.startsWith("response.body.")) {
+      bodyPath = bodyPath.substring("response.body.".length);
+    } else if (bodyPath.startsWith("$.body.")) {
+      bodyPath = bodyPath.substring("$.body.".length);
+    } else if (bodyPath.startsWith("response.")) {
+      bodyPath = bodyPath.substring("response.".length);
+    } else if (bodyPath.startsWith("$.")) {
+      bodyPath = bodyPath.substring("$.".length);
+    } else if (bodyPath === "response" || bodyPath === "$") {
+      return response.data;
+    } else if (bodyPath === "response.body" || bodyPath === "$.body") {
+      return response.data;
+    }
+
+    return this.resolvePath(response.data, bodyPath);
+  }
+
+  /**
+   * Resolve a dot-separated path from any object/array value.
+   */
+  private resolvePath(data: unknown, path: string): unknown {
+    if (!path) return data;
+    const parts = path.split(".");
     let current: unknown = data;
 
     for (const part of parts) {
       if (current === null || current === undefined) return null;
-      if (typeof current === "object") {
+      if (Array.isArray(current)) {
+        const index = parseInt(part, 10);
+        if (!isNaN(index)) {
+          current = current[index];
+        } else {
+          return null;
+        }
+      } else if (typeof current === "object") {
         current = (current as Record<string, unknown>)[part];
       } else {
         return null;
@@ -795,7 +887,7 @@ export class Interpreter {
       if (parts.length > 1) {
         const rootVal = vars.get(parts[0]);
         if (rootVal !== undefined && rootVal !== null) {
-          return String(this.resolveResponsePath(rootVal, parts.slice(1).join(".")));
+          return String(this.resolvePath(rootVal, parts.slice(1).join(".")));
         }
       }
       return `{{${varName}}}`;  // leave unresolved

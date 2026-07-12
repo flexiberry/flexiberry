@@ -5,6 +5,7 @@
   import type { BlockType } from "$lib/utils/berryBlocks";
 
   export let index: number;
+  export let showStep = false;
 
   const dispatch = createEventDispatcher();
 
@@ -44,6 +45,16 @@
     >
       <Plus class="w-3.5 h-3.5" /> Env
     </Button>
+    {#if showStep}
+      <Button 
+        variant="default" 
+        size="sm" 
+        class="h-7 px-3 text-xs font-black rounded-full bg-violet-600 hover:bg-violet-700 text-white border-violet-500 shadow-[0_0_15px_rgba(139,92,246,0.4)] border flex items-center gap-1.5 transition-all duration-300 transform hover:scale-105 active:scale-95 cursor-pointer"
+        on:click={(e) => { e.stopPropagation(); addBlock('Step'); }}
+      >
+        <Plus class="w-3.5 h-3.5 text-white" /> Step
+      </Button>
+    {/if}
     <Button 
       variant="outline" 
       size="sm" 
@@ -51,6 +62,22 @@
       on:click={(e) => { e.stopPropagation(); addBlock('Task'); }}
     >
       <Plus class="w-3.5 h-3.5" /> Task
+    </Button>
+    <Button 
+      variant="outline" 
+      size="sm" 
+      class="h-7 px-3 text-xs font-medium rounded-full bg-card hover:bg-pink-500/10 hover:text-pink-500 hover:border-pink-500/30 border-border shadow-sm flex items-center gap-1.5"
+      on:click={(e) => { e.stopPropagation(); addBlock('Link'); }}
+    >
+      <Plus class="w-3.5 h-3.5" /> Link
+    </Button>
+    <Button 
+      variant="outline" 
+      size="sm" 
+      class="h-7 px-3 text-xs font-medium rounded-full bg-card hover:bg-teal-500/10 hover:text-teal-500 hover:border-teal-500/30 border-border shadow-sm flex items-center gap-1.5"
+      on:click={(e) => { e.stopPropagation(); addBlock('Input'); }}
+    >
+      <Plus class="w-3.5 h-3.5" /> Input
     </Button>
   </div>
 </div>

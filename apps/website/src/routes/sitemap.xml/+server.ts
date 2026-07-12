@@ -10,7 +10,11 @@ export async function GET() {
     "about",
     "contact",
     "privacy",
-    "terms"
+    "terms",
+    "blog",
+    "blog/quick-start",
+    "blog/writing-berry-dsl",
+    "blog/ci-cd-integration"
   ];
 
   const sitemap = `<?xml version="1.0" encoding="UTF-8"?>

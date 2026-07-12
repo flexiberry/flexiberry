@@ -7,9 +7,10 @@ import { db, type Workspace } from "$lib/db/db";
 const STORAGE_KEY = "flexiberry:activeWorkspaceId";
 
 function createWorkspaceStore() {
-  const stored = typeof localStorage !== "undefined"
-    ? (localStorage.getItem(STORAGE_KEY) ?? "default")
-    : "default";
+  const stored =
+    typeof localStorage !== "undefined"
+      ? (localStorage.getItem(STORAGE_KEY) ?? "default")
+      : "default";
 
   const { subscribe, set } = writable<string>(stored);
 
@@ -31,7 +32,10 @@ export const activeWorkspaceId = createWorkspaceStore();
 
 // ─── Workspace CRUD helpers ────────────────────────────────────
 
-export async function createWorkspace(name: string, emoji = "📁"): Promise<string> {
+export async function createWorkspace(
+  name: string,
+  emoji = "📁",
+): Promise<string> {
   const id = `ws-${Date.now()}`;
   await db.workspaces.add({ id, name, emoji, createdAt: new Date() });
   activeWorkspaceId.switchTo(id);

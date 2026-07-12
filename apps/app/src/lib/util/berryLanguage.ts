@@ -9,7 +9,7 @@ const berryLanguage = StreamLanguage.define({
     // Keywords
     if (
       stream.match(
-        /Env|Var|Api|Url|Body|Header|Testcase|Step|Capture|Status|If|Break|Continue|Jump to/
+        /Env|Var|Api|Url|Body|Header|Testcase|Step|Capture|Status|If|Break|Continue|Jump to/,
       )
     )
       return "keyword";
