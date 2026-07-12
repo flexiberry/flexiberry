@@ -1,5 +1,12 @@
 # @flexiberry/language-server
 
+## 0.1.6
+
+### Patch Changes
+
+- Updated dependencies
+  - @flexiberry/berrycore@0.1.6
+
 ## 0.1.5
 
 ### Patch Changes
@@ -16,7 +23,6 @@
   Here is a summary of the changes we completed recently:
 
   ***
-
   - **Gutter Play Buttons**: Integrated a VS Code `TestController` in [extension.ts](file:///Users/rinturajc/lib_projects/Flexiberry/flexiberry/packages/vscode-berry-extension/src/extension.ts) that automatically adds clickable **green play buttons** in the editor gutter directly next to the line numbers for each `Api` statement.
   - **CodeLens Actions**: Registered a custom `CodeLensProvider` that renders `▶ Run API Standalone` text links directly above each `Api` statement.
   - **Interactive Variable Prompts**: Configured the standalone runner to parse the target API block for template variables (e.g. `{{petId}}`). If a variable is missing and not declared in a script's `Var` block, it pauses and prompts the user using a native `vscode.window.showInputBox` before resuming.

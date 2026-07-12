@@ -8,6 +8,7 @@
       items: [
         { label: "Features", href: "/features" },
         { label: "Documentation", href: "https://docs.flexiberry.dev/" },
+        { label: "Guides & Blog", href: "/blog" },
         { label: "Changelog", href: "/changelog" },
       ],
     },
@@ -20,6 +21,7 @@
         },
         { label: "Examples", href: "/example" },
         { label: "GitHub", href: "https://github.com/flexiberry/flexiberry" },
+        { label: "LLM Index (llms.txt)", href: "/llms.txt" },
       ],
     },
     {

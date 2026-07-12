@@ -6,6 +6,7 @@
 </script>
 
 <svelte:head>
+	<link rel="alternate" type="text/plain" title="LLM-friendly version" href="/llms.txt" />
 	<!-- Google tag (gtag.js) -->
 	<script
 		async

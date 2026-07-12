@@ -1,5 +1,13 @@
 # app
 
+## 0.1.4
+
+### Patch Changes
+
+- SEO/LLM accessibility features.
+- Updated dependencies
+  - @flexiberry/berrycore@0.1.6
+
 ## 0.1.3
 
 ### Patch Changes
