@@ -2,6 +2,8 @@ export const prerender = true;
 
 export async function GET() {
   const pages = [
+    "https://docs.flexiberry.dev/",
+    "https://app.flexiberry.dev/",
     "",
     "features",
     "example",
@@ -21,12 +23,15 @@ export async function GET() {
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   ${pages
     .map(
-      (page) => `
+      (page) => {
+        const loc = page.startsWith("http") ? page : `https://flexiberry.dev/${page}`;
+        return `
   <url>
-    <loc>https://flexiberry.dev/${page}</loc>
+    <loc>${loc}</loc>
     <changefreq>weekly</changefreq>
-    <priority>${page === "" ? "1.0" : "0.8"}</priority>
-  </url>`
+    <priority>${page === "" || page.startsWith("http") ? "1.0" : "0.8"}</priority>
+  </url>`;
+      }
     )
     .join("")}
 </urlset>`;
