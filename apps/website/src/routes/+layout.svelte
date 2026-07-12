@@ -1,11 +1,13 @@
 <script lang="ts">
 	import "../app.css";
 	import { PUBLIC_GA_ID, PUBLIC_ADSENSE_ID } from "$env/static/public";
+	import { page } from "$app/stores";
 
 	let { children } = $props();
 </script>
 
 <svelte:head>
+	<link rel="canonical" href="https://flexiberry.dev{$page.url.pathname.endsWith('/') && $page.url.pathname !== '/' ? $page.url.pathname.slice(0, -1) : $page.url.pathname}" />
 	<link rel="alternate" type="text/plain" title="LLM-friendly version" href="/llms.txt" />
 	<!-- Google tag (gtag.js) -->
 	<script
