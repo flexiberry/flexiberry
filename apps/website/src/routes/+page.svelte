@@ -10,10 +10,12 @@
     CTA,
     Footer,
     BerryCodeScroll,
+    ComparisonTable,
   } from "$lib";
 
   let isVisible = {
     hero: false,
+    comparison: false,
     problem: false,
     features: false,
     audience: false,
@@ -23,6 +25,7 @@
 
   onMount(() => {
     setTimeout(() => { isVisible.hero = true; }, 100);
+    setTimeout(() => { isVisible.comparison = true; }, 200);
     setTimeout(() => { isVisible.problem = true; }, 300);
     setTimeout(() => { isVisible.features = true; }, 500);
     setTimeout(() => { isVisible.audience = true; }, 700);
@@ -76,6 +79,8 @@
 <div class="min-h-screen bg-gray-900 text-gray-100 font-mono">
   <Navigation />
   <Hero isVisible={isVisible.hero} />
+
+  <ComparisonTable isVisible={isVisible.comparison} />
 
   <ProblemSolution isVisible={isVisible.problem} />
 

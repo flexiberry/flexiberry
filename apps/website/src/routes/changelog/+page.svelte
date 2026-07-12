@@ -1,77 +1,88 @@
 <script lang="ts">
   import { Navigation, Footer } from "$lib";
 
-  // Dummy Release Data
+  // Actual Release Data from Git History
   const releases = [
     {
-      version: "v1.0.0",
-      date: "May 2026",
+      version: "v0.1.6 / v1.0.7",
+      date: "July 12, 2026",
       badge: "Latest Release",
       badgeColor: "from-emerald-400 to-teal-500",
-      title: "Interactive Web Portal & Production Stability",
+      title: "Core & SEO Optimization",
       summary:
-        "We are thrilled to launch the stable v1.0.0 of Flexiberry! This update introduces the interactive web playground and showcases, full workspace parser integration, and performance upgrades.",
+        "This release consolidates dependencies across the monorepo packages, refines the custom `.berry` lexer/parser core, and integrates advanced SEO features including canonical links, sitemaps, and site navigation schemas on the website.",
       categories: [
         {
-          name: "Features",
+          name: "Features & Additions",
           items: [
-            "Launched the full interactive web Playground with syntax validation.",
-            "Created the Examples showcase portal containing full test script templates.",
-            "Integrated cross-file linking inside the browser compiler via URL fetching.",
-            "Supported advanced conditional expressions in check logic (OR operators and parenthesized groupings).",
+            "Integrated dynamic canonical URL link tag generation for the website landing page and blog guides.",
+            "Added structured Site Navigation JSON-LD schema to website root layout to optimize search engine sitelinks.",
+            "Added external documentation and app URLs to sitemap with dynamic location logic.",
+            "Updated `.berry` file associations in VS Code extension with custom icons and firstLine configuration.",
           ],
         },
         {
-          name: "Improvements",
+          name: "Improvements & Fixes",
           items: [
-            "Improved error messages detailing lines and columns for compile-time failures.",
-            "Enhanced execution timing metrics precision for API calls.",
-            "Optimized memory usage in sequential loop runs.",
+            "Refined lexer grammar engine loop safety to prevent infinite parse loops.",
+            "Sanitized filename outputs and vsix directories in the publishing workflow.",
           ],
         },
       ],
     },
     {
-      version: "v0.9.0",
-      date: "March 2026",
-      badge: "Beta Update",
+      version: "v0.1.5 / v1.0.5",
+      date: "July 2026",
+      badge: "Major Milestone",
       badgeColor: "from-purple-400 to-indigo-500",
-      title: "Advanced Data Capture & CLI Runner",
+      title: "Tauri Web IDE, LSP & CLI Standalone Execution",
       summary:
-        "Introduced advanced workflow automation with cross-step variables data extraction, custom token mapping, and the official flexiberry CLI runner command.",
+        "This milestone represents the culmination of a 270-commit journey starting from the original monorepo setup (b3f4a1f). It bridges the custom .berry DSL with the Tauri Desktop IDE, an interactive CLI client, and a dedicated VS Code Extension powered by a custom Language Server (LSP).",
       categories: [
         {
-          name: "Features",
+          name: "Web IDE",
           items: [
-            "Official launch of the CLI runner (`flexiberry run <file.berry>`).",
-            "Added `Capture` block to extract JSON path response values.",
-            "Supported direct Decrypt pipeline (`Decrypt` suffix) in variable declaration blocks.",
+            "Execution Inspection Suite: Added interactive tabs for outgoing request headers, formatted request body payloads, and response body/headers.",
+            "User Profiles & Backup: Added user profile page with local database backup and restore capabilities.",
+            "Overhauled Bottom Toolbar: Replaced legacy bar with database connection status and workspace active file context.",
+            "Authentication Flow: Implemented login overlays with multi-provider auth state management.",
           ],
         },
         {
-          name: "Improvements",
+          name: "VS Code Extension & LSP",
           items: [
-            "Robust relative file path resolution inside monorepo structures.",
-            "Added automated color formatting for console logs in terminal modes.",
+            "LSP Protocol: Added complete LSP-based language server support with diagnostic reporting, completions, and language features.",
+            "Gutter Play Buttons: Added green play buttons next to API calls and CodeLens run triggers in VS Code editor.",
+            "Variable Prompts: Implemented interactive prompt overlay in VS Code for missing variables during standalone runs.",
+          ],
+        },
+        {
+          name: "CLI Shell & Core Compiler",
+          items: [
+            "Interactive execution: Standalone CLI runs with placeholder interpolation and interactive prompt fallbacks.",
+            "Output Formatting: CLI color syntax highlighting for JSON and HTTP status outputs.",
+            "Lexer Refinements: Enhanced token patterns and comment reader features in berrycore.",
           ],
         },
       ],
     },
     {
-      version: "v0.8.0",
-      date: "January 2026",
-      badge: "Public Beta",
+      version: "v0.1.1 / v0.1.2",
+      date: "Earlier 2026",
+      badge: "Initial Beta",
       badgeColor: "from-cyan-400 to-blue-500",
-      title: "The Initial Open Beta Launch",
+      title: "The Birth of Berry DSL & Core Runtime",
       summary:
-        "First public debut of the Berry grammar and the compiler core. Developers can now write human-readable API tests like standard English.",
+        "First public debut of the Berry compiler core, runtime interpreter, and command-line shell interface.",
       categories: [
         {
           name: "Features",
           items: [
-            "Introduced custom `LexerEngine` and `AstEngine` matching BNF rules.",
-            "Supported basic assertions in the `Check` block (==, !=, >, <).",
+            "Introduced custom LexerEngine and AstEngine matching BNF rules.",
+            "Supported basic assertions in the Check block (==, !=, >, <).",
             "Added environment pointers (@UAT, @prod) for flexible config scoping.",
+            "Implemented directory & folder save functionality into IndexedDB.",
+            "Integrated Monaco editor and Tauri desktop window UI.",
           ],
         },
       ],
