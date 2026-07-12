@@ -10,3 +10,4 @@ export { default as Footer } from "./components/Footer.svelte";
 export { default as BerryCodeScroll } from "./components/BerryCodeScroll.svelte";
 export { default as ProblemSolution } from "./components/ProblemSolution.svelte";
 export { default as TargetAudience } from "./components/TargetAudience.svelte";
+export { default as ComparisonTable } from "./components/ComparisonTable.svelte";

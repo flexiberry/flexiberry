@@ -69,7 +69,7 @@
       baseSize: size,
       scale: 1,
       color: tokenColors[Math.floor(Math.random() * tokenColors.length)],
-      alpha: 0.06 + Math.random() * 0.08,
+      alpha: 0.12 + Math.random() * 0.1, // Increased word visibility by 30-40%
       rotate: Math.random() * Math.PI * 2,
       rotateSpeed: -0.003 + Math.random() * 0.006,
       hoverTick: 0,
@@ -188,7 +188,6 @@
 
   <!-- Container -->
   <div class="hero-content" class:visible={isVisible}>
-    
     <!-- Left Panel: Brand, Headline & Interactive Selectors -->
     <div class="hero-left-panel">
       <!-- Badge -->
@@ -199,18 +198,27 @@
 
       <!-- Bold Gradient Headline -->
       <h1 class="hero-heading">
-        One Simple Syntax. <br />
-        <span class="heading-gradient">Three Ways to Run.</span>
+        API Testing as Code. <br />
+        <span class="heading-gradient">Chain workflows, not collections.</span>
       </h1>
 
       <!-- Description -->
       <p class="hero-sub">
-        Flexiberry is the developer-first HTTP client built for sequential request chains. Stop writing heavy boilerplate scripts. Define your workflows in readable <code class="inline-code">.berry</code> code and execute them anywhere.
+        Flexiberry is the open-source API testing framework that chains
+        dependent requests sequentially using a clean, declarative language.
+        Zero Javascript boilerplate. Zero environment sync pain. Just readable <code
+          class="inline-code">.berry</code
+        > scripts that run natively from your editor, CLI, or CI/CD pipelines.
       </p>
 
       <!-- CTA Action Button Row -->
       <div class="hero-actions">
-        <a href="https://github.com/flexiberry/flexiberry" target="_blank" rel="noopener noreferrer" class="btn-primary">
+        <a
+          href="https://github.com/flexiberry/flexiberry"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="btn-primary"
+        >
           <svg
             width="15"
             height="15"
@@ -223,67 +231,117 @@
               d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"
             />
           </svg>
-          <span>Get Started on GitHub</span>
+          <span>Star on GitHub</span>
           <span class="btn-circle-arrow">➔</span>
         </a>
-        <a href="https://docs.flexiberry.dev" target="_blank" rel="noopener noreferrer" class="btn-secondary">
-          Read the Docs
+        <a
+          href="https://docs.flexiberry.dev"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="btn-secondary"
+        >
+          Read Docs
         </a>
       </div>
 
       <!-- Vertical Interactive Tab Selectors -->
       <div class="tab-selectors">
         <!-- Tab 0: CLI -->
-        <button 
-          class="tab-btn" 
-          class:active={activeTab === 0} 
+        <button
+          class="tab-btn"
+          class:active={activeTab === 0}
           onclick={() => selectTab(0)}
           style="--accent: #34d399;"
         >
           <div class="tab-icon">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <polyline points="4 17 10 11 4 5" /><line x1="12" y1="19" x2="20" y2="19" />
+            <svg
+              width="18"
+              height="18"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <polyline points="4 17 10 11 4 5" /><line
+                x1="12"
+                y1="19"
+                x2="20"
+                y2="19"
+              />
             </svg>
           </div>
           <div class="tab-btn-content">
             <span class="tab-btn-title">01 / Command Line Interface</span>
-            <span class="tab-btn-desc">Run workflows in any terminal or integrate into CI/CD pipelines.</span>
+            <span class="tab-btn-desc"
+              >Run workflows in any terminal or integrate into CI/CD pipelines.</span
+            >
           </div>
         </button>
 
         <!-- Tab 1: VS Code -->
-        <button 
-          class="tab-btn" 
-          class:active={activeTab === 1} 
+        <button
+          class="tab-btn"
+          class:active={activeTab === 1}
           onclick={() => selectTab(1)}
           style="--accent: #a78bfa;"
         >
           <div class="tab-icon">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <rect x="2" y="3" width="20" height="14" rx="2" ry="2" /><line x1="8" y1="21" x2="16" y2="21" /><line x1="12" y1="17" x2="12" y2="21" />
+            <svg
+              width="18"
+              height="18"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <rect x="2" y="3" width="20" height="14" rx="2" ry="2" /><line
+                x1="8"
+                y1="21"
+                x2="16"
+                y2="21"
+              /><line x1="12" y1="17" x2="12" y2="21" />
             </svg>
           </div>
           <div class="tab-btn-content">
             <span class="tab-btn-title">02 / VS Code & Open-VSX</span>
-            <span class="tab-btn-desc">Write scripts with syntax highlighting, autocomplete & inline runs.</span>
+            <span class="tab-btn-desc"
+              >Write scripts with syntax highlighting, autocomplete & inline
+              runs.</span
+            >
           </div>
         </button>
 
         <!-- Tab 2: Web App -->
-        <button 
-          class="tab-btn" 
-          class:active={activeTab === 2} 
+        <button
+          class="tab-btn"
+          class:active={activeTab === 2}
           onclick={() => selectTab(2)}
           style="--accent: #fb923c;"
         >
           <div class="tab-icon">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M3 3h18v18H3z"/><path d="M21 9H3M21 15H3M12 3v18"/>
+            <svg
+              width="18"
+              height="18"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path d="M3 3h18v18H3z" /><path d="M21 9H3M21 15H3M12 3v18" />
             </svg>
           </div>
           <div class="tab-btn-content">
             <span class="tab-btn-title">03 / Web App Dashboard</span>
-            <span class="tab-btn-desc">Build chains visually, manage environments, and track execution logs.</span>
+            <span class="tab-btn-desc"
+              >Build chains visually, manage environments, and track execution
+              logs.</span
+            >
           </div>
         </button>
       </div>
@@ -291,9 +349,13 @@
 
     <!-- Right Panel: High-Fidelity Glassmorphic Device Showcase -->
     <div class="hero-right-panel">
-      <div 
-        class="showcase-window" 
-        style="--theme-color: {activeTab === 0 ? '#34d399' : activeTab === 1 ? '#a78bfa' : '#fb923c'};"
+      <div
+        class="showcase-window"
+        style="--theme-color: {activeTab === 0
+          ? '#34d399'
+          : activeTab === 1
+            ? '#a78bfa'
+            : '#fb923c'};"
       >
         <!-- Window titlebar -->
         <div class="window-header">
@@ -303,7 +365,11 @@
             <span class="window-dot green"></span>
           </div>
           <span class="window-title">
-            {activeTab === 0 ? "terminal — flexiberry run" : activeTab === 1 ? "VS Code — auth-flow.berry" : "app.flexiberry.dev"}
+            {activeTab === 0
+              ? "terminal — flexiberry run"
+              : activeTab === 1
+                ? "VS Code — auth-flow.berry"
+                : "app.flexiberry.dev"}
           </span>
         </div>
 
@@ -313,45 +379,107 @@
             {#if activeTab === 0}
               <!-- CLI Terminal Simulator -->
               <div class="cli-mockup">
-                <div class="cli-line typing"><span class="cli-prompt">$</span> flexiberry run auth.berry</div>
-                <div class="cli-line loading">Loading script and initializing environment...</div>
+                <div class="cli-line typing">
+                  <span class="cli-prompt">$</span> flexiberry run auth.berry
+                </div>
+                <div class="cli-line loading">
+                  Loading script and initializing environment...
+                </div>
                 <div class="cli-line run-step step-1">
-                  <span class="status-badge success">RUN</span> Step 1: User Authentication
-                  <div class="sub-log">✔ POST /api/v1/auth/login <span class="log-meta">200 OK (38ms)</span></div>
-                  <div class="sub-log">✔ Captured variable <span class="log-var">token</span></div>
+                  <span class="status-badge success">RUN</span> Step 1: User
+                  Authentication
+                  <div class="sub-log">
+                    ✔ POST /api/v1/auth/login <span class="log-meta"
+                      >200 OK (38ms)</span
+                    >
+                  </div>
+                  <div class="sub-log">
+                    ✔ Captured variable <span class="log-var">token</span>
+                  </div>
                 </div>
                 <div class="cli-line run-step step-2">
-                  <span class="status-badge success">RUN</span> Step 2: Fetch Account Profile
-                  <div class="sub-log">✔ GET /api/v1/user/profile <span class="log-meta">200 OK (22ms)</span></div>
-                  <div class="sub-log">✔ Assertion check <span class="log-meta">$.status == 200</span> passed</div>
+                  <span class="status-badge success">RUN</span> Step 2: Fetch
+                  Account Profile
+                  <div class="sub-log">
+                    ✔ GET /api/v1/user/profile <span class="log-meta"
+                      >200 OK (22ms)</span
+                    >
+                  </div>
+                  <div class="sub-log">
+                    ✔ Assertion check <span class="log-meta"
+                      >$.status == 200</span
+                    > passed
+                  </div>
                 </div>
                 <div class="cli-line finished">
-                  <span class="cli-success-text">✔ Success: All tasks completed successfully in 60ms.</span>
+                  <span class="cli-success-text"
+                    >✔ Success: All tasks completed successfully in 60ms.</span
+                  >
                 </div>
               </div>
-
             {:else if activeTab === 1}
               <!-- VS Code Editor Simulator -->
               <div class="editor-mockup">
                 <div class="editor-lines">
-                  <div class="code-line"><span class="c-comment"># API Definitions & Task Testing Suite</span></div>
-                  <div class="code-line"><span class="c-keyword">Var</span> Config</div>
-                  <div class="code-line indent-1">- baseUrl: <span class="c-string">"https://api.flexiberry.dev"</span></div>
+                  <div class="code-line">
+                    <span class="c-comment"
+                      ># API Definitions & Task Testing Suite</span
+                    >
+                  </div>
+                  <div class="code-line">
+                    <span class="c-keyword">Var</span> Config
+                  </div>
+                  <div class="code-line indent-1">
+                    - baseUrl: <span class="c-string"
+                      >"https://api.flexiberry.dev"</span
+                    >
+                  </div>
                   <div class="code-line"></div>
-                  <div class="code-line"><span class="c-keyword">Api</span> <span class="c-method">POST</span> <span class="c-identifier">#loginUser</span></div>
-                  <div class="code-line indent-1"><span class="c-keyword">Url</span> {"{{Config.baseUrl}}/auth/login"}</div>
-                  <div class="code-line indent-1"><span class="c-keyword">Body</span> JSON `&#123; "username": "admin" &#125;`</div>
+                  <div class="code-line">
+                    <span class="c-keyword">Api</span>
+                    <span class="c-method">POST</span>
+                    <span class="c-identifier">#loginUser</span>
+                  </div>
+                  <div class="code-line indent-1">
+                    <span class="c-keyword">Url</span>
+                    {"{{Config.baseUrl}}/auth/login"}
+                  </div>
+                  <div class="code-line indent-1">
+                    <span class="c-keyword">Body</span> JSON `&#123; "username":
+                    "admin" &#125;`
+                  </div>
                   <div class="code-line"></div>
-                  <div class="code-line"><span class="c-keyword">Api</span> <span class="c-method">GET</span> <span class="c-identifier">#fetchProfile</span></div>
-                  <div class="code-line indent-1"><span class="c-keyword">Url</span> {"{{Config.baseUrl}}/user/profile"}</div>
-                  <div class="code-line indent-1"><span class="c-keyword">Header</span></div>
-                  <div class="code-line indent-1">- Authorization: <span class="c-string">"Bearer {"{{token}}"}"</span></div>
+                  <div class="code-line">
+                    <span class="c-keyword">Api</span>
+                    <span class="c-method">GET</span>
+                    <span class="c-identifier">#fetchProfile</span>
+                  </div>
+                  <div class="code-line indent-1">
+                    <span class="c-keyword">Url</span>
+                    {"{{Config.baseUrl}}/user/profile"}
+                  </div>
+                  <div class="code-line indent-1">
+                    <span class="c-keyword">Header</span>
+                  </div>
+                  <div class="code-line indent-1">
+                    - Authorization: <span class="c-string"
+                      >"Bearer {"{{token}}"}"</span
+                    >
+                  </div>
                   <div class="code-line"></div>
-                  <div class="code-line"><span class="c-keyword">Task</span> Authenticate and Fetch Profile</div>
-                  <div class="code-line indent-1"><span class="c-keyword">Step</span> Call Api loginUser</div>
-                  <div class="code-line indent-2"><span class="c-keyword">Capture</span></div>
+                  <div class="code-line">
+                    <span class="c-keyword">Task</span> Authenticate and Fetch Profile
+                  </div>
+                  <div class="code-line indent-1">
+                    <span class="c-keyword">Step</span> Call Api loginUser
+                  </div>
+                  <div class="code-line indent-2">
+                    <span class="c-keyword">Capture</span>
+                  </div>
                   <div class="code-line indent-2">- token: response.token</div>
-                  <div class="code-line indent-2"><span class="c-keyword">Check</span></div>
+                  <div class="code-line indent-2">
+                    <span class="c-keyword">Check</span>
+                  </div>
                   <div class="code-line indent-2">- $.status == 200</div>
                 </div>
                 <!-- Mini inline run decoration -->
@@ -359,7 +487,6 @@
                   <span class="action-play">▶</span> Run Workflow (Shift+Enter)
                 </div>
               </div>
-
             {:else if activeTab === 2}
               <!-- Web App Dashboard Simulator -->
               <div class="browser-mockup">
@@ -378,7 +505,7 @@
                     <span class="stat-title">Runs Today</span>
                   </div>
                 </div>
-                
+
                 <!-- Recent request list feed -->
                 <div class="dash-feed">
                   <div class="feed-item">
@@ -421,8 +548,22 @@
           rel="noopener noreferrer"
           class="redirect-pill cli-pill"
         >
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-            <polyline points="4 17 10 11 4 5" /><line x1="12" y1="19" x2="20" y2="19" />
+          <svg
+            width="12"
+            height="12"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2.5"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <polyline points="4 17 10 11 4 5" /><line
+              x1="12"
+              y1="19"
+              x2="20"
+              y2="19"
+            />
           </svg>
           <span>CLI Client</span>
         </a>
@@ -434,8 +575,22 @@
           rel="noopener noreferrer"
           class="redirect-pill ext-pill"
         >
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-            <rect x="2" y="3" width="20" height="14" rx="2" ry="2" /><line x1="8" y1="21" x2="16" y2="21" /><line x1="12" y1="17" x2="12" y2="21" />
+          <svg
+            width="12"
+            height="12"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2.5"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <rect x="2" y="3" width="20" height="14" rx="2" ry="2" /><line
+              x1="8"
+              y1="21"
+              x2="16"
+              y2="21"
+            /><line x1="12" y1="17" x2="12" y2="21" />
           </svg>
           <span>VS Code Extension</span>
         </a>
@@ -447,14 +602,30 @@
           rel="noopener noreferrer"
           class="redirect-pill app-pill"
         >
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M3 3h18v18H3z"/><path d="M21 9H3M21 15H3M12 3v18"/>
+          <svg
+            width="12"
+            height="12"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2.5"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path d="M3 3h18v18H3z" /><path d="M21 9H3M21 15H3M12 3v18" />
           </svg>
           <span>Web Dashboard</span>
         </a>
       </div>
+
+      <!-- Social Proof / Trust Badges -->
+      <div class="trust-badges">
+        <span class="trust-badge">100% Open Source</span>
+        <span class="trust-badge">Zero Dependencies</span>
+        <span class="trust-badge">CI/CD Ready</span>
+        <span class="trust-badge">MIT Licensed</span>
+      </div>
     </div>
-    
   </div>
 </section>
 
@@ -515,20 +686,28 @@
     animation: drift 12s ease-in-out infinite alternate;
   }
   @keyframes drift {
-    0% { transform: translate(0, 0) scale(1); }
-    100% { transform: translate(5%, 8%) scale(1.1); }
+    0% {
+      transform: translate(0, 0) scale(1);
+    }
+    100% {
+      transform: translate(5%, 8%) scale(1.1);
+    }
   }
 
   .hero-grid {
     position: absolute;
     inset: 0;
     z-index: 0;
-    background-image: 
+    background-image:
       linear-gradient(rgba(255, 255, 255, 0.012) 1px, transparent 1px),
       linear-gradient(90deg, rgba(255, 255, 255, 0.012) 1px, transparent 1px);
     background-size: 60px 60px;
     mask-image: radial-gradient(circle at 60% 50%, black, transparent 80%);
-    -webkit-mask-image: radial-gradient(circle at 60% 50%, black, transparent 80%);
+    -webkit-mask-image: radial-gradient(
+      circle at 60% 50%,
+      black,
+      transparent 80%
+    );
   }
 
   /* ── Content Grid ────────────────────────────────────────────────────── */
@@ -540,16 +719,43 @@
     margin: 0 auto;
     padding: 0 2rem;
     display: grid;
-    grid-template-columns: 1.1fr 0.9fr;
+    grid-template-columns: 1.25fr 0.75fr; /* Increased left panel width by ~13% */
     gap: 4.5rem;
     align-items: center;
     opacity: 0;
     transform: translateY(30px);
-    transition: opacity 1s cubic-bezier(0.16, 1, 0.3, 1), transform 1s cubic-bezier(0.16, 1, 0.3, 1);
+    transition:
+      opacity 1s cubic-bezier(0.16, 1, 0.3, 1),
+      transform 1s cubic-bezier(0.16, 1, 0.3, 1);
   }
   .hero-content.visible {
     opacity: 1;
     transform: none;
+  }
+
+  /* Trust Badges */
+  .trust-badges {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin-bottom: 2.5rem;
+  }
+  .trust-badge {
+    font-size: 0.68rem;
+    color: #64748b;
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 6px;
+    padding: 0.25rem 0.65rem;
+    font-family: "JetBrains Mono", monospace;
+    letter-spacing: 0.02em;
+    transition:
+      border-color 0.2s,
+      color 0.2s;
+  }
+  .trust-badge:hover {
+    border-color: rgba(52, 211, 153, 0.2);
+    color: #e2e8f0;
   }
 
   /* ── Left Panel ──────────────────────────────────────────────────────── */
@@ -582,8 +788,13 @@
     animation: blink-dot 2.5s ease-in-out infinite;
   }
   @keyframes blink-dot {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.35; }
+    0%,
+    100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0.35;
+    }
   }
 
   .hero-heading {
@@ -593,7 +804,9 @@
     color: #fff;
     letter-spacing: -0.03em;
     margin: 0 0 1.2rem;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    font-family:
+      -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial,
+      sans-serif;
   }
   .heading-gradient {
     background: linear-gradient(135deg, #34d399, #38bdf8, #a78bfa);
@@ -608,7 +821,8 @@
     line-height: 1.7;
     max-width: 580px;
     margin: 0 0 2rem;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-family:
+      -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   }
   .inline-code {
     font-family: "JetBrains Mono", monospace;
@@ -633,7 +847,8 @@
     gap: 1rem;
     background: #fff;
     color: #030712;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-family:
+      -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     font-size: 0.9rem;
     font-weight: 700;
     padding: 0.45rem 0.45rem 0.45rem 1.5rem;
@@ -675,7 +890,8 @@
     font-size: 0.9rem;
     text-decoration: none;
     transition: all 0.2s;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-family:
+      -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   }
   .btn-secondary:hover {
     background: rgba(255, 255, 255, 0.07);
@@ -712,7 +928,9 @@
   .tab-btn.active {
     background: rgba(255, 255, 255, 0.04);
     border-color: var(--accent);
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25), inset 0 0 12px rgba(255, 255, 255, 0.02);
+    box-shadow:
+      0 4px 20px rgba(0, 0, 0, 0.25),
+      inset 0 0 12px rgba(255, 255, 255, 0.02);
   }
 
   .tab-icon {
@@ -749,7 +967,8 @@
     font-weight: 700;
     color: #94a3b8;
     transition: color 0.2s;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-family:
+      -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   }
   .tab-btn.active .tab-btn-title {
     color: #fff;
@@ -758,7 +977,8 @@
     font-size: 0.78rem;
     color: #64748b;
     line-height: 1.4;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-family:
+      -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   }
   .tab-btn.active .tab-btn-desc {
     color: #94a3b8;
@@ -787,7 +1007,8 @@
     color: #64748b;
     text-decoration: none;
     transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-family:
+      -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   }
   .redirect-pill svg {
     transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
@@ -831,24 +1052,32 @@
     flex-direction: column;
     position: relative;
     box-shadow: none; /* Removed dropshadow entirely */
-    
+
     /* Rounded Gradient Border trick */
     border: 1px solid transparent;
-    background-image: 
-      linear-gradient(rgba(10, 10, 15, 0.85), rgba(10, 10, 15, 0.85)), 
-      linear-gradient(135deg, var(--theme-color) 0%, rgba(255, 255, 255, 0.04) 100%);
+    background-image:
+      linear-gradient(rgba(10, 10, 15, 0.85), rgba(10, 10, 15, 0.85)),
+      linear-gradient(
+        135deg,
+        var(--theme-color) 0%,
+        rgba(255, 255, 255, 0.04) 100%
+      );
     background-origin: border-box;
     background-clip: padding-box, border-box;
-    
+
     transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
   }
 
   /* Glass Sheen overlay */
   .showcase-window::after {
-    content: '';
+    content: "";
     position: absolute;
     inset: 0;
-    background: linear-gradient(135deg, rgba(255, 255, 255, 0.05) 0%, transparent 50%);
+    background: linear-gradient(
+      135deg,
+      rgba(255, 255, 255, 0.05) 0%,
+      transparent 50%
+    );
     pointer-events: none;
     z-index: 10;
   }
@@ -871,9 +1100,15 @@
     height: 10px;
     border-radius: 50%;
   }
-  .window-dot.red { background: #ff5f56; }
-  .window-dot.yellow { background: #ffbd2e; }
-  .window-dot.green { background: #27c93f; }
+  .window-dot.red {
+    background: #ff5f56;
+  }
+  .window-dot.yellow {
+    background: #ffbd2e;
+  }
+  .window-dot.green {
+    background: #27c93f;
+  }
   .window-title {
     position: absolute;
     left: 50%;
@@ -926,7 +1161,7 @@
   .cli-line.finished {
     animation-delay: 4.5s;
   }
-  
+
   .status-badge {
     font-size: 0.65rem;
     font-weight: 700;
@@ -959,8 +1194,14 @@
   }
 
   @keyframes fade-in-line {
-    from { opacity: 0; transform: translateY(6px); }
-    to { opacity: 1; transform: none; }
+    from {
+      opacity: 0;
+      transform: translateY(6px);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
   }
 
   /* 🔌 VS Code Editor Mockup */
@@ -984,30 +1225,74 @@
     opacity: 0;
     animation: slide-in-code 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
   }
-  .code-line:nth-child(1) { animation-delay: 0.05s; }
-  .code-line:nth-child(2) { animation-delay: 0.1s; }
-  .code-line:nth-child(4) { animation-delay: 0.2s; }
-  .code-line:nth-child(5) { animation-delay: 0.25s; }
-  .code-line:nth-child(6) { animation-delay: 0.3s; }
-  .code-line:nth-child(7) { animation-delay: 0.35s; }
-  .code-line:nth-child(8) { animation-delay: 0.4s; }
-  .code-line:nth-child(10) { animation-delay: 0.5s; }
-  .code-line:nth-child(11) { animation-delay: 0.55s; }
-  .code-line:nth-child(12) { animation-delay: 0.6s; }
-  .code-line:nth-child(13) { animation-delay: 0.65s; }
-
-  @keyframes slide-in-code {
-    from { opacity: 0; transform: translateX(-8px); }
-    to { opacity: 1; transform: none; }
+  .code-line:nth-child(1) {
+    animation-delay: 0.05s;
+  }
+  .code-line:nth-child(2) {
+    animation-delay: 0.1s;
+  }
+  .code-line:nth-child(4) {
+    animation-delay: 0.2s;
+  }
+  .code-line:nth-child(5) {
+    animation-delay: 0.25s;
+  }
+  .code-line:nth-child(6) {
+    animation-delay: 0.3s;
+  }
+  .code-line:nth-child(7) {
+    animation-delay: 0.35s;
+  }
+  .code-line:nth-child(8) {
+    animation-delay: 0.4s;
+  }
+  .code-line:nth-child(10) {
+    animation-delay: 0.5s;
+  }
+  .code-line:nth-child(11) {
+    animation-delay: 0.55s;
+  }
+  .code-line:nth-child(12) {
+    animation-delay: 0.6s;
+  }
+  .code-line:nth-child(13) {
+    animation-delay: 0.65s;
   }
 
-  .c-comment { color: #4b5563; }
-  .c-keyword { color: #c084fc; font-weight: 700; }
-  .c-method { color: #34d399; font-weight: 700; }
-  .c-string { color: #fcd34d; }
-  .c-identifier { color: #38bdf8; }
-  .indent-1 { padding-left: 1.25rem; }
-  .indent-2 { padding-left: 2.2rem; }
+  @keyframes slide-in-code {
+    from {
+      opacity: 0;
+      transform: translateX(-8px);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+
+  .c-comment {
+    color: #4b5563;
+  }
+  .c-keyword {
+    color: #c084fc;
+    font-weight: 700;
+  }
+  .c-method {
+    color: #34d399;
+    font-weight: 700;
+  }
+  .c-string {
+    color: #fcd34d;
+  }
+  .c-identifier {
+    color: #38bdf8;
+  }
+  .indent-1 {
+    padding-left: 1.25rem;
+  }
+  .indent-2 {
+    padding-left: 2.2rem;
+  }
 
   .editor-inline-action {
     display: inline-flex;
@@ -1059,9 +1344,15 @@
     opacity: 0;
     animation: fade-in-line 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
   }
-  .dash-stat:nth-child(1) { animation-delay: 0.1s; }
-  .dash-stat:nth-child(2) { animation-delay: 0.2s; }
-  .dash-stat:nth-child(3) { animation-delay: 0.3s; }
+  .dash-stat:nth-child(1) {
+    animation-delay: 0.1s;
+  }
+  .dash-stat:nth-child(2) {
+    animation-delay: 0.2s;
+  }
+  .dash-stat:nth-child(3) {
+    animation-delay: 0.3s;
+  }
 
   .stat-num {
     font-size: 1.15rem;
@@ -1096,14 +1387,28 @@
     opacity: 0;
     animation: slide-in-feed 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
   }
-  .feed-item:nth-child(1) { animation-delay: 0.4s; }
-  .feed-item:nth-child(2) { animation-delay: 0.5s; }
-  .feed-item:nth-child(3) { animation-delay: 0.6s; }
-  .feed-item:nth-child(4) { animation-delay: 0.7s; }
+  .feed-item:nth-child(1) {
+    animation-delay: 0.4s;
+  }
+  .feed-item:nth-child(2) {
+    animation-delay: 0.5s;
+  }
+  .feed-item:nth-child(3) {
+    animation-delay: 0.6s;
+  }
+  .feed-item:nth-child(4) {
+    animation-delay: 0.7s;
+  }
 
   @keyframes slide-in-feed {
-    from { opacity: 0; transform: translateY(8px); }
-    to { opacity: 1; transform: none; }
+    from {
+      opacity: 0;
+      transform: translateY(8px);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
   }
 
   .badge-method {
@@ -1114,10 +1419,22 @@
     width: 42px;
     text-align: center;
   }
-  .badge-method.post { background: rgba(52, 211, 153, 0.1); color: #34d399; }
-  .badge-method.get { background: rgba(56, 189, 248, 0.1); color: #38bdf8; }
-  .badge-method.put { background: rgba(167, 139, 250, 0.1); color: #a78bfa; }
-  .badge-method.delete { background: rgba(244, 63, 94, 0.1); color: #f43f5e; }
+  .badge-method.post {
+    background: rgba(52, 211, 153, 0.1);
+    color: #34d399;
+  }
+  .badge-method.get {
+    background: rgba(56, 189, 248, 0.1);
+    color: #38bdf8;
+  }
+  .badge-method.put {
+    background: rgba(167, 139, 250, 0.1);
+    color: #a78bfa;
+  }
+  .badge-method.delete {
+    background: rgba(244, 63, 94, 0.1);
+    color: #f43f5e;
+  }
 
   .feed-path {
     flex: 1;
