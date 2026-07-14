@@ -12,9 +12,27 @@
   import DirectoryGrid from "$lib/components/dashboard/DirectoryGrid.svelte";
   import DeleteConfirmDialog from "$lib/components/dashboard/DeleteConfirmDialog.svelte";
 
+  import { dashboardSearchQuery, dashboardCurrentFolderId } from "$lib/writable/assistant.store";
+  import { onDestroy } from "svelte";
+
   let searchQuery = "";
   let scrollY = 0;
   let currentFolderId: string | null = null;
+
+  // Two-way synchronization of dashboard states with assistant stores
+  const unsubSearch = dashboardSearchQuery.subscribe((val) => {
+    searchQuery = val;
+  });
+
+  $: dashboardSearchQuery.set(searchQuery);
+  $: dashboardCurrentFolderId.set(currentFolderId);
+
+  onDestroy(() => {
+    unsubSearch();
+    dashboardSearchQuery.set("");
+    dashboardCurrentFolderId.set(null);
+  });
+
   let isEditingFolder = false;
   let editingFolderName = "";
   let folderInputEl: HTMLInputElement;
