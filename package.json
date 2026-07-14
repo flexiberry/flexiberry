@@ -28,6 +28,7 @@
     "dev:app": "pnpm --filter @flexiberry/berrycore dev && pnpm --filter @flexiberry/cli dev && pnpm --filter @flexiberry/vscode-berry-extension dev",
     "dev:doc": "pnpm --filter documentation dev",
     "dev:website": "pnpm --filter website dev",
+    "deploy:app": "pnpm --filter app deploy",
     "deploy:doc": "pnpm --filter documentation deploy",
     "deploy:website": "pnpm --filter website deploy"
   },
