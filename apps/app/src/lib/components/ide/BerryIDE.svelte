@@ -35,7 +35,7 @@
     type BerryBlock,
     type BlockType,
   } from "$lib/utils/berryBlocks";
-  import BerryChat from "./BerryChat.svelte";
+  import { assistantOpen } from "$lib/writable/assistant.store";
   import CodeMirror from "svelte-codemirror-editor";
   import { oneDark } from "@codemirror/theme-one-dark";
   import { mode } from "mode-watcher";
@@ -79,7 +79,6 @@
   $: extension = ctx.fileName.split(".").pop()?.toLowerCase() ?? "";
 
   let viewMode: "blocks" | "raw" = "blocks";
-  let isChatOpen = false;
   let rawContent = "";
   let hoveredId: string | null = null;
 
@@ -339,10 +338,7 @@
 
   <!-- Shared App Header -->
   <div class="fv-header-wrap relative z-10">
-    <Header
-      mode={isChatOpen ? "assistant" : "visual"}
-      onToggle={(newMode) => (isChatOpen = newMode === "assistant")}
-    />
+    <Header />
   </div>
 
   <!-- File Topbar (Matching FileViewer) -->
@@ -446,12 +442,12 @@
         >
           <!-- Global actions -->
           <button
-            class="group/btn flex flex-row-reverse items-center justify-start gap-0 hover:gap-2 w-9 hover:w-32 h-9 px-2.5 rounded-full transition-all duration-300 shadow-sm active:scale-90 border border-transparent hover:border-primary/20 cursor-pointer overflow-hidden whitespace-nowrap {isChatOpen
+            class="group/btn flex flex-row-reverse items-center justify-start gap-0 hover:gap-2 w-9 hover:w-32 h-9 px-2.5 rounded-full transition-all duration-300 shadow-sm active:scale-90 border border-transparent hover:border-primary/20 cursor-pointer overflow-hidden whitespace-nowrap {$assistantOpen
               ? 'bg-primary/10 text-primary border-primary/30'
               : 'text-muted-foreground hover:bg-primary/10 hover:text-primary'}"
             on:click={() => {
               playClickSound();
-              isChatOpen = !isChatOpen;
+              assistantOpen.update((open) => !open);
             }}
             on:mouseenter={playHoverSound}
             title="Toggle AI Copilot"
@@ -919,51 +915,7 @@
     {/if}
   </div>
 
-  <!-- Sliding AI Sidebar Panel -->
-  {#if isChatOpen}
-    <div
-      class="fixed right-0 top-[3.75rem] bottom-8 w-full sm:w-[380px] z-40 border-l border-border/40 dark:border-border/80 bg-card/95 dark:bg-[#141b2b]/95 backdrop-blur shadow-2xl flex flex-col transition-all duration-300 animate-in slide-in-from-right duration-300"
-    >
-      <!-- Panel Header -->
-      <div
-        class="p-4 border-b border-border/40 flex items-center justify-between"
-      >
-        <div class="flex items-center gap-3 select-none">
-          <div
-            class="w-8 h-8 rounded-lg bg-primary/10 border border-primary/20 flex items-center justify-center text-primary shadow-sm"
-          >
-            <Sparkles class="w-4 h-4" />
-          </div>
-          <div class="flex flex-col">
-            <div class="flex items-center gap-2">
-              <span class="text-xs font-bold tracking-tight">AI Copilot</span>
-              <span
-                class="text-[9px] font-black uppercase tracking-tighter bg-primary/10 text-primary px-1.5 py-0.5 rounded border border-primary/20"
-              >
-                Active
-              </span>
-            </div>
-          </div>
-        </div>
 
-        <button
-          type="button"
-          class="p-1 rounded-md text-muted-foreground/60 hover:text-foreground hover:bg-muted transition-all cursor-pointer"
-          on:click={() => {
-            playClickSound();
-            isChatOpen = false;
-          }}
-        >
-          <X class="w-4 h-4" strokeWidth={2} />
-        </button>
-      </div>
-
-      <!-- Panel Body -->
-      <div class="flex-grow overflow-hidden p-4">
-        <BerryChat />
-      </div>
-    </div>
-  {/if}
 
   <!-- Floating Execution Overlay Component -->
   <ExecutionOverlay
