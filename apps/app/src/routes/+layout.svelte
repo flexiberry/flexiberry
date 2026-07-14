@@ -3,6 +3,7 @@
   import { Toaster } from "svelte-sonner";
   import { ModeWatcher } from "mode-watcher";
   import AuthOverlay from "$lib/components/auth/AuthOverlay.svelte";
+  import "../app.css";
 </script>
 
 <Toaster position="bottom-center" />
