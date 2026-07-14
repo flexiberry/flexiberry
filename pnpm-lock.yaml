@@ -66,8 +66,8 @@ importers:
         specifier: ^6.34.3
         version: 6.38.1
       '@flexiberry/berrycore':
-        specifier: workspace:*
-        version: link:../../packages/berrycore
+        specifier: latest
+        version: 0.1.6
       '@lezer/common':
         specifier: ^1.2.0
         version: 1.2.3
@@ -1351,6 +1351,11 @@ packages:
 
   '@flexiberry/berrycore@0.1.3':
     resolution: {integrity: sha512-+F88lTnlHj/VEVtJX0S3Wm0SoNxq8cz3B2Tu/iysVP2NzDNfDUM55pMFYgqIH75q2v3PZ/giTknYULsFA2sTog==}
+    engines: {node: '>=18.0.0'}
+    hasBin: true
+
+  '@flexiberry/berrycore@0.1.6':
+    resolution: {integrity: sha512-Q3Yaw8Na0NUblibOa7rXUHzG5SCdMiss5T/fu6TdF6UkWcsTNJkEQ96Z/jHWe0s+EVnsJuodMYibGUGkAMBGdQ==}
     engines: {node: '>=18.0.0'}
     hasBin: true
 
@@ -6008,6 +6013,8 @@ snapshots:
   '@firebase/webchannel-wrapper@1.0.1': {}
 
   '@flexiberry/berrycore@0.1.3': {}
+
+  '@flexiberry/berrycore@0.1.6': {}
 
   '@floating-ui/core@1.7.2':
     dependencies:
