@@ -74,4 +74,21 @@ db.version(2)
       .modify({ workspaceId: "default" });
   });
 
+// Seed default workspace if missing on database ready
+db.on("ready", async () => {
+  try {
+    const existing = await db.workspaces.get("default");
+    if (!existing) {
+      await db.workspaces.add({
+        id: "default",
+        name: "My Workspace",
+        emoji: "🚀",
+        createdAt: new Date(),
+      });
+    }
+  } catch (e) {
+    console.error("Error seeding default workspace:", e);
+  }
+});
+
 export { db };
