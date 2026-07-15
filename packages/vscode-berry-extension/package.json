@@ -2,7 +2,7 @@
   "name": "vscode-berry-extension",
   "displayName": "FlexiBerry",
   "publisher": "flexiberry",
-  "version": "1.0.7",
+  "version": "1.0.8",
   "description": "Interactive developer extension for the FlexiBerry DSL. Write, validate, and execute API test scripts with real-time visual feedback.",
   "icon": "icon.png",
   "galleryBanner": {

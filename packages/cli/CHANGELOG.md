@@ -1,5 +1,12 @@
 # @flexiberry/cli
 
+## 0.1.7
+
+### Patch Changes
+
+- Updated dependencies
+  - @flexiberry/berrycore@0.1.7
+
 ## 0.1.6
 
 ### Patch Changes

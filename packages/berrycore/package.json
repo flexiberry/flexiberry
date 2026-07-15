@@ -1,6 +1,6 @@
 {
   "name": "@flexiberry/berrycore",
-  "version": "0.1.6",
+  "version": "0.1.7",
   "description": "The official compiler, runtime engine, lexer, parser, and formatter for FlexiBerry .Berry DSL—a scripting language for API orchestration and test automation.",
   "main": "./dist/index.js",
   "type": "module",
