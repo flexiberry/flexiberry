@@ -707,6 +707,31 @@
         </button>
       </div>
 
+      <!-- Run Button -->
+      <button
+        class="flex items-center gap-1.5 px-3 h-7 rounded-md text-white font-bold uppercase text-[9px] tracking-wider transition-all duration-300 shadow-sm active:scale-95 border border-transparent cursor-pointer mr-2
+            {runCountdown > 0
+          ? 'bg-amber-500 hover:bg-amber-600 animate-pulse'
+          : 'bg-emerald-600 hover:bg-emerald-700'}"
+        on:click={() => {
+          if (runCountdown > 0) return;
+          startCountdown();
+        }}
+        on:mouseenter={playHoverSound}
+        title={runCountdown > 0
+          ? `Launching in ${runCountdown}s...`
+          : "Run Notebook File"}
+        disabled={runCountdown > 0}
+      >
+        {#if runCountdown > 0}
+          <span class="text-xs font-black">{runCountdown}</span>
+          <span>Launching…</span>
+        {:else}
+          <Play class="w-3 h-3 fill-current shrink-0" />
+          <span>Run File</span>
+        {/if}
+      </button>
+
       <button
         class="action-btn action-save"
         class:loading={isSaving}
@@ -928,41 +953,16 @@
       {/if}
 
       <!-- Floating Right Run Sidebar / Dashboard -->
-      {#if $berryBlocks.length > 0}
+      {#if $berryBlocks.length > 0 && $executions.length > 0}
         <div
           class="fixed right-3 lg:right-auto lg:left-[calc(50vw+464px)] top-1/2 -translate-y-1/2 z-30 w-28 flex flex-col gap-2 p-2 bg-card/95 dark:bg-[#141b2b]/95 backdrop-blur border border-border/40 dark:border-border/80 rounded-2xl shadow-xl transition-all duration-300"
           aria-label="Execution Controller"
         >
-          <!-- Run Button -->
-          <button
-            class="group/btn flex items-center justify-center gap-1.5 w-full h-8 px-2 rounded-lg text-white font-bold uppercase text-[9px] tracking-wider transition-all duration-300 shadow-sm active:scale-95 border border-transparent cursor-pointer
-                {runCountdown > 0
-              ? 'bg-amber-500 hover:bg-amber-600 animate-pulse'
-              : 'bg-emerald-600 hover:bg-emerald-700'}"
-            on:click={() => {
-              if (runCountdown > 0) return;
-              startCountdown();
-            }}
-            on:mouseenter={playHoverSound}
-            title={runCountdown > 0
-              ? `Launching in ${runCountdown}s...`
-              : "Run Notebook File"}
-            disabled={runCountdown > 0}
-          >
-            {#if runCountdown > 0}
-              <span class="text-xs font-black">{runCountdown}</span>
-              <span>Launching…</span>
-            {:else}
-              <Play class="w-3 h-3 fill-current shrink-0" />
-              <span>Run File</span>
-            {/if}
-          </button>
-
           <!-- Executions Grid -->
-          {#if $executions.length > 0}
-            <div class="w-full h-[1px] bg-border/40 my-0.5"></div>
+          <div class="text-[8px] font-black uppercase text-muted-foreground/60 text-center tracking-wider py-0.5 select-none">Runs History</div>
+          <div class="w-full h-[1px] bg-border/40 my-0.5"></div>
 
-            <div class="grid grid-cols-4 gap-1.5 w-full justify-items-center">
+          <div class="grid grid-cols-4 gap-1.5 w-full justify-items-center">
               {#each $executions as exec, i (exec.id)}
                 <button
                   transition:scale={{ duration: 250, start: 0.6 }}
@@ -1084,7 +1084,6 @@
                 </button>
               {/each}
             </div>
-          {/if}
         </div>
       {/if}
 

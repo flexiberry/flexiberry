@@ -82,6 +82,12 @@
       </div>
     </div>
 
+    <!-- AI Warning Status Banner -->
+    <div class="px-3.5 py-2 bg-amber-500/10 border border-amber-500/20 rounded-xl text-[10px] font-bold text-amber-600 dark:text-amber-400/90 flex items-center gap-2 mb-4 shrink-0 select-none">
+      <div class="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse shrink-0"></div>
+      <span>AI Generation is currently disabled. Quick Actions are active.</span>
+    </div>
+
     <!-- Messages -->
     <div
       class="flex-1 overflow-y-auto pr-2 space-y-5 pb-4 scrollbar-thin"
