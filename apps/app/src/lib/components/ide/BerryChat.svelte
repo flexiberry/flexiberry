@@ -158,6 +158,12 @@
       </p>
     </div>
 
+    <!-- AI Warning Status Banner -->
+    <div class="px-4 py-2.5 bg-amber-500/10 border border-amber-500/20 rounded-2xl text-[10px] font-bold text-amber-600 dark:text-amber-400/90 flex items-center gap-2 select-none">
+      <div class="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse shrink-0"></div>
+      <span>AI Generation is currently disabled. Quick Starters are active.</span>
+    </div>
+
     <!-- Suggested Card Actions -->
     <div class="flex flex-col gap-2 mt-2">
       <span class="text-[10px] font-black uppercase tracking-wider text-muted-foreground/45 px-1">Quick Starters</span>

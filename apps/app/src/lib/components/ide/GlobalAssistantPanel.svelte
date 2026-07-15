@@ -379,6 +379,12 @@
     </button>
   </div>
 
+  <!-- AI Warning Status Banner -->
+  <div class="px-4 py-2 bg-amber-500/10 border-b border-border/20 text-[10px] font-bold text-amber-600 dark:text-amber-400 flex items-center gap-2 shrink-0 select-none">
+    <div class="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse shrink-0"></div>
+    <span>AI Generation is currently disabled. Quick Actions are active.</span>
+  </div>
+
   <!-- Panel Body / Message list -->
   <div
     bind:this={chatContainer}

@@ -1,5 +1,11 @@
 # app
 
+## 0.1.5
+
+### Patch Changes
+
+- feat: add AI status warnings, implement execution persistence, and update IDE run button UI and interpreter response handling
+
 ## 0.1.4
 
 ### Patch Changes

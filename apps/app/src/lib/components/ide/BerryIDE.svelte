@@ -46,6 +46,8 @@
   } from "$lib/utils/berryLanguage";
   import { onDestroy } from "svelte";
   import { scale } from "svelte/transition";
+  import { BerryCore, InterpreterEvent } from "@flexiberry/berrycore";
+  import StandaloneApiDialog from "./StandaloneApiDialog.svelte";
   import { Button } from "$lib/components/ui/button";
   import type { RunInstance } from "./execution/execution.types";
   import ExecutionOverlay from "./execution/ExecutionOverlay.svelte";
@@ -177,8 +179,319 @@
     }
   }
 
-  function handleRunBlock(e: CustomEvent<{ id: string }>) {
-    toast.success(`Block executed! (Mock)`);
+  // Standalone run state
+  let showPrompt = false;
+  let runLoading = false;
+  let activeApi: any = null;
+  let declaredVars: Record<string, string> = {};
+  let missingPlaceholders: string[] = [];
+
+  let showStandaloneApiDialog = false;
+  let apiDetails: any = null;
+  let responseDetails: any = null;
+
+  function substituteVariables(text: string, vars: Record<string, string>): string {
+    return text.replace(/\{\{(.+?)\}\}/g, (match, key) => {
+      const trimmedKey = key.trim();
+      return vars[trimmedKey] !== undefined ? vars[trimmedKey] : match;
+    });
+  }
+
+  async function handleRunBlock(e: CustomEvent<{ id: string }>) {
+    const block = $berryBlocks.find((b) => b.id === e.detail.id);
+    if (!block) return;
+
+    if (block.type !== "Api") {
+      toast.info("Standalone execution is supported for API blocks.");
+      return;
+    }
+
+    try {
+      // 1. Parse API content line-by-line: name, method, url, headers, body
+      let apiName = "unnamed";
+      let apiMethod = "GET";
+      let apiUrl = "";
+      const apiHeaders: Record<string, string> = {};
+      const apiBodyLines: string[] = [];
+      let isBodySection = false;
+
+      const lines = block.content.split("\n");
+      for (const line of lines) {
+        const trimmedLine = line.trim();
+        if (!trimmedLine) continue;
+
+        // Match Api line: e.g. Api GET #getUser
+        const apiMatch = trimmedLine.match(/^Api\s+([a-zA-Z]+)(?:\s+#([\w-]+))?/i);
+        if (apiMatch) {
+          apiMethod = apiMatch[1].toUpperCase();
+          if (apiMatch[2]) {
+            apiName = apiMatch[2];
+          }
+          continue;
+        }
+
+        // Match Url line
+        if (trimmedLine.startsWith("Url ")) {
+          apiUrl = trimmedLine.substring(4).trim();
+          continue;
+        }
+
+        // Match section flags
+        if (trimmedLine.toLowerCase() === "headers") {
+          isBodySection = false;
+          continue;
+        }
+        if (trimmedLine.toLowerCase() === "body") {
+          isBodySection = true;
+          continue;
+        }
+
+        if (isBodySection) {
+          apiBodyLines.push(line);
+        } else {
+          // Parse header: Key: Value or - Key: Value
+          const headerMatch = trimmedLine.match(/^(?:-\s*)?([\w-]+)\s*:\s*(.+)$/);
+          if (headerMatch) {
+            apiHeaders[headerMatch[1]] = headerMatch[2].trim();
+          }
+        }
+      }
+
+      // 2. Extract placeholders from API block content
+      const placeholders = new Set<string>();
+      const regex = /\{\{(.+?)\}\}/g;
+      let match;
+      while ((match = regex.exec(block.content)) !== null) {
+        placeholders.add(match[1].trim());
+      }
+
+      // 3. Scan for declared variable keys and values in Var and Env blocks
+      const vars: Record<string, string> = {};
+      for (const b of $berryBlocks) {
+        if (b.type === "Var" || b.type === "Env") {
+          const lines = b.content.split("\n");
+          for (const line of lines) {
+            const m = line.trim().match(/^(?:-\s*)?([\w-]+)\s*:\s*["']?([^"']+)["']?$/);
+            if (m) {
+              vars[m[1]] = m[2];
+            }
+          }
+        }
+      }
+      declaredVars = vars;
+
+      // 4. Collect all placeholders in the API block (enabling user to customize them even if declared)
+      const allPlaceholders = Array.from(placeholders);
+      missingPlaceholders = allPlaceholders;
+
+      activeApi = {
+        name: apiName,
+        method: apiMethod,
+        url: apiUrl,
+        headers: apiHeaders,
+        body: apiBodyLines.join("\n").trim()
+      };
+
+      showStandaloneApiDialog = true;
+
+      // Build initial promptedVars from declaredVars
+      const initialVars: Record<string, string> = {};
+      for (const p of allPlaceholders) {
+        initialVars[p] = declaredVars[p] || "";
+      }
+      await executeStandaloneApi(initialVars);
+    } catch (err: any) {
+      toast.error("Failed to parse API block", { description: err.message });
+    }
+  }
+
+  async function executeStandaloneApi(promptedVars: Record<string, string>) {
+    if (!activeApi) return;
+    runLoading = true;
+
+    // Merge variables
+    const mergedVars = { ...declaredVars, ...promptedVars };
+
+    // Pre-resolve Request Details for immediate/reliable UI rendering
+    const resolvedUrl = substituteVariables(activeApi.url, mergedVars);
+    const resolvedHeaders: Record<string, string> = {};
+    for (const [key, val] of Object.entries(activeApi.headers)) {
+      resolvedHeaders[key] = substituteVariables(val as string, mergedVars);
+    }
+    const resolvedBody = activeApi.body ? substituteVariables(activeApi.body, mergedVars) : "";
+
+    apiDetails = {
+      name: activeApi.name,
+      method: activeApi.method,
+      url: resolvedUrl,
+      headers: resolvedHeaders,
+      body: resolvedBody
+    };
+
+    const baseCode = stringifyBerryBlocks($berryBlocks);
+    let varBlock = "";
+    if (Object.keys(promptedVars).length > 0) {
+      varBlock = "Var\n" + Object.entries(promptedVars)
+        .map(([k, v]) => `- ${k}: "${v}"`)
+        .join("\n") + "\n\n";
+    }
+
+    const tempScript = `${baseCode}\n\n${varBlock}Task "Quick Run"\n  Step Call Api ${activeApi.name}`;
+
+    responseDetails = null;
+    showStandaloneApiDialog = true;
+
+    const start = Date.now();
+    let capturedRequest: any = null;
+    let capturedResponse: any = null;
+
+    // Monkeypatch fetch temporarily to extract resolved headers/body sent by BerryCore
+    const originalFetch = window.fetch;
+    const localRequestDetails = { headers: {} as any, body: null as any };
+
+    window.fetch = async (input, init) => {
+      let requestHeaders: Record<string, string> = {};
+      if (init?.headers) {
+        if (init.headers instanceof Headers) {
+          init.headers.forEach((val, key) => {
+            requestHeaders[key] = val;
+          });
+        } else if (Array.isArray(init.headers)) {
+          init.headers.forEach(([key, val]) => {
+            requestHeaders[key] = val;
+          });
+        } else {
+          requestHeaders = { ...init.headers } as Record<string, string>;
+        }
+      }
+      localRequestDetails.headers = requestHeaders;
+      localRequestDetails.body = init?.body ?? null;
+
+      return originalFetch(input, init);
+    };
+
+    try {
+      const core = new BerryCore(tempScript);
+
+      core.on(InterpreterEvent.ApiCallBegin, (payload) => {
+        if (payload.apiName === activeApi.name) {
+          capturedRequest = {
+            name: payload.apiName,
+            method: payload.method || "GET",
+            url: payload.url
+          };
+        }
+      });
+
+      core.on(InterpreterEvent.StepDone, (payload) => {
+        if (payload.targetName === activeApi.name) {
+          if (payload.response) {
+            capturedResponse = {
+              status: payload.response.status,
+              statusText: (() => {
+                const statusTexts: Record<number, string> = {
+                  200: "OK", 201: "Created", 202: "Accepted", 204: "No Content",
+                  301: "Moved Permanently", 302: "Found", 304: "Not Modified",
+                  400: "Bad Request", 401: "Unauthorized", 403: "Forbidden", 404: "Not Found",
+                  405: "Method Not Allowed", 415: "Unsupported Media Type",
+                  500: "Internal Server Error", 502: "Bad Gateway", 503: "Service Unavailable", 504: "Gateway Timeout"
+                };
+                return statusTexts[payload.response.status] || (payload.response.status >= 200 && payload.response.status < 300 ? "OK" : "Error");
+              })(),
+              headers: payload.response.headers || {},
+              body: typeof payload.response.body === "object"
+                ? JSON.stringify(payload.response.body)
+                : String(payload.response.body),
+              duration: payload.endTime.getTime() - payload.startTime.getTime()
+            };
+          }
+          if (payload.error) {
+            capturedResponse = {
+              status: 0,
+              statusText: "Error",
+              headers: {},
+              body: "",
+              duration: payload.endTime.getTime() - payload.startTime.getTime(),
+              error: payload.error
+            };
+          }
+        }
+      });
+
+      await core.run();
+
+      const duration = Date.now() - start;
+
+      // Extract resolved body text
+      let bodyText = "";
+      if (localRequestDetails.body) {
+        if (typeof localRequestDetails.body === "string") {
+          bodyText = localRequestDetails.body;
+        } else if (localRequestDetails.body instanceof Blob) {
+          bodyText = await localRequestDetails.body.text();
+        } else {
+          bodyText = String(localRequestDetails.body);
+        }
+      }
+
+      apiDetails = {
+        name: activeApi.name,
+        method: capturedRequest?.method || activeApi.method,
+        url: capturedRequest?.url || activeApi.url,
+        headers: localRequestDetails.headers,
+        body: bodyText
+      };
+
+      if (!capturedResponse) {
+        capturedResponse = {
+          status: 0,
+          statusText: "Not Run",
+          headers: {},
+          body: "",
+          duration,
+          error: "The API step was not executed. Please ensure the block is named correctly (e.g. 'Api GET #apiName') and is called properly."
+        };
+      }
+      responseDetails = capturedResponse;
+
+      toast.success(`Standalone API Run Completed: #${activeApi.name}`);
+    } catch (err: any) {
+      const duration = Date.now() - start;
+
+      let bodyText = "";
+      if (localRequestDetails.body) {
+        if (typeof localRequestDetails.body === "string") {
+          bodyText = localRequestDetails.body;
+        } else if (localRequestDetails.body instanceof Blob) {
+          bodyText = await localRequestDetails.body.text();
+        } else {
+          bodyText = String(localRequestDetails.body);
+        }
+      }
+
+      apiDetails = {
+        name: activeApi.name,
+        method: capturedRequest?.method || activeApi.method,
+        url: capturedRequest?.url || activeApi.url,
+        headers: localRequestDetails.headers,
+        body: bodyText
+      };
+
+      responseDetails = {
+        status: 0,
+        statusText: "Error",
+        headers: {},
+        body: "",
+        duration,
+        error: err.message
+      };
+
+      toast.error(`Standalone API Run Failed: ${err.message}`);
+    } finally {
+      // Restore original fetch
+      window.fetch = originalFetch;
+      runLoading = false;
+    }
   }
 
   function handleInsertBlock(
@@ -393,6 +706,31 @@
           <span>Raw</span>
         </button>
       </div>
+
+      <!-- Run Button -->
+      <button
+        class="flex items-center gap-1.5 px-3 h-7 rounded-md text-white font-bold uppercase text-[9px] tracking-wider transition-all duration-300 shadow-sm active:scale-95 border border-transparent cursor-pointer mr-2
+            {runCountdown > 0
+          ? 'bg-amber-500 hover:bg-amber-600 animate-pulse'
+          : 'bg-emerald-600 hover:bg-emerald-700'}"
+        on:click={() => {
+          if (runCountdown > 0) return;
+          startCountdown();
+        }}
+        on:mouseenter={playHoverSound}
+        title={runCountdown > 0
+          ? `Launching in ${runCountdown}s...`
+          : "Run Notebook File"}
+        disabled={runCountdown > 0}
+      >
+        {#if runCountdown > 0}
+          <span class="text-xs font-black">{runCountdown}</span>
+          <span>Launching…</span>
+        {:else}
+          <Play class="w-3 h-3 fill-current shrink-0" />
+          <span>Run File</span>
+        {/if}
+      </button>
 
       <button
         class="action-btn action-save"
@@ -615,41 +953,16 @@
       {/if}
 
       <!-- Floating Right Run Sidebar / Dashboard -->
-      {#if $berryBlocks.length > 0}
+      {#if $berryBlocks.length > 0 && $executions.length > 0}
         <div
           class="fixed right-3 lg:right-auto lg:left-[calc(50vw+464px)] top-1/2 -translate-y-1/2 z-30 w-28 flex flex-col gap-2 p-2 bg-card/95 dark:bg-[#141b2b]/95 backdrop-blur border border-border/40 dark:border-border/80 rounded-2xl shadow-xl transition-all duration-300"
           aria-label="Execution Controller"
         >
-          <!-- Run Button -->
-          <button
-            class="group/btn flex items-center justify-center gap-1.5 w-full h-8 px-2 rounded-lg text-white font-bold uppercase text-[9px] tracking-wider transition-all duration-300 shadow-sm active:scale-95 border border-transparent cursor-pointer
-                {runCountdown > 0
-              ? 'bg-amber-500 hover:bg-amber-600 animate-pulse'
-              : 'bg-emerald-600 hover:bg-emerald-700'}"
-            on:click={() => {
-              if (runCountdown > 0) return;
-              startCountdown();
-            }}
-            on:mouseenter={playHoverSound}
-            title={runCountdown > 0
-              ? `Launching in ${runCountdown}s...`
-              : "Run Notebook File"}
-            disabled={runCountdown > 0}
-          >
-            {#if runCountdown > 0}
-              <span class="text-xs font-black">{runCountdown}</span>
-              <span>Launching…</span>
-            {:else}
-              <Play class="w-3 h-3 fill-current shrink-0" />
-              <span>Run File</span>
-            {/if}
-          </button>
-
           <!-- Executions Grid -->
-          {#if $executions.length > 0}
-            <div class="w-full h-[1px] bg-border/40 my-0.5"></div>
+          <div class="text-[8px] font-black uppercase text-muted-foreground/60 text-center tracking-wider py-0.5 select-none">Runs History</div>
+          <div class="w-full h-[1px] bg-border/40 my-0.5"></div>
 
-            <div class="grid grid-cols-4 gap-1.5 w-full justify-items-center">
+          <div class="grid grid-cols-4 gap-1.5 w-full justify-items-center">
               {#each $executions as exec, i (exec.id)}
                 <button
                   transition:scale={{ duration: 250, start: 0.6 }}
@@ -771,7 +1084,6 @@
                 </button>
               {/each}
             </div>
-          {/if}
         </div>
       {/if}
 
@@ -934,6 +1246,17 @@
         submitPromptInput(e.detail.id, exec.promptValue);
       }
     }}
+  />
+
+  <!-- Standalone API Result/Run Dialog -->
+  <StandaloneApiDialog
+    bind:open={showStandaloneApiDialog}
+    {apiDetails}
+    {responseDetails}
+    placeholders={missingPlaceholders}
+    declaredVars={declaredVars}
+    loading={runLoading}
+    on:rerun={(e) => executeStandaloneApi(e.detail)}
   />
 </div>
 

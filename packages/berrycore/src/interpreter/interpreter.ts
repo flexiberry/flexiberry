@@ -99,7 +99,7 @@ export class Interpreter {
   /** Check if killed — bypasses TS narrowing since state changes async */
   private isKilled(): boolean { return this.state === ExecutionState.Killed; }
 
-  constructor(ast: ProgramNode, options: Partial<InterpreterOptions> = {}) {
+  constructor (ast: ProgramNode, options: Partial<InterpreterOptions> = {}) {
     this.ast = ast;
     this.options = { ...DEFAULT_OPTIONS, ...options };
   }
@@ -481,7 +481,13 @@ export class Interpreter {
 
       // Store response metadata in step environment
       stepEnv.declare("$.status", response.status);
+      stepEnv.declare("response.status", response.status);
       stepEnv.declare("$.body", response.data ?? null);
+      stepEnv.declare("response.body", response.data ?? null);
+      stepEnv.declare("$", response.data ?? null);
+      stepEnv.declare("response", response.data ?? null);
+      stepEnv.declare("$.headers", response.headers ?? {});
+      stepEnv.declare("response.headers", response.headers ?? {});
 
       // Process capture
       if (node.capture) {
@@ -765,6 +771,15 @@ export class Interpreter {
     stepEnv: Environment,
     taskEnv: Environment
   ): unknown {
+    // Strip quotes from string literals
+    if (
+      (raw.startsWith('"') && raw.endsWith('"')) ||
+      (raw.startsWith("'") && raw.endsWith("'")) ||
+      (raw.startsWith("`") && raw.endsWith("`"))
+    ) {
+      return raw.slice(1, -1);
+    }
+
     // Special keyword: null
     if (raw === "null") return null;
     // Special keyword: true/false

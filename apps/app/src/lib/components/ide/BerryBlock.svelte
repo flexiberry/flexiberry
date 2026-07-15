@@ -252,7 +252,8 @@
           <Wand2 class="w-3.5 h-3.5" />
         </button>
       {/if}
-      {#if block.type !== 'Link' && block.type !== 'Step' && block.type !== 'Input'}
+
+      {#if block.type === 'Api' || block.type === 'Task'}
         <button 
           class="w-7 h-7 flex items-center justify-center rounded text-muted-foreground hover:bg-primary/10 hover:text-primary transition-colors cursor-pointer"
           title="Run Block"

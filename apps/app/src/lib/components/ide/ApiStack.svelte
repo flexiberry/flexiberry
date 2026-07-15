@@ -222,21 +222,21 @@
           <div class="p-3 flex items-center justify-between gap-3">
             <div class="flex items-center gap-3 overflow-hidden">
               <!-- Method Tag -->
-              <span class="text-[9px] font-black px-1.5 py-0.5 rounded-md border {getMethodColor(api.method || 'GET')} flex shadow-sm min-w-[40px] justify-center tracking-tighter">
+              <span class="text-xs font-black px-2 py-0.5 rounded-md border {getMethodColor(api.method || 'GET')} flex shadow-sm min-w-[48px] justify-center tracking-tight">
                 {api.method || "GET"}
               </span>
 
               <div class="flex flex-col min-w-0">
                 <div class="flex items-center gap-1.5 overflow-hidden">
-                  <span class="text-xs font-black tracking-tight truncate">#{api.name}</span>
+                  <span class="text-base font-black tracking-tight truncate">#{api.name}</span>
                   {#if api.title}
-                    <span class="text-[10px] text-muted-foreground font-medium truncate opacity-60">
+                    <span class="text-sm text-muted-foreground font-medium truncate opacity-70">
                       • {api.title}
                     </span>
                   {/if}
                 </div>
-                <div class="flex items-center gap-1 text-[10px] text-muted-foreground/60 font-mono truncate">
-                   <Globe class="w-2.5 h-2.5" />
+                <div class="flex items-center gap-1 text-sm text-muted-foreground/75 font-mono truncate">
+                   <Globe class="w-3.5 h-3.5" />
                    {api.url?.value || "no url"}
                 </div>
               </div>
@@ -277,31 +277,31 @@
                   <div class="flex items-center justify-between border-b border-border/50 pb-2">
                     <div class="flex items-center gap-4">
                        <div class="flex flex-col">
-                         <span class="text-[9px] font-black text-muted-foreground uppercase tracking-widest">Status</span>
-                         <span class="text-sm font-black {result.status < 400 ? 'text-emerald-500' : 'text-rose-500'}">
+                         <span class="text-xs font-black text-muted-foreground uppercase tracking-widest">Status</span>
+                         <span class="text-lg font-black {result.status < 400 ? 'text-emerald-500' : 'text-rose-500'}">
                            {result.status}
                          </span>
                        </div>
                        <div class="flex flex-col border-l border-border/50 pl-4">
-                         <span class="text-[9px] font-black text-muted-foreground uppercase tracking-widest">Time</span>
-                         <span class="text-xs font-bold text-foreground/80">{result.duration}ms</span>
+                         <span class="text-xs font-black text-muted-foreground uppercase tracking-widest">Time</span>
+                         <span class="text-base font-bold text-foreground/80">{result.duration}ms</span>
                        </div>
                     </div>
-                    <span class="text-[10px] text-muted-foreground/40 font-mono">
+                    <span class="text-sm text-muted-foreground/50 font-mono">
                       {result.timestamp.toLocaleTimeString()}
                     </span>
                   </div>
 
                   {#if result.error}
-                     <div class="p-3 rounded-lg bg-rose-500/5 border border-rose-500/10 text-rose-500 text-[10px] font-bold">
+                     <div class="p-3 rounded-lg bg-rose-500/5 border border-rose-500/10 text-rose-500 text-xs font-bold">
                        {result.error}
                      </div>
                   {/if}
 
                   <!-- Response Body -->
                   <div class="space-y-1.5">
-                    <span class="text-[9px] font-black text-muted-foreground uppercase tracking-widest">Response Body</span>
-                    <div class="p-3 rounded-xl bg-muted/30 border border-border/40 font-mono text-[11px] max-h-[200px] overflow-auto custom-scrollbar whitespace-pre-wrap selection-primary">
+                    <span class="text-xs font-black text-muted-foreground uppercase tracking-widest">Response Body</span>
+                    <div class="p-3 rounded-xl bg-muted/30 border border-border/40 font-mono text-sm max-h-[200px] overflow-auto custom-scrollbar whitespace-pre-wrap selection-primary">
                       {JSON.stringify(result.body, null, 2)}
                     </div>
                   </div>
@@ -309,7 +309,7 @@
               {:else}
                 <div class="p-8 text-center flex flex-col items-center gap-3 opacity-40">
                   <Activity class="w-8 h-8 text-muted-foreground" />
-                  <p class="text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground">No execution data</p>
+                  <p class="text-xs font-bold uppercase tracking-[0.2em] text-muted-foreground">No execution data</p>
                   <Button 
                     variant="outline" 
                     size="sm" 
@@ -329,8 +329,8 @@
               <Zap class="w-6 h-6 text-muted-foreground/40" />
            </div>
            <div>
-              <p class="text-xs font-black uppercase tracking-tighter text-foreground/60 mb-1">No APIs Detected</p>
-              <p class="text-[10px] text-muted-foreground font-medium leading-relaxed">
+              <p class="text-sm font-black uppercase tracking-tighter text-foreground/60 mb-1">No APIs Detected</p>
+              <p class="text-xs text-muted-foreground font-medium leading-relaxed">
                 Add an <code>Api</code> block in your .berry code to see it here. Example: 
                 <br/><code class="text-primary/70">Api GET #v1 Hello World</code>
               </p>

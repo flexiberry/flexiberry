@@ -9,7 +9,30 @@ import type { RunInstance, PlanTask, PlanStep } from "./execution.types";
 import { toast } from "svelte-sonner";
 import { db } from "$lib/db/db";
 
-export const executions = writable<RunInstance[]>([]);
+const saved = typeof window !== "undefined" ? localStorage.getItem("berry_executions") : null;
+const initialExecutions: RunInstance[] = saved
+  ? JSON.parse(saved).map((e: any) => {
+      if (e.status === "running") {
+        e.status = "failed";
+        e.error = "Execution interrupted by page reload";
+      }
+      e.startTime = new Date(e.startTime);
+      if (e.endTime) e.endTime = new Date(e.endTime);
+      return e;
+    })
+  : [];
+
+export const executions = writable<RunInstance[]>(initialExecutions);
+
+if (typeof window !== "undefined") {
+  executions.subscribe((list) => {
+    const serializableList = list.map((exec) => {
+      const { core, adapter, timerInterval, resolvePrompt, ...rest } = exec;
+      return rest;
+    });
+    localStorage.setItem("berry_executions", JSON.stringify(serializableList));
+  });
+}
 
 // Keep a reference to original fetch to restore it
 const originalFetch = window.fetch;

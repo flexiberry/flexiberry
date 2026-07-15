@@ -259,8 +259,6 @@
             class="cursor-pointer"
             on:click={() => goto("/profile")}>Profile</DropdownMenu.Item
           >
-          <DropdownMenu.Item>Billing</DropdownMenu.Item>
-          <DropdownMenu.Item>Settings</DropdownMenu.Item>
         </DropdownMenu.Group>
         <DropdownMenu.Separator />
         <DropdownMenu.Item

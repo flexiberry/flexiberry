@@ -26,10 +26,10 @@
 </script>
 
 <Card class="bg-card/45 border-border/30 overflow-hidden shadow-sm">
-  <CardHeader class="bg-muted/40 px-3.5 py-2 border-b border-border/30 flex flex-row items-center justify-between gap-3 space-y-0 select-text">
-    <div class="flex items-center gap-2 shrink-0">
-      <span class="text-[9px] font-black uppercase text-zinc-500 dark:text-zinc-400">Request</span>
-      <span class="font-mono text-[9px] px-2 py-0.5 rounded font-black 
+  <CardHeader class="bg-muted/40 px-3.5 py-3 border-b border-border/30 flex flex-row items-center justify-between gap-3 space-y-0 select-text">
+    <div class="flex items-center gap-2.5 shrink-0">
+      <span class="text-xs font-black uppercase text-zinc-500 dark:text-zinc-400">Request</span>
+      <span class="font-mono text-xs px-2.5 py-0.5 rounded font-black 
         {request.method === 'GET' ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20' : 
          request.method === 'POST' ? 'bg-sky-500/10 text-sky-600 dark:text-sky-400 border border-sky-500/20' : 
          request.method === 'PUT' ? 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20' : 
@@ -37,15 +37,15 @@
         {request.method}
       </span>
     </div>
-    <span class="font-mono text-[10px] text-zinc-600 dark:text-zinc-300 break-all select-all flex-grow text-right">{request.url}</span>
+    <span class="font-mono text-sm text-zinc-600 dark:text-zinc-300 break-all select-all flex-grow text-right">{request.url}</span>
   </CardHeader>
 
   <CardContent class="p-3.5 space-y-3.5 font-mono">
     <!-- Request Headers -->
     {#if request.headers && Object.keys(request.headers).length > 0}
       <div class="space-y-1.5">
-        <h4 class="text-[9px] font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">Headers</h4>
-        <div class="grid grid-cols-3 gap-x-3 gap-y-1 text-[10px] bg-muted/50 dark:bg-black/25 p-3 rounded-lg border border-border/15 max-h-40 overflow-y-auto custom-scrollbar select-text">
+        <h4 class="text-xs font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">Headers</h4>
+        <div class="grid grid-cols-3 gap-x-3 gap-y-1 text-sm bg-muted/50 dark:bg-black/25 p-3 rounded-lg border border-border/15 max-h-40 overflow-y-auto custom-scrollbar select-text">
           {#each Object.entries(request.headers) as [hk, hv]}
             <span class="text-zinc-500 dark:text-zinc-400 font-semibold truncate select-none">{hk}:</span>
             <span class="text-zinc-800 dark:text-zinc-300 col-span-2 break-all select-all">{hv}</span>
@@ -57,8 +57,8 @@
     <!-- Request Body -->
     {#if request.body}
       <div class="space-y-1.5">
-        <h4 class="text-[9px] font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">Body</h4>
-        <pre class="bg-muted/50 dark:bg-black/25 p-3 rounded-lg border border-border/15 overflow-x-auto max-h-48 text-[10px] text-zinc-800 dark:text-zinc-300 select-all custom-scrollbar leading-relaxed">{formatBody(request.body)}</pre>
+        <h4 class="text-xs font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">Body</h4>
+        <pre class="bg-muted/50 dark:bg-black/25 p-3 rounded-lg border border-border/15 overflow-x-auto max-h-48 text-sm text-zinc-800 dark:text-zinc-300 select-all custom-scrollbar leading-relaxed">{formatBody(request.body)}</pre>
       </div>
     {/if}
   </CardContent>
