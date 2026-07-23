@@ -176,8 +176,8 @@
                         {/if}
                         <span
                           class={check.pass
-                            ? "text-zinc-300"
-                            : "text-rose-400 font-bold"}
+                            ? "text-zinc-800 dark:text-zinc-300"
+                            : "text-rose-600 dark:text-rose-400 font-bold"}
                           >{check.expression}</span
                         >
                       </div>
@@ -185,7 +185,7 @@
                         class="text-muted-foreground/80 select-text break-all text-right font-sans text-[9px]"
                       >
                         Evaluated: <code
-                          class="bg-muted px-1 py-0.5 rounded font-mono text-[9px] text-zinc-300"
+                          class="bg-muted px-1 py-0.5 rounded font-mono text-[9px] text-zinc-800 dark:text-zinc-300"
                           >{check.evaluated}</code
                         >
                       </span>
@@ -231,9 +231,9 @@
                     <div
                       class="flex items-start justify-between gap-4 py-2 font-mono text-[10px] last:pb-0 first:pt-0"
                     >
-                      <span class="text-indigo-400 font-bold">{key}</span>
+                      <span class="text-indigo-600 dark:text-indigo-400 font-bold">{key}</span>
                       <span
-                        class="text-zinc-300 select-text break-all text-right"
+                        class="text-zinc-800 dark:text-zinc-300 select-text break-all text-right"
                       >
                         {typeof value === "object"
                           ? JSON.stringify(value)
