@@ -1,1 +1,13 @@
-/*  /200.html  200
+# Serve assets directly
+/_app/*                  /:splat                  200
+/icons/*                 /:splat                  200
+/logo/*                  /:splat                  200
+/favicon.png             /favicon.png             200
+/favicon%20copy.ico      /favicon%20copy.ico      200
+
+# Prevent loops on fallback pages
+/index.html              /index.html              200
+/200.html                /200.html                200
+
+# Fallback all other routes to SPA router
+/*                       /200.html                200
