@@ -254,7 +254,7 @@
 
       {#if !isResettingPassword}
         <!-- Social Sign-in Buttons -->
-        <div class="grid grid-cols-2 gap-3 mb-5">
+        <div class="grid grid-cols-2 gap-3 mb-3">
           <Button
             variant="outline"
             class="w-full flex items-center justify-center gap-2 h-10 text-xs border-border/80 hover:bg-accent/50 dark:hover:bg-accent/20 rounded-xl"
@@ -303,6 +303,33 @@
             </svg>
             GitHub
           </Button>
+        </div>
+
+        <div class="flex flex-col items-center mb-5">
+          <Button
+            variant="outline"
+            class="w-full flex items-center justify-center gap-2 h-10 text-xs border-border/80 hover:bg-accent/50 dark:hover:bg-accent/20 rounded-xl"
+            on:click={loginAnonymously}
+            disabled={submitting}
+          >
+            <svg
+              class="h-4 w-4 text-muted-foreground"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+              />
+            </svg>
+            Continue as Guest
+          </Button>
+          <span class="text-[10px] text-muted-foreground/60 mt-1.5 text-center font-medium">
+            * Temporary session with restricted features
+          </span>
         </div>
 
         <div class="relative flex py-3 items-center">
