@@ -709,10 +709,10 @@
 
       <!-- Run Button -->
       <button
-        class="flex items-center gap-1.5 px-3 h-7 rounded-md text-white font-bold uppercase text-[9px] tracking-wider transition-all duration-300 shadow-sm active:scale-95 border border-transparent cursor-pointer mr-2
+        class="flex items-center gap-1.5 px-4 h-8 rounded-md text-white font-bold uppercase text-[10px] tracking-wider transition-all duration-300 shadow-md active:scale-95 hover:scale-[1.03] cursor-pointer mr-2
             {runCountdown > 0
-          ? 'bg-amber-500 hover:bg-amber-600 animate-pulse'
-          : 'bg-emerald-600 hover:bg-emerald-700'}"
+          ? 'bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 border border-amber-400/25 animate-pulse shadow-amber-500/20'
+          : 'bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 border border-emerald-400/25 shadow-emerald-500/25 hover:shadow-emerald-500/35'}"
         on:click={() => {
           if (runCountdown > 0) return;
           startCountdown();
@@ -727,7 +727,7 @@
           <span class="text-xs font-black">{runCountdown}</span>
           <span>Launching…</span>
         {:else}
-          <Play class="w-3 h-3 fill-current shrink-0" />
+          <Play class="w-3.5 h-3.5 fill-current shrink-0" />
           <span>Run File</span>
         {/if}
       </button>
@@ -1419,11 +1419,13 @@
     flex-shrink: 0;
   }
   .action-save {
-    background: hsl(var(--primary));
-    color: hsl(var(--primary-foreground));
+    background: transparent;
+    border: 1px solid hsl(var(--primary) / 0.4);
+    color: hsl(var(--primary));
   }
   .action-save:hover:not(.loading) {
-    opacity: 0.9;
+    background: hsl(var(--primary) / 0.15);
+    border-color: hsl(var(--primary));
   }
   .action-save.loading {
     opacity: 0.65;
