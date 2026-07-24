@@ -219,11 +219,11 @@
             Create your account
           {/if}
         </h1>
-        <p class="text-xs text-muted-foreground mt-1 max-w-[280px]">
+        <p class="text-xs text-muted-foreground mt-1 max-w-[300px]">
           {#if isResettingPassword}
             Enter your email to receive a password reset link
           {:else if isLogin}
-            The node-based system developer workspace
+            The developer-first HTTP client for sequential API workflows
           {:else}
             Get started by creating your developer account
           {/if}
