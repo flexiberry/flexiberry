@@ -6,25 +6,18 @@
 
 **The Developer-First HTTP Client Built for Sequential API Workflows.**
 
-[![Website](https://img.shields.io/badge/website-flexiberry.dev-6C63FF?style=for-the-badge&logo=google-chrome&logoColor=white)](https://flexiberry.dev)
-[![Status](https://img.shields.io/badge/status-in%20development-orange?style=for-the-badge&logo=gitbook&logoColor=white)](https://flexiberry.dev)
-[![License: MIT](https://img.shields.io/badge/license-MIT-blue?style=for-the-badge)](./LICENSE.md)
-[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen?style=for-the-badge&logo=github)](./CONTRIBUTING.md)
-[![Node.js](https://img.shields.io/badge/node.js-18%2B-339933?style=for-the-badge&logo=node.js&logoColor=white)](https://nodejs.org)
-[![TypeScript](https://img.shields.io/badge/TypeScript-strict-3178C6?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org)
+[![Website](https://img.shields.io/badge/website-flexiberry.dev-6C63FF?style=flat-square&logo=google-chrome&logoColor=white)](https://flexiberry.dev)
+[![CLI](https://img.shields.io/badge/CLI-@flexiberry/cli-CB3837?style=flat-square&logo=npm&logoColor=white)](https://www.npmjs.com/package/@flexiberry/cli)
+[![VS Code Extension](https://img.shields.io/badge/VS_Code-Extension-007ACC?style=flat-square&logo=visualstudiocode&logoColor=white)](https://open-vsx.org/extension/flexiberry/vscode-berry-extension)
+[![Status](https://img.shields.io/badge/status-in%20development-orange?style=flat-square&logo=gitbook&logoColor=white)](https://flexiberry.dev)
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue?style=flat-square)](./LICENSE.md)
+[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen?style=flat-square&logo=github)](./CONTRIBUTING.md)
+[![Node.js](https://img.shields.io/badge/node.js-18%2B-339933?style=flat-square&logo=node.js&logoColor=white)](https://nodejs.org)
+[![TypeScript](https://img.shields.io/badge/TypeScript-strict-3178C6?style=flat-square&logo=typescript&logoColor=white)](https://www.typescriptlang.org)
 
-<br/>
 
-> [!WARNING]
-> 🚧 **Active Development — Not Production Ready**
->
-> FlexiBerry is currently in its **early development phase**. APIs, syntax, and features are subject to **breaking changes** without prior notice. We do **not** recommend using it in production environments yet.
->
-> ⭐ **Star this repo** to stay notified as we approach a stable release!
-
-<br/>
-
-<video src="./apps/website/src/lib/assets/demo.mp4" width="100%" style="max-width: 800px; border-radius: 8px; border: 1px solid #30363d;" controls muted autoplay loop></video>
+<img src="./assets/videos/app_demo_1.gif" alt="FlexiBerry Web App Demo" width="100%" style="max-width: 800px; border-radius: 8px; border: 1px solid #30363d;" />
+<p align="center"><em>FlexiBerry Web App in action — Visualizing sequential multi-API workflows & real-time assertions.</em></p>
 
 <br/>
 
@@ -137,12 +130,13 @@ Step Call Api getPetById
 - **Node.js** `v18+`
 - **npm** or **pnpm**
 
-### npm Packages
+### npm Packages & Extensions
 
-You can install the official published packages directly from npm:
+You can install the official published packages directly from npm or VS Code Marketplace:
 
 * 🌐 **FlexiBerry CLI**: [@flexiberry/cli on npm](https://www.npmjs.com/package/@flexiberry/cli)
 * 🧠 **BerryCore Engine**: [@flexiberry/berrycore on npm](https://www.npmjs.com/package/@flexiberry/berrycore)
+* 🔌 **VS Code Extension**: [FlexiBerry on Open VSX](https://open-vsx.org/extension/flexiberry/vscode-berry-extension)
 
 ```bash
 # Install the CLI globally
