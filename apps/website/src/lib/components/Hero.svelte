@@ -190,11 +190,26 @@
   <div class="hero-content" class:visible={isVisible}>
     <!-- Left Panel: Brand, Headline & Interactive Selectors -->
     <div class="hero-left-panel">
-      <!-- Badge -->
-      <span class="hero-badge">
-        <span class="badge-dot"></span>
-        BERRY LANGUAGE · OPEN BETA
-      </span>
+      <!-- Badges -->
+      <div class="hero-badge-group">
+        <span class="hero-badge">
+          <span class="badge-dot"></span>
+          BERRY LANGUAGE · OPEN BETA
+        </span>
+        <a
+          href="https://www.producthunt.com/products/flexiberry-dev?embed=true&amp;utm_source=badge-featured&amp;utm_medium=badge&amp;utm_campaign=badge-flexiberry"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="ph-badge"
+        >
+          <img
+            src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=1206783&amp;theme=light&amp;t=1785215732677"
+            alt="flexiberry - Open-source, Lightweight HTTP client &amp; API testing framework | Product Hunt"
+            width="250"
+            height="54"
+          />
+        </a>
+      </div>
 
       <!-- Bold Gradient Headline -->
       <h1 class="hero-heading">
@@ -766,6 +781,13 @@
     flex-direction: column;
     align-items: flex-start;
   }
+  .hero-badge-group {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+    margin-bottom: 1.5rem;
+  }
   .hero-badge {
     display: inline-flex;
     align-items: center;
@@ -779,7 +801,21 @@
     border: 1px solid rgba(74, 222, 128, 0.18);
     border-radius: 9999px;
     padding: 0.35rem 0.95rem;
-    margin-bottom: 1.5rem;
+  }
+  .ph-badge {
+    display: inline-flex;
+    align-items: center;
+    transition: transform 0.2s ease, opacity 0.2s ease;
+  }
+  .ph-badge:hover {
+    transform: translateY(-2px);
+    opacity: 0.92;
+  }
+  .ph-badge img {
+    height: 38px;
+    width: auto;
+    display: block;
+    border-radius: 6px;
   }
   .badge-dot {
     width: 6px;

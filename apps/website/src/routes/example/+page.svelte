@@ -370,11 +370,11 @@ Task Secure Endpoint Verification
           <div
             class="flex flex-col gap-3 bg-gray-900/50 backdrop-blur-md border border-white/5 rounded-2xl p-4"
           >
-            <h3
+            <h2
               class="text-xs text-slate-500 uppercase tracking-widest font-bold px-2 mb-1"
             >
               Select Scenario
-            </h3>
+            </h2>
             {#each examples as example}
               <button
                 onclick={() => (activeTab = example.id)}

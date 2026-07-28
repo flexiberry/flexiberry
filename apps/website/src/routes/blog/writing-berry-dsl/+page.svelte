@@ -6,7 +6,7 @@
   <title>Mastering the .berry DSL Language · Flexiberry Guides</title>
   <meta
     name="description"
-    content="A comprehensive guide to writing scripts in the .berry Domain Specific Language (DSL). Learn variables, API definitions, dynamic captures, environments, and assertions."
+    content="A complete guide to writing scripts in the .berry DSL. Learn variables, API definitions, dynamic captures, environments, and assertions."
   />
 </svelte:head>
 

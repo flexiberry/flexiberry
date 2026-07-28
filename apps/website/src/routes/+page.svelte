@@ -3,6 +3,7 @@
   import {
     Navigation,
     Hero,
+    FrameworkIntegrations,
     ProblemSolution,
     Features,
     TargetAudience,
@@ -15,6 +16,7 @@
 
   let isVisible = {
     hero: false,
+    integrations: false,
     comparison: false,
     problem: false,
     features: false,
@@ -25,6 +27,7 @@
 
   onMount(() => {
     setTimeout(() => { isVisible.hero = true; }, 100);
+    setTimeout(() => { isVisible.integrations = true; }, 150);
     setTimeout(() => { isVisible.comparison = true; }, 200);
     setTimeout(() => { isVisible.problem = true; }, 300);
     setTimeout(() => { isVisible.features = true; }, 500);
@@ -35,7 +38,7 @@
 </script>
 
 <svelte:head>
-  <title>Flexiberry · The Developer-First HTTP Client for Sequential API Workflows</title>
+  <title>Flexiberry · Developer-First HTTP Client for API Workflows</title>
   <meta
     name="description"
     content="Flexiberry is an open-source, lightweight HTTP client and API testing framework designed to chain dependent requests sequentially with ease."
@@ -79,6 +82,7 @@
 <div class="min-h-screen bg-gray-900 text-gray-100 font-mono">
   <Navigation />
   <Hero isVisible={isVisible.hero} />
+  <FrameworkIntegrations isVisible={isVisible.integrations} />
 
   <ComparisonTable isVisible={isVisible.comparison} />
 
