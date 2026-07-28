@@ -1,0 +1,138 @@
+[
+  {
+    "severity": "info",
+    "issueType": "canonicalized-page",
+    "issue": "Canonicalized to another URL",
+    "url": "https://flexiberry.dev/playground?preset=kitchen-sink",
+    "details": {
+      "canonicalUrl": "https://flexiberry.dev/playground"
+    },
+    "howToFix": "If this page should rank on its own, set its canonical to itself. Otherwise no action is needed."
+  },
+  {
+    "severity": "info",
+    "issueType": "heading-order-skip",
+    "issue": "Heading levels skip",
+    "url": "https://flexiberry.dev/",
+    "details": null,
+    "howToFix": "Adjust heading levels so they descend one step at a time (H1 → H2 → H3) without skipping."
+  },
+  {
+    "severity": "info",
+    "issueType": "heading-order-skip",
+    "issue": "Heading levels skip",
+    "url": "https://flexiberry.dev/example",
+    "details": null,
+    "howToFix": "Adjust heading levels so they descend one step at a time (H1 → H2 → H3) without skipping."
+  },
+  {
+    "severity": "info",
+    "issueType": "heading-order-skip",
+    "issue": "Heading levels skip",
+    "url": "https://flexiberry.dev/about",
+    "details": null,
+    "howToFix": "Adjust heading levels so they descend one step at a time (H1 → H2 → H3) without skipping."
+  },
+  {
+    "severity": "info",
+    "issueType": "heading-order-skip",
+    "issue": "Heading levels skip",
+    "url": "https://flexiberry.dev/contact",
+    "details": null,
+    "howToFix": "Adjust heading levels so they descend one step at a time (H1 → H2 → H3) without skipping."
+  },
+  {
+    "severity": "info",
+    "issueType": "heading-order-skip",
+    "issue": "Heading levels skip",
+    "url": "https://flexiberry.dev/privacy",
+    "details": null,
+    "howToFix": "Adjust heading levels so they descend one step at a time (H1 → H2 → H3) without skipping."
+  },
+  {
+    "severity": "info",
+    "issueType": "heading-order-skip",
+    "issue": "Heading levels skip",
+    "url": "https://flexiberry.dev/terms",
+    "details": null,
+    "howToFix": "Adjust heading levels so they descend one step at a time (H1 → H2 → H3) without skipping."
+  },
+  {
+    "severity": "info",
+    "issueType": "heading-order-skip",
+    "issue": "Heading levels skip",
+    "url": "https://flexiberry.dev/blog",
+    "details": null,
+    "howToFix": "Adjust heading levels so they descend one step at a time (H1 → H2 → H3) without skipping."
+  },
+  {
+    "severity": "info",
+    "issueType": "heading-order-skip",
+    "issue": "Heading levels skip",
+    "url": "https://flexiberry.dev/blog/quick-start",
+    "details": null,
+    "howToFix": "Adjust heading levels so they descend one step at a time (H1 → H2 → H3) without skipping."
+  },
+  {
+    "severity": "info",
+    "issueType": "heading-order-skip",
+    "issue": "Heading levels skip",
+    "url": "https://flexiberry.dev/blog/writing-berry-dsl",
+    "details": null,
+    "howToFix": "Adjust heading levels so they descend one step at a time (H1 → H2 → H3) without skipping."
+  },
+  {
+    "severity": "info",
+    "issueType": "heading-order-skip",
+    "issue": "Heading levels skip",
+    "url": "https://flexiberry.dev/blog/ci-cd-integration",
+    "details": null,
+    "howToFix": "Adjust heading levels so they descend one step at a time (H1 → H2 → H3) without skipping."
+  },
+  {
+    "severity": "info",
+    "issueType": "meta-description-too-long",
+    "issue": "Meta description too long",
+    "url": "https://flexiberry.dev/blog/writing-berry-dsl",
+    "details": {
+      "length": 168
+    },
+    "howToFix": "Trim the description to roughly 70–160 characters while keeping the core message and call to action."
+  },
+  {
+    "severity": "warning",
+    "issueType": "missing-h1",
+    "issue": "Missing H1 heading",
+    "url": "https://flexiberry.dev/playground",
+    "details": null,
+    "howToFix": "Add a single H1 that states the page's main topic, consistent with the title tag."
+  },
+  {
+    "severity": "warning",
+    "issueType": "missing-h1",
+    "issue": "Missing H1 heading",
+    "url": "https://flexiberry.dev/playground?preset=kitchen-sink",
+    "details": null,
+    "howToFix": "Add a single H1 that states the page's main topic, consistent with the title tag."
+  },
+  {
+    "severity": "warning",
+    "issueType": "thin-content",
+    "issue": "Thin content",
+    "url": "https://flexiberry.dev/contact",
+    "details": {
+      "wordCount": 107
+    },
+    "howToFix": "Either expand the page with genuinely useful content, noindex it, or consolidate it into a stronger page. If the content exists but is rendered by JavaScript, ensure it is server-rendered or pre-rendered."
+  },
+  {
+    "severity": "info",
+    "issueType": "title-too-long",
+    "issue": "Title too long",
+    "url": "https://flexiberry.dev/",
+    "details": {
+      "length": 73
+    },
+    "howToFix": "Shorten the title to roughly 50–60 characters, front-loading the most important words."
+  }
+]

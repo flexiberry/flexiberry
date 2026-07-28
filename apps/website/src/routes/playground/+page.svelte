@@ -462,7 +462,18 @@ Task Secure Endpoint Verification
     <Navigation />
 
     <!-- Playground Workspace -->
-    <section class="pt-24 pb-12 px-6 max-w-1200 mx-auto w-full">
+    <section class="pt-28 pb-12 px-6 max-w-1200 mx-auto w-full">
+      <div class="mb-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div>
+          <h1 class="text-2xl md:text-3xl font-extrabold tracking-tight text-white mb-1">
+            Berry Interactive <span class="bg-gradient-to-r from-emerald-400 to-purple-400 bg-clip-text text-transparent">Playground</span>
+          </h1>
+          <p class="text-xs text-slate-400 font-sans">
+            Build, format, and run sequential HTTP API tests in your browser.
+          </p>
+        </div>
+      </div>
+
       <!-- Toolbar Header -->
       <div
         class="flex flex-wrap items-center justify-between gap-4 bg-gray-900/60 border border-white/5 rounded-2xl p-4 mb-6 backdrop-blur-md"

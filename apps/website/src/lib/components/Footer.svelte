@@ -106,7 +106,7 @@
     <!-- Link columns -->
     {#each links as col}
       <div class="footer-col">
-        <h4 class="col-heading">{col.group}</h4>
+        <h3 class="col-heading">{col.group}</h3>
         <ul class="col-links">
           {#each col.items as item}
             <li><a href={item.href} class="col-link">{item.label}</a></li>
