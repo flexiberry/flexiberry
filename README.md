@@ -1,24 +1,30 @@
-<div align="center">
+<p align="center">
+  <img src="./assets/favicon/android-icon-192x192.png" height="100" width="100" alt="FlexiBerry Logo" />
+</p>
 
-<img src="./assets/favicon/android-icon-192x192.png" height="100" width="100" alt="FlexiBerry Logo" />
+<h1 align="center">FlexiBerry</h1>
 
-# FlexiBerry
-
-**The Developer-First HTTP Client Built for Sequential API Workflows.**
+<p align="center">
+  <strong>The Developer-First HTTP Client Built for Sequential API Workflows.</strong>
+</p>
 
 <p align="center">
   <a href="https://flexiberry.dev"><img src="https://img.shields.io/badge/website-flexiberry.dev-6C63FF?style=flat-square&logo=google-chrome&logoColor=white" alt="Website" /></a> <a href="https://www.npmjs.com/package/@flexiberry/cli"><img src="https://img.shields.io/badge/CLI-@flexiberry/cli-CB3837?style=flat-square&logo=npm&logoColor=white" alt="CLI" /></a> <a href="https://open-vsx.org/extension/flexiberry/vscode-berry-extension"><img src="https://img.shields.io/badge/VS_Code-Extension-007ACC?style=flat-square&logo=visualstudiocode&logoColor=white" alt="VS Code Extension" /></a> <a href="https://flexiberry.dev"><img src="https://img.shields.io/badge/status-in%20development-orange?style=flat-square&logo=gitbook&logoColor=white" alt="Status" /></a> <a href="./LICENSE.md"><img src="https://img.shields.io/badge/license-MIT-blue?style=flat-square" alt="License: MIT" /></a> <a href="./CONTRIBUTING.md"><img src="https://img.shields.io/badge/PRs-welcome-brightgreen?style=flat-square&logo=github" alt="PRs Welcome" /></a> <a href="https://nodejs.org"><img src="https://img.shields.io/badge/node.js-18%2B-339933?style=flat-square&logo=node.js&logoColor=white" alt="Node.js" /></a> <a href="https://www.typescriptlang.org"><img src="https://img.shields.io/badge/TypeScript-strict-3178C6?style=flat-square&logo=typescript&logoColor=white" alt="TypeScript" /></a>
 </p>
 
+<br/>
 
-<img src="./assets/videos/app_demo_1.gif" alt="FlexiBerry Web App Demo" width="100%" style="max-width: 800px; border-radius: 8px; border: 1px solid #30363d;" />
-<p align="center"><em>FlexiBerry Web App in action — Visualizing sequential multi-API workflows & real-time assertions.</em></p>
+<p align="center">
+  <img src="./assets/videos/app_demo_1.gif" alt="FlexiBerry Web App Demo" width="100%" style="max-width: 800px; border-radius: 8px; border: 1px solid #30363d;" />
+  <br/>
+  <em>FlexiBerry Web App in action — Visualizing sequential multi-API workflows & real-time assertions.</em>
+</p>
 
 <br/>
 
-[🌐 Website](https://flexiberry.dev) · [📖 Docs](https://docs.flexiberry.dev) · [📦 Installation](#-installation) · [⚡ Quick Start](#-quick-start) · [✨ Features](#-features) · [🤝 Contributing](#-contributing) · [💬 Support](#-support)
-
-</div>
+<p align="center">
+  <a href="https://flexiberry.dev">🌐 Website</a> · <a href="https://docs.flexiberry.dev">📖 Docs</a> · <a href="#-installation">📦 Installation</a> · <a href="#-quick-start">⚡ Quick Start</a> · <a href="#-features">✨ Features</a> · <a href="#-contributing">🤝 Contributing</a> · <a href="#-support">💬 Support</a>
+</p>
 
 ---
 
