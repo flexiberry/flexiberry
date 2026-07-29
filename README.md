@@ -6,14 +6,9 @@
 
 **The Developer-First HTTP Client Built for Sequential API Workflows.**
 
-[![Website](https://img.shields.io/badge/website-flexiberry.dev-6C63FF?style=flat-square&logo=google-chrome&logoColor=white)](https://flexiberry.dev)
-[![CLI](https://img.shields.io/badge/CLI-@flexiberry/cli-CB3837?style=flat-square&logo=npm&logoColor=white)](https://www.npmjs.com/package/@flexiberry/cli)
-[![VS Code Extension](https://img.shields.io/badge/VS_Code-Extension-007ACC?style=flat-square&logo=visualstudiocode&logoColor=white)](https://open-vsx.org/extension/flexiberry/vscode-berry-extension)
-[![Status](https://img.shields.io/badge/status-in%20development-orange?style=flat-square&logo=gitbook&logoColor=white)](https://flexiberry.dev)
-[![License: MIT](https://img.shields.io/badge/license-MIT-blue?style=flat-square)](./LICENSE.md)
-[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen?style=flat-square&logo=github)](./CONTRIBUTING.md)
-[![Node.js](https://img.shields.io/badge/node.js-18%2B-339933?style=flat-square&logo=node.js&logoColor=white)](https://nodejs.org)
-[![TypeScript](https://img.shields.io/badge/TypeScript-strict-3178C6?style=flat-square&logo=typescript&logoColor=white)](https://www.typescriptlang.org)
+<p align="center">
+  <a href="https://flexiberry.dev"><img src="https://img.shields.io/badge/website-flexiberry.dev-6C63FF?style=flat-square&logo=google-chrome&logoColor=white" alt="Website" /></a> <a href="https://www.npmjs.com/package/@flexiberry/cli"><img src="https://img.shields.io/badge/CLI-@flexiberry/cli-CB3837?style=flat-square&logo=npm&logoColor=white" alt="CLI" /></a> <a href="https://open-vsx.org/extension/flexiberry/vscode-berry-extension"><img src="https://img.shields.io/badge/VS_Code-Extension-007ACC?style=flat-square&logo=visualstudiocode&logoColor=white" alt="VS Code Extension" /></a> <a href="https://flexiberry.dev"><img src="https://img.shields.io/badge/status-in%20development-orange?style=flat-square&logo=gitbook&logoColor=white" alt="Status" /></a> <a href="./LICENSE.md"><img src="https://img.shields.io/badge/license-MIT-blue?style=flat-square" alt="License: MIT" /></a> <a href="./CONTRIBUTING.md"><img src="https://img.shields.io/badge/PRs-welcome-brightgreen?style=flat-square&logo=github" alt="PRs Welcome" /></a> <a href="https://nodejs.org"><img src="https://img.shields.io/badge/node.js-18%2B-339933?style=flat-square&logo=node.js&logoColor=white" alt="Node.js" /></a> <a href="https://www.typescriptlang.org"><img src="https://img.shields.io/badge/TypeScript-strict-3178C6?style=flat-square&logo=typescript&logoColor=white" alt="TypeScript" /></a>
+</p>
 
 
 <img src="./assets/videos/app_demo_1.gif" alt="FlexiBerry Web App Demo" width="100%" style="max-width: 800px; border-radius: 8px; border: 1px solid #30363d;" />
