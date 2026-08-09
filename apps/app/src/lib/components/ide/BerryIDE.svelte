@@ -25,7 +25,9 @@
     X,
     Link2,
     FileSpreadsheet,
+    Cloud,
   } from "lucide-svelte";
+  import { saasApiClient } from "$lib/services/saasApiClient";
   import BerryBlockComponent from "$lib/components/ide/BerryBlock.svelte";
   import BlockAdder from "$lib/components/ide/BlockAdder.svelte";
   import { berryBlocks } from "$lib/writable/berry.store";
@@ -65,6 +67,29 @@
 
   let runCountdown = 0;
   let countdownInterval: any = null;
+  let isCloudRunning = false;
+
+  async function handleCloudBerryExecute() {
+    if (isCloudRunning) return;
+    isCloudRunning = true;
+    playClickSound();
+
+    const source = viewMode === "raw" ? rawContent : stringifyBerryBlocks($berryBlocks);
+
+    try {
+      toast.loading("Submitting script to Cloudflare Berry Executor...", { id: "cloud-exec" });
+      const res = await saasApiClient.executeCloudBerry(source, ctx.fileName);
+
+      toast.success(`Cloud Execution Started! (Run ID: ${res.runId})`, {
+        id: "cloud-exec",
+        description: "Open Cloud Monitoring to view live step execution.",
+      });
+    } catch (err: any) {
+      toast.error(`Cloud Execution Failed: ${err.message}`, { id: "cloud-exec" });
+    } finally {
+      isCloudRunning = false;
+    }
+  }
 
   onDestroy(() => {
     if (countdownInterval) clearInterval(countdownInterval);
@@ -730,6 +755,18 @@
           <Play class="w-3.5 h-3.5 fill-current shrink-0" />
           <span>Run File</span>
         {/if}
+      </button>
+
+      <!-- Run in Cloud Button -->
+      <button
+        class="flex items-center gap-1.5 px-4 h-8 rounded-md text-white font-bold uppercase text-[10px] tracking-wider transition-all duration-300 shadow-md active:scale-95 hover:scale-[1.03] cursor-pointer mr-2 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 border border-indigo-400/25 shadow-indigo-500/25 hover:shadow-indigo-500/35"
+        on:click={handleCloudBerryExecute}
+        on:mouseenter={playHoverSound}
+        disabled={isCloudRunning}
+        title="Execute .berry script in Cloudflare Cloud Berry Executor"
+      >
+        <Cloud class="w-3.5 h-3.5 fill-current shrink-0 {isCloudRunning ? 'animate-bounce' : ''}" />
+        <span>{isCloudRunning ? "Executing…" : "Run in Cloud"}</span>
       </button>
 
       <button

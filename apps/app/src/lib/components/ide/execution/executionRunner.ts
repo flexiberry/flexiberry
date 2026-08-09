@@ -357,7 +357,7 @@ export function runBerryFile(
             stepObj.captures = payload.captures;
           }
           if (payload?.checks) {
-            stepObj.checks = payload.checks;
+            stepObj.checks = [...payload.checks];
           }
           if (payload.error) {
             stepObj.error = payload.error;

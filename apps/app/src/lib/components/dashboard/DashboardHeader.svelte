@@ -12,10 +12,14 @@
     FilePlus2,
     FolderPlus,
     ArrowLeft,
+    Cloud,
+    Activity,
   } from "lucide-svelte";
   import { Input } from "$lib/components/ui/input";
   import { Button } from "$lib/components/ui/button";
   import WorkspaceSwitcher from "$lib/components/dashboard/WorkspaceSwitcher.svelte";
+  import CloudMonitoringModal from "$lib/components/dashboard/CloudMonitoringModal.svelte";
+  import { syncActiveWorkspaceToCloud } from "$lib/services/workspaceSync";
 
   export let scrollY: number;
   export let currentFolderId: string | null;
@@ -26,6 +30,9 @@
   export let folderInputEl: HTMLInputElement;
 
   const dispatch = createEventDispatcher();
+
+  let showMonitoringModal = false;
+  let isSyncing = false;
 
   const hour = new Date().getHours();
   const greeting =
@@ -52,13 +59,20 @@
   function navigateBack() {
     currentFolderId = null;
   }
+
+  async function handleCloudSync() {
+    isSyncing = true;
+    await syncActiveWorkspaceToCloud();
+    isSyncing = false;
+  }
 </script>
+
+<CloudMonitoringModal open={showMonitoringModal} onClose={() => (showMonitoringModal = false)} />
 
 <!-- Merged Compact Dashboard Header -->
 <!-- Row 1 collapses cleanly on scroll; Row 2 (toolbar) is always visible -->
 <div class="flex flex-col gap-3 will-change-[opacity,max-height,transform]">
   <!-- ─── Collapsible Context Row ────────────────────────── -->
-  <!-- Using max-height+opacity avoids layout reflow (no negative margins) -->
   <div
     class="overflow-hidden transition-all duration-500 ease-[cubic-bezier(0.2,0.8,0.2,1)] {scrollY >
     60
@@ -106,17 +120,22 @@
 
       <!-- Right: Stat Chips -->
       <div class="hidden sm:flex items-center gap-2 self-start mt-0.5">
-        <!-- <span
-          class="flex items-center gap-1.5 text-xs font-medium text-muted-foreground bg-muted/40 border border-border/40 rounded-lg px-2.5 py-1.5 backdrop-blur-sm"
+        <button
+          on:click={handleCloudSync}
+          disabled={isSyncing}
+          class="flex items-center gap-1.5 text-xs font-medium text-indigo-400 bg-indigo-500/10 border border-indigo-500/20 rounded-lg px-2.5 py-1.5 backdrop-blur-sm hover:bg-indigo-500/20 transition"
         >
-          <FileCode2 class="w-3.5 h-3.5 text-primary" /> .berry
-        </span> -->
-        <span
-          class="flex items-center gap-1.5 text-xs font-medium text-muted-foreground bg-muted/40 border border-border/40 rounded-lg px-2.5 py-1.5 backdrop-blur-sm"
+          <Cloud class="w-3.5 h-3.5 text-indigo-400 {isSyncing ? 'animate-bounce' : ''}" />
+          {isSyncing ? "Syncing..." : "Cloud Sync"}
+        </button>
+
+        <button
+          on:click={() => (showMonitoringModal = true)}
+          class="flex items-center gap-1.5 text-xs font-medium text-purple-400 bg-purple-500/10 border border-purple-500/20 rounded-lg px-2.5 py-1.5 backdrop-blur-sm hover:bg-purple-500/20 transition"
         >
-          <Layers class="w-3.5 h-3.5 text-indigo-500" />
-          {currentFolderId ? "Folder" : "Root"}
-        </span>
+          <Activity class="w-3.5 h-3.5 text-purple-400" />
+          Cloud Monitoring
+        </button>
       </div>
     </div>
   </div>
@@ -138,7 +157,6 @@
         <span class="text-border/60 select-none mx-0.5">|</span>
       {/if}
 
-      <!-- WorkspaceSwitcher: replaces static "Workspace" label -->
       <WorkspaceSwitcher />
 
       {#if currentFolderId}
@@ -200,12 +218,13 @@
           class="h-9 gap-1.5 rounded-lg ring-1 ring-primary/20 text-sm text-muted-foreground border border-border/40 bg-muted/30 hover:bg-muted/60 hover:text-foreground px-3 transition-all"
           on:click={handleCreateFolder}
         >
-          <FolderPlus class="w-4 h-4" />
-          <span class="hidden sm:inline">New Folder</span>
+          <FolderPlus class="w-4 h-4 text-primary" />
+          <span class="hidden md:inline">New Folder</span>
         </Button>
       {/if}
+
       <Button
-        class="h-9 gap-1.5 rounded-lg text-sm font-medium bg-primary hover:bg-primary/90 text-white shadow-sm px-3 transition-all"
+        class="h-9 gap-1.5 rounded-lg bg-primary hover:bg-primary/90 text-primary-foreground font-semibold px-3 shadow-md shadow-primary/20 transition-all"
         on:click={handleCreateFile}
       >
         <FilePlus2 class="w-4 h-4" />

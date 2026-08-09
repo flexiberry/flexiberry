@@ -133,7 +133,7 @@
         // Auto-expand on success to show results
         expandedApi = api.name;
         
-        if (stepResult.status === 'Pass') {
+        if ((stepResult.status as any) === 'Pass' || (stepResult.status as any) === 'PASS') {
            toast.success(`API Run Completed: ${api.name}`);
         } else {
            toast.error(`API Failed: ${stepResult.error}`);
