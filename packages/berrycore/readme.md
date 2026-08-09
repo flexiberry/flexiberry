@@ -111,6 +111,28 @@ Following standard language engineering practices, `berrycore` adheres strictly 
 
 ---
 
+## 🗺️ Roadmap
+
+- ✅ **Lexer, Parser & AST Pipeline**: Complete `.berry` grammar parsing, tokenization, & formatting.
+- ✅ **Runtime Interpreter Engine**: Visitor-pattern execution, environment scopes, & event lifecycle.
+- ✅ **HTTP Execution Engine**: Request execution (`GET`, `POST`, `PUT`, `DELETE`, `PATCH`) with timeouts.
+- ✅ **Variable Interpolation**: `{{varName}}` & `{{obj.property}}` template string replacement.
+- ✅ **Response Captures & Checks**: Dynamic value capture (`Step.1.token`) & comparison checks (`==`, `!=`, `>`, `<`, `OR`).
+- ✅ **Interactive Execution Control**: Event-driven `Pause`, `Continue`, `Skip`, `Stop`, & `Kill` commands.
+- ✅ **Collection Importers**: Converters for cURL commands, Postman Collection (v2), & Swagger / OpenAPI definitions.
+- ✅ **Variable Decryption**: Base64 & custom `decryptionProvider` hooks for encrypted variables.
+- ⏳ **Auth Presets**: OAuth 2.0, AWS SigV4, Digest, & Basic Auth.
+- ⏳ **Cookie Jar**: Automatic session persistence across task steps.
+- ⏳ **Network Control**: Proxies (HTTP/SOCKS5), mTLS, & custom CA certs.
+- ⏳ **Payload Support**: Multipart file uploads & form-urlencoded bodies.
+- ⏳ **Binary & Streaming**: File downloads, SSE (EventSource), & WebSockets.
+- ⏳ **Dynamic Variables**: Built-in mock data (`{{$guid}}`, `{{$timestamp}}`).
+- ⏳ **Pre/Post Hooks**: Scripting sandbox for HMAC signatures & custom logic.
+- ⏳ **Advanced Checks**: JSON Schema, regex, & SLA response time checks.
+- ⏳ **cURL Exporter & Code Gen**: Export Berry APIs to cURL, Node.js, Python, & Go.
+
+---
+
 ## 🤝 Contributing
 
 This package is part of the FlexiBerry monorepo. We welcome contributions to grammar definitions, execution optimizations, and AST tooling. 
@@ -120,3 +142,4 @@ Please see the root `CONTRIBUTING.md` for guidelines, or join our community on t
 ## 📄 License
 
 MIT © FlexiBerry.dev
+
