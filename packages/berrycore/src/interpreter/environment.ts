@@ -27,6 +27,7 @@ export class Environment {
 
   /**
    * Look up a variable, walking up the scope chain.
+   * Falls back to system process.env if available.
    * Throws VariableNotFoundError if not found in any scope.
    */
   lookup(name: string): RuntimeValue {
@@ -36,11 +37,15 @@ export class Environment {
     if (this.parent) {
       return this.parent.lookup(name);
     }
+    if (typeof process !== "undefined" && process.env && process.env[name] !== undefined) {
+      return process.env[name]!;
+    }
     throw new VariableNotFoundError(name);
   }
 
   /**
    * Try to look up a variable without throwing.
+   * Falls back to system process.env if available.
    * Returns undefined if not found.
    */
   tryLookup(name: string): RuntimeValue | undefined {
@@ -49,6 +54,9 @@ export class Environment {
     }
     if (this.parent) {
       return this.parent.tryLookup(name);
+    }
+    if (typeof process !== "undefined" && process.env && process.env[name] !== undefined) {
+      return process.env[name];
     }
     return undefined;
   }

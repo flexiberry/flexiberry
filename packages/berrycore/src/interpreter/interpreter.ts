@@ -918,18 +918,30 @@ export class Interpreter {
    * Replace {{varName}} placeholders with values from the variable map.
    */
   private interpolate(template: string, vars: Map<string, unknown>): string {
-    return template.replace(/\{\{(\w+(?:\.\w+)*)\}\}/g, (_match, varName: string) => {
+    return template.replace(/\{\{([a-zA-Z0-9_\-.]+)\}\}/g, (_match, varName: string) => {
+      // 1. Direct variable lookup
       const value = vars.get(varName);
       if (value !== undefined && value !== null) {
         return String(value);
       }
-      // Try dot-path lookup
+      // 2. Explicit $env.PREFIX support (e.g. {{$env.API_KEY}})
+      if (varName.startsWith("$env.")) {
+        const envKey = varName.replace("$env.", "");
+        if (typeof process !== "undefined" && process.env && process.env[envKey] !== undefined) {
+          return String(process.env[envKey]);
+        }
+      }
+      // 3. Dot-path lookup
       const parts = varName.split(".");
       if (parts.length > 1) {
         const rootVal = vars.get(parts[0]);
         if (rootVal !== undefined && rootVal !== null) {
           return String(this.resolvePath(rootVal, parts.slice(1).join(".")));
         }
+      }
+      // 4. Automatic fallback to process.env (e.g. {{API_KEY}})
+      if (typeof process !== "undefined" && process.env && process.env[varName] !== undefined) {
+        return String(process.env[varName]);
       }
       return `{{${varName}}}`;  // leave unresolved
     });
