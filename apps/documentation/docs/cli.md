@@ -99,6 +99,9 @@ Executes tasks defined within a `.berry` script file. If no file is provided, it
 flexiberry run [file_name] [options]
 ```
 
+#### Options for Environment Scoping
+- **`-e, --env <env_name>`**: Target a specific environment scope (e.g., `-e DEV`, `-e PROD`, `-e UAT`). Activates matching `@env_name` variable pointer blocks.
+
 #### Options for Data-Driven Testing
 If the script contains an `Input` statement linking to an external CSV or JSON file:
 - **`--iter <all|custom>`**: Directs the iteration execution mode.
@@ -114,6 +117,9 @@ To run a single API configuration independently without executing tasks:
 
 #### Examples:
 ```bash
+# Run script with DEV environment scoping
+flexiberry run my-test.berry -e DEV
+
 # Run the active script with all data rows
 flexiberry run --iter all
 

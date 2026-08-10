@@ -91,18 +91,43 @@ Var AppConfig
 - newPetName: "Sherlock"
 ```
 
-### 3.2 Environment-Specific Variables (`@Pointer`)
-You can use the `@` pointer symbol to define variables that only apply to a specific environment:
+### 3.2 Environment Declarations & Scoped Variables (`Env`, `@Pointer`)
+Declare supported environments at the top of your script using `Env`:
 ```berry
-Var @UAT Configuration settings for User Acceptance Testing
-- baseUrl: "https://uat-api.petstore.io/v2"
-- apiKey: "uat-secret-token"
+Env DEV, STAGING, PROD
+```
 
-Var @PROD Production endpoint details
+Then target variables to specific environments using the `@` pointer symbol:
+```berry
+Var @DEV Development Config
+- baseUrl: "https://dev-api.petstore.io/v2"
+- apiKey: "dev-secret-token"
+
+Var @PROD Production Config
 - baseUrl: "https://api.petstore.io/v2"
 - apiKey: "prod-live-token"
 ```
-When you run your script, the runtime resolves the targeted environment's variables.
+
+#### Selecting Target Environment at Runtime
+- **Web IDE**: Select the environment directly from the dropdown menu attached to the **Run Button** (`Default (Global)`, `@DEV`, `@PROD`, or type a custom env).
+- **CLI**: Pass the `-e` or `--env` flag when running scripts:
+  ```bash
+  flexiberry run my-workflow.berry -e DEV
+  ```
+
+### 3.3 System Environment Variables (`process.env` & `{{$env.KEY}}`)
+Berry automatically resolves any undeclared variable placeholder from your system environment variables (`process.env`):
+```berry
+# Automatically falls back to process.env.DATABASE_SECRET
+Var Database
+- secretKey: {{DATABASE_SECRET}}
+```
+
+You can also explicitly reference system environment variables using the `{{$env.KEY}}` namespace:
+```berry
+Var Auth
+- bearerToken: {{$env.MY_SECRET_TOKEN}}
+```
 
 ---
 

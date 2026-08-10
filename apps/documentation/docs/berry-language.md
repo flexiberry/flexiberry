@@ -73,17 +73,32 @@ Var AppConfig
 - timeout_ms: 10000
 ```
 
-### 4.2 Environmental Pointers (`@Pointer`)
-You can define variables targeted for a specific environment using the `@` pointer symbol. The title acts as a description for the environment.
+### 4.2 Environment Declarations (`Env`) & Environmental Pointers (`@Pointer`)
+You can declare supported environments at the top of a script using the `Env` keyword:
 ```berry
-Var @UAT User Acceptance Testing Environment Config
-- gatewayUrl: 'https://uat-api.example.com'
+Env DEV, STAGING, PROD
+```
+
+You can target variables to specific environments using the `@` pointer symbol:
+```berry
+Var @DEV Development Config
+- gatewayUrl: 'https://dev-api.example.com'
 
 Var @PROD Production Config
 - gatewayUrl: 'https://api.example.com'
 ```
 
-### 4.3 Data Source Variable Mapping (`Input.<field>`)
+### 4.3 System Process Environment Variables (`$env.` & Automatic Fallback)
+Berry automatically falls back to system process environment variables (`process.env` in Node.js/CLI) for any unresolved variable placeholders.
+
+You can also explicitly reference system environment variables using the `{{$env.KEY}}` or `{{KEY}}` namespace syntax:
+```berry
+Var AppSecrets
+- databaseSecret: {{$env.DB_PASSWORD}}
+- apiKey: {{$env.API_KEY}}
+```
+
+### 4.4 Data Source Variable Mapping (`Input.<field>`)
 When a data-driven `Input` file is declared, you can map row fields to variables using `Input.<fieldName>`.
 ```berry
 Var UserData
@@ -91,7 +106,7 @@ Var UserData
 - activeUserId: Input.id
 ```
 
-### 4.4 Encrypted Variables (`Decrypt`)
+### 4.5 Encrypted Variables (`Decrypt`)
 Variables flagged with `Decrypt` are processed through the decryption provider. The default provider assumes Base64 decryption, but custom providers (like KMS or Vault) can be defined programmatically.
 ```berry
 Var SecureCredentials
@@ -212,7 +227,8 @@ When you capture a variable (e.g. `- id: $.body.id`):
 When resolving expressions and placeholders (`{{varName}}`), the engine searches in the following order:
 1. **Step Environment (`stepEnv`)**: Resolves step parameters and response properties (like `$.status` and `$.body`).
 2. **Task Environment (`taskEnv`)**: Resolves step outputs captured from previous steps using the syntax `Step.<Step-Index>.<Captured-Key>` (e.g. `Step.1.token`), as well as short-name variables.
-3. **Global Environment (`globalEnv`)**: Resolves variables defined in global `Var` blocks.
+3. **Global Environment (`globalEnv`)**: Resolves variables defined in global `Var` blocks (matching active `targetEnv` pointers if configured).
+4. **System Process Environment (`process.env`)**: Automatically resolves any remaining unresolved variable names or explicit `{{$env.KEY}}` or `{{KEY}}` references from the operating system / runtime process environment variables.
 
 ### 7.5 Assertions (`Check`) Syntax
 The check block executes a list of assertions. All assertions must evaluate to `true` for the step to pass.

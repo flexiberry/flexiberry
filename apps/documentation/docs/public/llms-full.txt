@@ -196,18 +196,43 @@ Var AppConfig
 - newPetName: "Sherlock"
 ```
 
-### 3.2 Environment-Specific Variables (`@Pointer`)
-You can use the `@` pointer symbol to define variables that only apply to a specific environment:
+### 3.2 Environment Declarations & Scoped Variables (`Env`, `@Pointer`)
+Declare supported environments at the top of your script using `Env`:
 ```berry
-Var @UAT Configuration settings for User Acceptance Testing
-- baseUrl: "https://uat-api.petstore.io/v2"
-- apiKey: "uat-secret-token"
+Env DEV, STAGING, PROD
+```
 
-Var @PROD Production endpoint details
+Then target variables to specific environments using the `@` pointer symbol:
+```berry
+Var @DEV Development Config
+- baseUrl: "https://dev-api.petstore.io/v2"
+- apiKey: "dev-secret-token"
+
+Var @PROD Production Config
 - baseUrl: "https://api.petstore.io/v2"
 - apiKey: "prod-live-token"
 ```
-When you run your script, the runtime resolves the targeted environment's variables.
+
+#### Selecting Target Environment at Runtime
+- **Web IDE**: Select the environment directly from the dropdown menu attached to the **Run Button** (`Default (Global)`, `@DEV`, `@PROD`, or type a custom env).
+- **CLI**: Pass the `-e` or `--env` flag when running scripts:
+  ```bash
+  flexiberry run my-workflow.berry -e DEV
+  ```
+
+### 3.3 System Environment Variables (`process.env` & `{{$env.KEY}}`)
+Berry automatically resolves any undeclared variable placeholder from your system environment variables (`process.env`):
+```berry
+# Automatically falls back to process.env.DATABASE_SECRET
+Var Database
+- secretKey: {{DATABASE_SECRET}}
+```
+
+You can also explicitly reference system environment variables using the `{{$env.KEY}}` namespace:
+```berry
+Var Auth
+- bearerToken: {{$env.MY_SECRET_TOKEN}}
+```
 
 ---
 
@@ -716,6 +741,9 @@ Executes tasks defined within a `.berry` script file. If no file is provided, it
 flexiberry run [file_name] [options]
 ```
 
+#### Options for Environment Scoping
+- **`-e, --env <env_name>`**: Target a specific environment scope (e.g., `-e DEV`, `-e PROD`, `-e UAT`). Activates matching `@env_name` variable pointer blocks.
+
 #### Options for Data-Driven Testing
 If the script contains an `Input` statement linking to an external CSV or JSON file:
 - **`--iter <all|custom>`**: Directs the iteration execution mode.
@@ -731,6 +759,9 @@ To run a single API configuration independently without executing tasks:
 
 #### Examples:
 ```bash
+# Run script with DEV environment scoping
+flexiberry run my-test.berry -e DEV
+
 # Run the active script with all data rows
 flexiberry run --iter all
 
@@ -841,17 +872,32 @@ Var AppConfig
 - timeout_ms: 10000
 ```
 
-### 4.2 Environmental Pointers (`@Pointer`)
-You can define variables targeted for a specific environment using the `@` pointer symbol. The title acts as a description for the environment.
+### 4.2 Environment Declarations (`Env`) & Environmental Pointers (`@Pointer`)
+You can declare supported environments at the top of a script using the `Env` keyword:
 ```berry
-Var @UAT User Acceptance Testing Environment Config
-- gatewayUrl: 'https://uat-api.example.com'
+Env DEV, STAGING, PROD
+```
+
+You can target variables to specific environments using the `@` pointer symbol:
+```berry
+Var @DEV Development Config
+- gatewayUrl: 'https://dev-api.example.com'
 
 Var @PROD Production Config
 - gatewayUrl: 'https://api.example.com'
 ```
 
-### 4.3 Data Source Variable Mapping (`Input.<field>`)
+### 4.3 System Process Environment Variables (`$env.` & Automatic Fallback)
+Berry automatically falls back to system process environment variables (`process.env` in Node.js/CLI) for any unresolved variable placeholders.
+
+You can also explicitly reference system environment variables using the `{{$env.KEY}}` namespace syntax:
+```berry
+Var AppSecrets
+- databaseSecret: {{$env.DB_PASSWORD}}
+- apiKey: {{$env.API_KEY}}
+```
+
+### 4.4 Data Source Variable Mapping (`Input.<field>`)
 When a data-driven `Input` file is declared, you can map row fields to variables using `Input.<fieldName>`.
 ```berry
 Var UserData
@@ -859,7 +905,7 @@ Var UserData
 - activeUserId: Input.id
 ```
 
-### 4.4 Encrypted Variables (`Decrypt`)
+### 4.5 Encrypted Variables (`Decrypt`)
 Variables flagged with `Decrypt` are processed through the decryption provider. The default provider assumes Base64 decryption, but custom providers (like KMS or Vault) can be defined programmatically.
 ```berry
 Var SecureCredentials
@@ -980,7 +1026,8 @@ When you capture a variable (e.g. `- id: $.body.id`):
 When resolving expressions and placeholders (`{{varName}}`), the engine searches in the following order:
 1. **Step Environment (`stepEnv`)**: Resolves step parameters and response properties (like `$.status` and `$.body`).
 2. **Task Environment (`taskEnv`)**: Resolves step outputs captured from previous steps using the syntax `Step.<Step-Index>.<Captured-Key>` (e.g. `Step.1.token`), as well as short-name variables.
-3. **Global Environment (`globalEnv`)**: Resolves variables defined in global `Var` blocks.
+3. **Global Environment (`globalEnv`)**: Resolves variables defined in global `Var` blocks (matching active `targetEnv` pointers if configured).
+4. **System Process Environment (`process.env`)**: Automatically resolves any remaining unresolved variable names or explicit `{{$env.KEY}}` references from the operating system / runtime process environment variables.
 
 ### 7.5 Assertions (`Check`) Syntax
 The check block executes a list of assertions. All assertions must evaluate to `true` for the step to pass.
