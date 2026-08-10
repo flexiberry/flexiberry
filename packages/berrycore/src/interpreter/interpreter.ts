@@ -21,6 +21,7 @@ import {
   ProgramNode,
   NodeType,
   StatementNode,
+  EnvStatementNode,
   VarDeclarationNode,
   ApiBlockNode,
   TaskBlockNode,
@@ -51,6 +52,8 @@ import { RuntimeError, ApiNotFoundError } from "./errors";
 // ─── Interpreter Options ────────────────────────────────────────────────────
 
 export interface InterpreterOptions {
+  /** Target environment name (default: "" -> ignores all @env tagged Var blocks) */
+  readonly targetEnv?: string;
   /** Timeout in ms for API calls (default: 30000) */
   readonly apiTimeout: number;
   /** Whether to continue on step failure (default: true) */
@@ -64,6 +67,7 @@ export interface InterpreterOptions {
 }
 
 const DEFAULT_OPTIONS: InterpreterOptions = {
+  targetEnv: "",
   apiTimeout: 30000,
   continueOnError: true,
   dryRun: false,
@@ -216,6 +220,9 @@ export class Interpreter {
 
     for (const node of this.ast.body) {
       switch (node.type) {
+        case NodeType.EnvStatement:
+          this.pushLog("debug", `Env declared: ${node.environments.join(", ")}`);
+          break;
         case NodeType.VarDeclaration:
           await this.visitVarDeclaration(node);
           break;
@@ -287,6 +294,25 @@ export class Interpreter {
   // ── Var Declaration Visitor ─────────────────────────────────────────────
 
   private async visitVarDeclaration(node: VarDeclarationNode): Promise<void> {
+    const targetEnv = (this.options.targetEnv ?? "").trim().toUpperCase();
+
+    // Environment-scoped Var handling:
+    // If the Var block has an @env pointer (e.g., Var @DEV Base Config)
+    if (node.pointer) {
+      const declaredPointerEnv = node.pointer.target.trim().toUpperCase();
+
+      // Default targetEnv is "" (empty string).
+      // If targetEnv is empty string, all @env scoped Var blocks are IGNORED.
+      // If targetEnv is specified (e.g. "DEV"), only matching @DEV blocks are evaluated.
+      if (!targetEnv || declaredPointerEnv !== targetEnv) {
+        this.pushLog(
+          "debug",
+          `Skipping Var block '${node.title ?? ""}' scoped to @${node.pointer.target} (targetEnv: '${this.options.targetEnv ?? ""}')`
+        );
+        return;
+      }
+    }
+
     // Store each key-value entry as a global variable
     for (const entry of node.entries) {
       if (entry.type === NodeType.Comment) continue;

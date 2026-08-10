@@ -97,6 +97,7 @@ program
 program
   .command("run")
   .argument("[file]", "Path to the .berry script file")
+  .option("-e, --env <env>", "Target environment name (e.g., DEV, UAT, PROD)")
   .option("--iter <type>", "Iteration type: 'all' or 'custom'")
   .option("--start <index>", "Start index for custom iterations (1-based)")
   .option("--end <index>", "End index for custom iterations")

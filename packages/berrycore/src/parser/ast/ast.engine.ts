@@ -18,6 +18,7 @@ import {
   NodePosition,
   ProgramNode,
   StatementNode,
+  EnvStatementNode,
   VarDeclarationNode,
   LinkStatementNode,
   InputStatementNode,
@@ -101,6 +102,7 @@ export class AstEngine {
   // ── Statement Dispatch ──────────────────────────────────────────────────
 
   private parseStatement(): StatementNode | null {
+    if (this.check(TokenType.Env)) return this.parseEnvStatement();
     if (this.check(TokenType.Var)) return this.parseVarDeclaration();
     if (this.check(TokenType.Link)) return this.parseLinkStatement();
     if (this.check(TokenType.Input)) return this.parseInputStatement();
@@ -115,6 +117,29 @@ export class AstEngine {
     // Skip unrecognized tokens to avoid infinite loop
     this.advance();
     return null;
+  }
+
+  // ── Env Statement ────────────────────────────────────────────────────────
+
+  /**
+   * Grammar: Env DEV, STAGING, PROD
+   * Tokens:  Env, Value
+   */
+  private parseEnvStatement(): EnvStatementNode {
+    const envToken = this.expect(TokenType.Env, "Expected 'Env' keyword");
+    const position = this.positionOf(envToken);
+    const valueToken = this.expect(TokenType.Value, "Expected environment list");
+
+    const environments = valueToken.value
+      .split(",")
+      .map((e: string) => e.trim())
+      .filter((e: string) => e.length > 0);
+
+    return {
+      type: NodeType.EnvStatement,
+      position,
+      environments,
+    };
   }
 
   // ── Var Declaration ─────────────────────────────────────────────────────

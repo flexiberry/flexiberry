@@ -10,7 +10,8 @@
 export enum NodeType {
   Program = "Program",
 
-  // Variable constructs
+  // Variable & Env constructs
+  EnvStatement = "EnvStatement",
   VarDeclaration = "VarDeclaration",
   PointerReference = "PointerReference",
 
@@ -70,6 +71,7 @@ export interface ProgramNode extends BaseNode {
 // ─── Statement Union ────────────────────────────────────────────────────────
 
 export type StatementNode =
+  | EnvStatementNode
   | VarDeclarationNode
   | LinkStatementNode
   | InputStatementNode
@@ -80,6 +82,19 @@ export type StatementNode =
   | CaptureBlockNode
   | CheckBlockNode
   | CommentNode;
+
+// ─── Env Constructs ─────────────────────────────────────────────────────────
+
+/**
+ * `Env DEV, STAGING, PROD`
+ *
+ * Grammar: env.grammer.ts
+ * Tokens: Env, Value
+ */
+export interface EnvStatementNode extends BaseNode {
+  readonly type: NodeType.EnvStatement;
+  readonly environments: ReadonlyArray<string>;
+}
 
 // ─── Variable Constructs ────────────────────────────────────────────────────
 
@@ -316,6 +331,7 @@ export interface CommentNode extends BaseNode {
 
 export type ASTNode =
   | ProgramNode
+  | EnvStatementNode
   | VarDeclarationNode
   | LinkStatementNode
   | InputStatementNode

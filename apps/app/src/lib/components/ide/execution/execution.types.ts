@@ -36,6 +36,7 @@ export interface PlanTask {
 export interface RunInstance {
   id: string;
   fileName: string;
+  targetEnv?: string;
   status: "running" | "completed" | "failed" | "killed";
   startTime: Date;
   endTime?: Date;

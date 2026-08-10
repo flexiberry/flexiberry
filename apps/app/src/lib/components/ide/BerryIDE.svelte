@@ -25,7 +25,10 @@
     X,
     Link2,
     FileSpreadsheet,
+    ChevronDown,
   } from "lucide-svelte";
+  import * as DropdownMenu from "$lib/components/ui/dropdown-menu";
+  import { extractEnvironments } from "$lib/utils/envUtils";
   import BerryBlockComponent from "$lib/components/ide/BerryBlock.svelte";
   import BlockAdder from "$lib/components/ide/BlockAdder.svelte";
   import { berryBlocks } from "$lib/writable/berry.store";
@@ -83,6 +86,14 @@
   let viewMode: "blocks" | "raw" = "blocks";
   let rawContent = "";
   let hoveredId: string | null = null;
+
+  let selectedEnv = "";
+  let customEnvInput = "";
+  let envDropdownOpen = false;
+
+  $: availableEnvs = extractEnvironments(
+    viewMode === "raw" ? rawContent : stringifyBerryBlocks($berryBlocks)
+  );
 
   // Load the .berry file
   $: if (ctx.fileName) loadFile(ctx);
@@ -613,6 +624,7 @@
           ctx.fileName,
           viewMode === "raw" ? rawContent : stringifyBerryBlocks($berryBlocks),
           ctx.workspaceId,
+          selectedEnv,
         );
       }
     }, 100);
@@ -707,30 +719,137 @@
         </button>
       </div>
 
-      <!-- Run Button -->
-      <button
-        class="flex items-center gap-1.5 px-4 h-8 rounded-md text-white font-bold uppercase text-[10px] tracking-wider transition-all duration-300 shadow-md active:scale-95 hover:scale-[1.03] cursor-pointer mr-2
-            {runCountdown > 0
-          ? 'bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 border border-amber-400/25 animate-pulse shadow-amber-500/20'
-          : 'bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 border border-emerald-400/25 shadow-emerald-500/25 hover:shadow-emerald-500/35'}"
-        on:click={() => {
-          if (runCountdown > 0) return;
-          startCountdown();
-        }}
-        on:mouseenter={playHoverSound}
-        title={runCountdown > 0
-          ? `Launching in ${runCountdown}s...`
-          : "Run Notebook File"}
-        disabled={runCountdown > 0}
-      >
-        {#if runCountdown > 0}
-          <span class="text-xs font-black">{runCountdown}</span>
-          <span>Launching…</span>
-        {:else}
-          <Play class="w-3.5 h-3.5 fill-current shrink-0" />
-          <span>Run File</span>
-        {/if}
-      </button>
+      <!-- Combined Run Button + Environment Selector -->
+      <div class="inline-flex items-stretch rounded-md shadow-md overflow-hidden mr-2">
+        <button
+          class="flex items-center gap-1.5 px-3 h-8 text-white font-bold uppercase text-[10px] tracking-wider transition-all duration-200 active:scale-95 cursor-pointer
+              {runCountdown > 0
+            ? 'bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 animate-pulse'
+            : 'bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700'}"
+          on:click={() => {
+            if (runCountdown > 0) return;
+            startCountdown();
+          }}
+          on:mouseenter={playHoverSound}
+          title={runCountdown > 0
+            ? `Launching in ${runCountdown}s...`
+            : selectedEnv
+              ? `Run in [@${selectedEnv}] environment`
+              : "Run File (Default Environment)"}
+          disabled={runCountdown > 0}
+        >
+          {#if runCountdown > 0}
+            <span class="text-xs font-black">{runCountdown}</span>
+            <span>Launching…</span>
+          {:else}
+            <Play class="w-3.5 h-3.5 fill-current shrink-0" />
+            <span>Run</span>
+            {#if selectedEnv}
+              <span class="ml-0.5 px-1.5 py-0.5 rounded bg-black/30 text-amber-300 text-[9px] font-extrabold tracking-wider border border-amber-400/40 lowercase">
+                @{selectedEnv}
+              </span>
+            {/if}
+          {/if}
+        </button>
+
+        <DropdownMenu.Root bind:open={envDropdownOpen}>
+          <DropdownMenu.Trigger asChild let:builder>
+            <button
+              use:builder.action
+              {...builder}
+              class="flex items-center justify-center px-1.5 h-8 text-white/90 hover:text-white border-l border-white/20 transition-colors cursor-pointer
+                  {runCountdown > 0
+                ? 'bg-orange-600 hover:bg-orange-700'
+                : 'bg-teal-700 hover:bg-teal-800'}"
+              title="Select Target Environment"
+              disabled={runCountdown > 0}
+            >
+              <ChevronDown class="w-3.5 h-3.5" />
+            </button>
+          </DropdownMenu.Trigger>
+
+          <DropdownMenu.Content align="end" class="w-56 p-1.5 rounded-xl shadow-2xl border border-border bg-card">
+            <DropdownMenu.Label class="px-2.5 py-1.5 text-[10px] font-bold uppercase tracking-wider text-muted-foreground flex items-center justify-between">
+              <span>Target Environment</span>
+              {#if selectedEnv}
+                <span class="text-amber-500 font-mono text-[9px] lowercase">@{selectedEnv}</span>
+              {/if}
+            </DropdownMenu.Label>
+            <DropdownMenu.Separator class="my-1" />
+
+            <!-- Default (Global) Option -->
+            <DropdownMenu.Item
+              class="flex items-center justify-between px-2.5 py-1.5 rounded-lg text-xs font-medium cursor-pointer hover:bg-muted/80"
+              on:click={() => { selectedEnv = ""; }}
+            >
+              <div class="flex items-center gap-2">
+                <Globe class="w-3.5 h-3.5 text-blue-400" />
+                <span>Default (Global)</span>
+              </div>
+              {#if selectedEnv === ""}
+                <Check class="w-3.5 h-3.5 text-emerald-500" />
+              {/if}
+            </DropdownMenu.Item>
+
+            <!-- Detected Environments List -->
+            {#if availableEnvs.length > 0}
+              <DropdownMenu.Separator class="my-1" />
+              <div class="px-2.5 py-1 text-[9px] font-bold uppercase tracking-wider text-muted-foreground/70">
+                Detected in file
+              </div>
+              {#each availableEnvs as envName}
+                <DropdownMenu.Item
+                  class="flex items-center justify-between px-2.5 py-1.5 rounded-lg text-xs font-medium cursor-pointer hover:bg-muted/80"
+                  on:click={() => { selectedEnv = envName; }}
+                >
+                  <div class="flex items-center gap-2">
+                    <span class="px-1.5 py-0.5 text-[10px] font-black rounded bg-amber-500/15 text-amber-500 border border-amber-500/30 font-mono">
+                      @{envName}
+                    </span>
+                    <span>{envName}</span>
+                  </div>
+                  {#if selectedEnv === envName}
+                    <Check class="w-3.5 h-3.5 text-emerald-500" />
+                  {/if}
+                </DropdownMenu.Item>
+              {/each}
+            {/if}
+
+            <!-- Custom Environment Input -->
+            <DropdownMenu.Separator class="my-1" />
+            <div class="p-1.5">
+              <div class="text-[10px] font-semibold text-muted-foreground mb-1">Custom Environment</div>
+              <div class="flex gap-1">
+                <input
+                  type="text"
+                  placeholder="e.g. STAGING"
+                  bind:value={customEnvInput}
+                  on:keydown={(e) => {
+                    if (e.key === "Enter" && customEnvInput.trim()) {
+                      selectedEnv = customEnvInput.trim().toUpperCase();
+                      customEnvInput = "";
+                      envDropdownOpen = false;
+                    }
+                  }}
+                  class="w-full h-7 px-2 text-xs rounded bg-muted/50 border border-border focus:outline-none focus:border-primary uppercase font-mono"
+                />
+                <button
+                  class="h-7 px-2 text-[10px] font-bold uppercase rounded bg-primary text-primary-foreground hover:bg-primary/90 cursor-pointer"
+                  on:click={() => {
+                    if (customEnvInput.trim()) {
+                      selectedEnv = customEnvInput.trim().toUpperCase();
+                      customEnvInput = "";
+                      envDropdownOpen = false;
+                    }
+                  }}
+                >
+                  Set
+                </button>
+              </div>
+            </div>
+          </DropdownMenu.Content>
+        </DropdownMenu.Root>
+      </div>
 
       <button
         class="action-btn action-save"

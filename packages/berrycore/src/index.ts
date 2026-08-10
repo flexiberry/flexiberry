@@ -19,7 +19,34 @@ import {
   ExecutionStatus,
 } from "./interpreter/interpreter.types";
 import { type BerryCoreOptions } from "./berry-core";
-import { NodeType, type BaseNode, type TaskBlockNode, type StepBlockNode, type ParamsBlockNode, type CaptureBlockNode, type CheckBlockNode, type KeyValuePairNode, type ConditionNode, ProgramNode, type ApiBlockNode, type VarDeclarationNode } from "./parser/ast/ast.types";
+import { TokenType } from "./parser/tokenizer/tokenType";
+import {
+  NodeType,
+  type BaseNode,
+  type TaskBlockNode,
+  type StepBlockNode,
+  type ParamsBlockNode,
+  type CaptureBlockNode,
+  type CheckBlockNode,
+  type KeyValuePairNode,
+  type ConditionNode,
+  ProgramNode,
+  type ApiBlockNode,
+  type VarDeclarationNode,
+  type EnvStatementNode,
+  type LinkStatementNode,
+  type InputStatementNode,
+  type PointerReferenceNode,
+  type UrlStatementNode,
+  type HeaderBlockNode,
+  type BodyBlockNode,
+  type BinaryExpressionNode,
+  type IdentifierNode,
+  type LiteralNode,
+  type CommentNode,
+  type StatementNode,
+  type ASTNode,
+} from "./parser/ast/ast.types";
 
 export {
   // ── High-level facade (recommended entry-point) ──────────────────────
@@ -45,6 +72,7 @@ export {
   ExecutionState,
   ExecutionStatus,
   NodeType,
+  TokenType,
   type IOAdapter,
   type LogLevel,
   type CompletedPayload,
@@ -60,5 +88,18 @@ export {
   type ConditionNode,
   type ProgramNode,
   type ApiBlockNode,
-  type VarDeclarationNode
+  type VarDeclarationNode,
+  type EnvStatementNode,
+  type LinkStatementNode,
+  type InputStatementNode,
+  type PointerReferenceNode,
+  type UrlStatementNode,
+  type HeaderBlockNode,
+  type BodyBlockNode,
+  type BinaryExpressionNode,
+  type IdentifierNode,
+  type LiteralNode,
+  type CommentNode,
+  type StatementNode,
+  type ASTNode,
 };
