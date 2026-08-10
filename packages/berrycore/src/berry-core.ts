@@ -40,6 +40,12 @@ import {
 
 export interface BerryCoreOptions {
   /**
+   * Target environment name to activate (e.g. "DEV", "PROD").
+   * Default: "" (ignores all @env tagged Var blocks).
+   */
+  readonly targetEnv?: string;
+
+  /**
    * IO adapter used for user-input prompts, log output, and keyboard commands.
    * Pass a `CliAdapter` for terminal use, or a custom adapter for a UI/WS layer.
    * When omitted, the interpreter runs silently (events are still emitted).
@@ -318,6 +324,7 @@ export class BerryCore {
 
     // ── Phase 3: Create Interpreter ───────────────────────────────────
     this.interpreter = new Interpreter(ast, {
+      targetEnv: this.options.targetEnv,
       ...this.options.interpreterOptions,
       inputRow,
       decryptionProvider: this.options.decryptionProvider

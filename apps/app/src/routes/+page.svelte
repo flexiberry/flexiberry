@@ -11,6 +11,7 @@
   import FileTable from "$lib/components/dashboard/FileTable.svelte";
   import DirectoryGrid from "$lib/components/dashboard/DirectoryGrid.svelte";
   import DeleteConfirmDialog from "$lib/components/dashboard/DeleteConfirmDialog.svelte";
+  import DashboardReadme from "$lib/components/dashboard/DashboardReadme.svelte";
 
   import { dashboardSearchQuery, dashboardCurrentFolderId } from "$lib/writable/assistant.store";
   import { onDestroy } from "svelte";
@@ -69,6 +70,13 @@
 
   // Reset folder navigation when workspace changes
   $: if ($activeWorkspaceId) currentFolderId = null;
+
+  // Reactively find README.md in root location
+  $: rootReadmeFile = !currentFolderId
+    ? allFiles.find(
+        (f) => !(f as any).folderId && (f.name ?? "").toLowerCase() === "readme.md",
+      )
+    : null;
 
   // Helper date formatter
   const formatDate = (dateValue: any) => {
@@ -305,6 +313,10 @@
           {scrollY}
           on:deleteFolder={(e) => handleDeleteFolder(e.detail.e, e.detail.id)}
         />
+
+        {#if !currentFolderId && rootReadmeFile}
+          <DashboardReadme file={rootReadmeFile} />
+        {/if}
       </div>
     </div>
   </div>

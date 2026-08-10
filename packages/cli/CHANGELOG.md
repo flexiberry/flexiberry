@@ -1,5 +1,13 @@
 # @flexiberry/cli
 
+## 0.1.8
+
+### Patch Changes
+
+- Added AST-based environment extraction, Web IDE target environment dropdown execution, system process variable (`process.env` / `{{$env.KEY}}`) fallback resolution in `@flexiberry/berrycore`, and updated official documentation.
+- Updated dependencies
+  - @flexiberry/berrycore@0.1.8
+
 ## 0.1.7
 
 ### Patch Changes

@@ -224,6 +224,11 @@
         ></div>
       {/if}
       <span class="text-xs font-black tracking-tight truncate flex-grow min-w-0">{exec.fileName}</span>
+      {#if exec.targetEnv}
+        <span class="px-1.5 py-0.5 rounded text-[9px] font-black uppercase bg-amber-500/15 text-amber-500 border border-amber-500/30 shrink-0">
+          @{exec.targetEnv}
+        </span>
+      {/if}
       <span class="text-[10px] text-muted-foreground/60 font-mono shrink-0">{exec.elapsedTime}s</span>
     </div>
 

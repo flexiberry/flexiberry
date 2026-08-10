@@ -1,5 +1,14 @@
 # vscode-berry-extension
 
+## 1.0.9
+
+### Patch Changes
+
+- Added AST-based environment extraction, Web IDE target environment dropdown execution, system process variable (`process.env` / `{{$env.KEY}}`) fallback resolution in `@flexiberry/berrycore`, and updated official documentation.
+- Updated dependencies
+  - @flexiberry/berrycore@0.1.8
+  - @flexiberry/language-server@0.1.8
+
 ## 1.0.8
 
 ### Patch Changes

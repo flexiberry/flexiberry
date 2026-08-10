@@ -52,6 +52,7 @@ export function runBerryFile(
   fileName: string,
   text: string,
   workspaceId: string = "default",
+  targetEnv: string = "",
 ) {
   if (!text.trim()) {
     toast.error("Cannot run an empty file.");
@@ -105,6 +106,7 @@ export function runBerryFile(
 
   const core = new BerryCore(text, {
     adapter,
+    targetEnv,
     linkResolver: async (linkPath: string) => {
       // 1. HTTP/HTTPS URLs
       if (linkPath.startsWith("http://") || linkPath.startsWith("https://")) {
@@ -175,6 +177,7 @@ export function runBerryFile(
   const newExecution: RunInstance = {
     id: executionId,
     fileName,
+    targetEnv,
     status: "running",
     startTime: new Date(),
     elapsedTime: 0,
@@ -227,7 +230,12 @@ export function runBerryFile(
     });
   };
 
-  log(`Starting execution of ${fileName}...`, "system");
+  log(
+    targetEnv
+      ? `Starting execution of ${fileName} [@${targetEnv}]...`
+      : `Starting execution of ${fileName}...`,
+    "system",
+  );
 
   const timer = setInterval(() => {
     executions.update((list) => {

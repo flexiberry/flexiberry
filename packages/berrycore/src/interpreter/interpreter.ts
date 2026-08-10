@@ -21,6 +21,7 @@ import {
   ProgramNode,
   NodeType,
   StatementNode,
+  EnvStatementNode,
   VarDeclarationNode,
   ApiBlockNode,
   TaskBlockNode,
@@ -51,6 +52,8 @@ import { RuntimeError, ApiNotFoundError } from "./errors";
 // ─── Interpreter Options ────────────────────────────────────────────────────
 
 export interface InterpreterOptions {
+  /** Target environment name (default: "" -> ignores all @env tagged Var blocks) */
+  readonly targetEnv?: string;
   /** Timeout in ms for API calls (default: 30000) */
   readonly apiTimeout: number;
   /** Whether to continue on step failure (default: true) */
@@ -64,6 +67,7 @@ export interface InterpreterOptions {
 }
 
 const DEFAULT_OPTIONS: InterpreterOptions = {
+  targetEnv: "",
   apiTimeout: 30000,
   continueOnError: true,
   dryRun: false,
@@ -216,6 +220,9 @@ export class Interpreter {
 
     for (const node of this.ast.body) {
       switch (node.type) {
+        case NodeType.EnvStatement:
+          this.pushLog("debug", `Env declared: ${node.environments.join(", ")}`);
+          break;
         case NodeType.VarDeclaration:
           await this.visitVarDeclaration(node);
           break;
@@ -287,6 +294,25 @@ export class Interpreter {
   // ── Var Declaration Visitor ─────────────────────────────────────────────
 
   private async visitVarDeclaration(node: VarDeclarationNode): Promise<void> {
+    const targetEnv = (this.options.targetEnv ?? "").trim().toUpperCase();
+
+    // Environment-scoped Var handling:
+    // If the Var block has an @env pointer (e.g., Var @DEV Base Config)
+    if (node.pointer) {
+      const declaredPointerEnv = node.pointer.target.trim().toUpperCase();
+
+      // Default targetEnv is "" (empty string).
+      // If targetEnv is empty string, all @env scoped Var blocks are IGNORED.
+      // If targetEnv is specified (e.g. "DEV"), only matching @DEV blocks are evaluated.
+      if (!targetEnv || declaredPointerEnv !== targetEnv) {
+        this.pushLog(
+          "debug",
+          `Skipping Var block '${node.title ?? ""}' scoped to @${node.pointer.target} (targetEnv: '${this.options.targetEnv ?? ""}')`
+        );
+        return;
+      }
+    }
+
     // Store each key-value entry as a global variable
     for (const entry of node.entries) {
       if (entry.type === NodeType.Comment) continue;
@@ -892,18 +918,30 @@ export class Interpreter {
    * Replace {{varName}} placeholders with values from the variable map.
    */
   private interpolate(template: string, vars: Map<string, unknown>): string {
-    return template.replace(/\{\{(\w+(?:\.\w+)*)\}\}/g, (_match, varName: string) => {
+    return template.replace(/\{\{([a-zA-Z0-9_\-.]+)\}\}/g, (_match, varName: string) => {
+      // 1. Direct variable lookup
       const value = vars.get(varName);
       if (value !== undefined && value !== null) {
         return String(value);
       }
-      // Try dot-path lookup
+      // 2. Explicit $env.PREFIX support (e.g. {{$env.API_KEY}})
+      if (varName.startsWith("$env.")) {
+        const envKey = varName.replace("$env.", "");
+        if (typeof process !== "undefined" && process.env && process.env[envKey] !== undefined) {
+          return String(process.env[envKey]);
+        }
+      }
+      // 3. Dot-path lookup
       const parts = varName.split(".");
       if (parts.length > 1) {
         const rootVal = vars.get(parts[0]);
         if (rootVal !== undefined && rootVal !== null) {
           return String(this.resolvePath(rootVal, parts.slice(1).join(".")));
         }
+      }
+      // 4. Automatic fallback to process.env (e.g. {{API_KEY}})
+      if (typeof process !== "undefined" && process.env && process.env[varName] !== undefined) {
+        return String(process.env[varName]);
       }
       return `{{${varName}}}`;  // leave unresolved
     });

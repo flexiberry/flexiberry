@@ -141,7 +141,8 @@ export class RunUtility {
     // BerryCore: tokenise → parse → execute
     const core = new BerryCore(source, {
       adapter,
-      basePath: path.dirname(filePath)
+      basePath: path.dirname(filePath),
+      targetEnv: options?.env ?? "",
     });
 
     // Track current task index and iteration offset

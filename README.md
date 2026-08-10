@@ -2,7 +2,7 @@
   <img src="./assets/favicon/android-icon-192x192.png" height="100" width="100" alt="FlexiBerry Logo" />
 </p>
 
-<h1 align="center">FlexiBerry</h1>
+<h1 align="center">flexiberry</h1>
 
 <h2 align="center"> The Developer-First HTTP Client Built for Sequential API Workflows.
 </h2>
