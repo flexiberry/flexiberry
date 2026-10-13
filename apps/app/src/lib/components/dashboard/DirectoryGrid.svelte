@@ -57,10 +57,11 @@
           <Button
             variant="ghost"
             size="icon"
-            class="absolute top-2 right-2 h-7 w-7 opacity-0 group-focus-within:opacity-100 group-hover:opacity-100 transition-opacity bg-background/50 hover:bg-destructive/10 hover:text-destructive shadow-sm border border-transparent hover:border-destructive/20 backdrop-blur-sm"
+            aria-label="Delete folder"
+            class="absolute top-2 right-2 h-8 w-8 opacity-0 group-focus-within:opacity-100 group-hover:opacity-100 transition-opacity bg-background/50 hover:bg-destructive/10 hover:text-destructive shadow-sm border border-transparent hover:border-destructive/20 backdrop-blur-sm"
             on:click={(e) => handleDeleteFolder(e, folder.id)}
           >
-            <Trash2 class="w-3.5 h-3.5" />
+            <Trash2 class="w-4 h-4" />
           </Button>
         </div>
       {/each}

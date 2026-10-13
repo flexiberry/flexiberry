@@ -8,6 +8,7 @@
     type ApiBlockNode, 
     BerryCore,
     InterpreterEvent,
+    ExecutionStatus,
     type TaskResult
   } from "@flexiberry/berrycore";
   import { 
@@ -133,7 +134,7 @@
         // Auto-expand on success to show results
         expandedApi = api.name;
         
-        if (stepResult.status === 'Pass') {
+        if (stepResult.status === ExecutionStatus.Pass) {
            toast.success(`API Run Completed: ${api.name}`);
         } else {
            toast.error(`API Failed: ${stepResult.error}`);

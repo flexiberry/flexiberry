@@ -1,3 +1,7 @@
+<script context="module" lang="ts">
+  declare const CORE_VERSION: string;
+</script>
+
 <script lang="ts">
   import { onMount } from "svelte";
   import { page } from "$app/stores";
@@ -15,6 +19,8 @@
     HelpCircle,
   } from "lucide-svelte";
   import { toast } from "svelte-sonner";
+
+  const coreVersion = typeof CORE_VERSION !== "undefined" ? CORE_VERSION : "0.1.0";
 
   // 1. Connection Status
   let isOnline = true;
@@ -141,17 +147,19 @@
       class="hidden sm:flex items-center gap-1 text-[10px] text-muted-foreground/60"
     >
       <Terminal size={10} />
-      <span>Flexiberry CLI v{CORE_VERSION}</span>
+      <span>Flexiberry CLI v{coreVersion}</span>
     </div>
 
     <div class="hidden sm:block w-[1px] h-3 bg-border"></div>
 
     <!-- Shortcuts Info -->
     <button
-      class="flex items-center gap-1 hover:text-foreground hover:bg-muted/50 px-1.5 py-0.5 rounded transition-colors text-[11px]"
+      type="button"
+      aria-label="View keyboard shortcuts"
+      class="flex items-center gap-1.5 hover:text-foreground hover:bg-muted/50 px-2 py-1 min-h-[28px] rounded transition-colors text-[11px] focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-primary"
       on:click={showShortcuts}
     >
-      <HelpCircle size={12} />
+      <HelpCircle size={13} />
       <span>Shortcuts</span>
     </button>
 
@@ -160,18 +168,21 @@
       href="https://docs.flexiberry.dev"
       target="_blank"
       rel="noreferrer"
-      class="flex items-center gap-1 hover:text-foreground hover:bg-muted/50 px-1.5 py-0.5 rounded transition-colors text-[11px]"
+      aria-label="Open documentation in new tab"
+      class="flex items-center gap-1.5 hover:text-foreground hover:bg-muted/50 px-2 py-1 min-h-[28px] rounded transition-colors text-[11px] focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-primary"
     >
       <span>Docs</span>
-      <ExternalLink size={10} />
+      <ExternalLink size={11} />
     </a>
 
     <!-- Settings Button -->
     <button
-      class="flex items-center gap-1 hover:text-foreground hover:bg-muted/50 px-1.5 py-0.5 rounded transition-colors text-[11px]"
+      type="button"
+      aria-label="Open IDE settings"
+      class="flex items-center gap-1.5 hover:text-foreground hover:bg-muted/50 px-2 py-1 min-h-[28px] rounded transition-colors text-[11px] focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-primary"
       on:click={openSettings}
     >
-      <Settings size={12} />
+      <Settings size={13} />
       <span>Settings</span>
     </button>
   </div>

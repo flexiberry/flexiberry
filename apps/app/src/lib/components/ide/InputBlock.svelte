@@ -172,6 +172,12 @@
   }
 </script>
 
+<svelte:window
+  on:keydown={(e) => {
+    if (showSelector && e.key === "Escape") showSelector = false;
+  }}
+/>
+
 <div class="flex flex-col gap-2 p-1.5 w-full select-none">
   <!-- Horizontal Input & Controls Row -->
   <div class="flex items-center gap-2">
@@ -222,9 +228,15 @@
 
 <!-- Custom Workspace File Selector Modal Dialog -->
 {#if showSelector}
-  <div class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-in fade-in duration-250">
+  <div
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="select-input-file-title"
+    tabindex="-1"
+    class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-in fade-in duration-250"
+  >
     <!-- Modal Card -->
-    <div class="bg-card dark:bg-[#141b2b] border border-border/80 rounded-2xl shadow-2xl w-full max-w-md max-h-[75vh] flex flex-col overflow-hidden animate-in zoom-in-95 duration-200">
+    <div class="bg-card border border-border/80 rounded-2xl shadow-2xl w-full max-w-md max-h-[75vh] flex flex-col overflow-hidden animate-in zoom-in-95 duration-200">
       <!-- Modal Header -->
       <div class="p-4 border-b border-border/40 flex items-center justify-between bg-muted/20">
         <div class="flex items-center gap-2.5">
@@ -232,14 +244,15 @@
             <FileSpreadsheet class="w-4 h-4" />
           </div>
           <div class="flex flex-col">
-            <span class="text-sm font-bold text-foreground">Select Input File</span>
+            <h2 id="select-input-file-title" class="text-sm font-bold text-foreground">Select Input File</h2>
             <span class="text-[10px] text-muted-foreground">Choose CSV or JSON data source</span>
           </div>
         </div>
         <button
           type="button"
+          aria-label="Close dialog"
           on:click={() => showSelector = false}
-          class="p-1 rounded-md text-muted-foreground/60 hover:text-foreground hover:bg-muted transition-all cursor-pointer"
+          class="p-1 rounded-md text-muted-foreground/60 hover:text-foreground hover:bg-muted transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-primary"
         >
           <X class="w-4.5 h-4.5" />
         </button>

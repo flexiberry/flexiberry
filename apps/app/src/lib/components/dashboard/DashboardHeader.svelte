@@ -56,7 +56,7 @@
 
 <!-- Merged Compact Dashboard Header -->
 <!-- Row 1 collapses cleanly on scroll; Row 2 (toolbar) is always visible -->
-<div class="flex flex-col gap-3 will-change-[opacity,max-height,transform]">
+<div class="flex flex-col gap-3">
   <!-- ─── Collapsible Context Row ────────────────────────── -->
   <!-- Using max-height+opacity avoids layout reflow (no negative margins) -->
   <div
@@ -129,11 +129,13 @@
     >
       {#if currentFolderId}
         <button
-          class="flex items-center justify-center h-6 w-6 rounded-md hover:bg-muted transition-colors shrink-0"
+          type="button"
+          class="flex items-center justify-center h-8 w-8 -ml-1 rounded-md hover:bg-muted transition-colors shrink-0"
           on:click={navigateBack}
+          aria-label="Back to root directory"
           title="Back to root"
         >
-          <ArrowLeft class="w-3.5 h-3.5 text-foreground/70" />
+          <ArrowLeft class="w-4 h-4 text-foreground/70" />
         </button>
         <span class="text-border/60 select-none mx-0.5">|</span>
       {/if}
@@ -148,6 +150,7 @@
           <input
             bind:this={folderInputEl}
             bind:value={editingFolderName}
+            aria-label="Edit folder name"
             on:keydown={(e) => {
               if (e.key === "Enter") saveFolderName();
               if (e.key === "Escape") isEditingFolder = false;
@@ -157,8 +160,10 @@
           />
         {:else}
           <button
+            type="button"
             class="flex items-center gap-1.5 px-2 py-0.5 rounded-md text-foreground bg-muted/60 hover:bg-muted transition-colors group"
             on:click={startEditingFolder}
+            aria-label={`Rename folder ${folderName}`}
             title="Click to rename"
           >
             <FolderIcon
@@ -188,6 +193,7 @@
       <Input
         bind:value={searchQuery}
         placeholder="Search files, folders..."
+        aria-label="Search files and folders"
         class="pl-10 h-9 text-sm rounded-lg bg-background/60 dark:bg-muted/30 backdrop-blur-xl border border-border/50 dark:border-white/10 hover:bg-background/80 group-focus-within:bg-background focus-visible:ring-1 focus-visible:ring-primary/40 ring-primary/20 ring-1 relative z-10 transition-all duration-200"
       />
     </div>
@@ -205,7 +211,7 @@
         </Button>
       {/if}
       <Button
-        class="h-9 gap-1.5 rounded-lg text-sm font-medium bg-primary hover:bg-primary/90 text-white shadow-sm px-3 transition-all"
+        class="h-9 gap-1.5 rounded-lg text-sm font-medium bg-primary hover:bg-primary/90 text-primary-foreground shadow-sm px-3 transition-all"
         on:click={handleCreateFile}
       >
         <FilePlus2 class="w-4 h-4" />

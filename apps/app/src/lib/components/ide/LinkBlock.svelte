@@ -219,11 +219,22 @@
   {/if}
 </div>
 
+<svelte:window
+  on:keydown={(e) => {
+    if (e.key === "Escape" && showSelector) showSelector = false;
+  }}
+/>
+
 <!-- Custom Workspace File Selector Modal Dialog -->
 {#if showSelector}
   <div class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-in fade-in duration-250">
     <!-- Modal Card -->
-    <div class="bg-card dark:bg-[#141b2b] border border-border/80 rounded-2xl shadow-2xl w-full max-w-md max-h-[75vh] flex flex-col overflow-hidden animate-in zoom-in-95 duration-200">
+    <div
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="select-file-link-title"
+      class="bg-card border border-border/80 rounded-2xl shadow-2xl w-full max-w-md max-h-[75vh] flex flex-col overflow-hidden animate-in zoom-in-95 duration-200"
+    >
       <!-- Modal Header -->
       <div class="p-4 border-b border-border/40 flex items-center justify-between bg-muted/20">
         <div class="flex items-center gap-2.5">
@@ -231,12 +242,13 @@
             <FolderKanban class="w-4 h-4" />
           </div>
           <div class="flex flex-col">
-            <span class="text-sm font-bold text-foreground">Select File to Link</span>
+            <span id="select-file-link-title" class="text-sm font-bold text-foreground">Select File to Link</span>
             <span class="text-[10px] text-muted-foreground">Choose from workspace files</span>
           </div>
         </div>
         <button
           type="button"
+          aria-label="Close selector dialog"
           on:click={() => showSelector = false}
           class="p-1 rounded-md text-muted-foreground/60 hover:text-foreground hover:bg-muted transition-all cursor-pointer"
         >
@@ -252,6 +264,7 @@
             type="text"
             bind:value={searchQuery}
             placeholder="Search files..."
+            aria-label="Search files to link"
             class="h-9 w-full bg-card border border-border/60 rounded-lg text-xs pl-9 pr-3.5 focus:outline-none focus:ring-1 focus:ring-primary/45 transition-all shadow-sm placeholder:text-muted-foreground/45"
           />
         </div>

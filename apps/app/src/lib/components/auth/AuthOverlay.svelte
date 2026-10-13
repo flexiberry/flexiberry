@@ -143,7 +143,7 @@
       ></div>
     </div>
     <div class="relative z-10 flex flex-col items-center gap-4">
-      <img src={berry} class="h-16 w-16 animate-bounce" alt="FlexiBerry Logo" />
+      <img src={berry} class="h-16 w-16 drop-shadow-md" alt="FlexiBerry Logo" />
       <div
         class="flex items-center gap-2 text-muted-foreground text-sm font-medium"
       >
@@ -344,7 +344,7 @@
 
       <!-- Login / Signup Form -->
       <form
-        on:submit={isResettingPassword ? handleEmailAuth : handleEmailAuth}
+        on:submit={handleEmailAuth}
         class="space-y-4"
       >
         <div class="space-y-1.5">
@@ -394,9 +394,8 @@
               {#if isLogin}
                 <button
                   type="button"
-                  class="text-[10px] text-primary hover:underline font-semibold"
+                  class="text-[10px] text-primary hover:underline font-semibold focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-primary rounded px-0.5"
                   on:click={() => (isResettingPassword = true)}
-                  tabindex="-1"
                 >
                   Forgot Password?
                 </button>
@@ -430,9 +429,9 @@
               />
               <button
                 type="button"
-                class="absolute inset-y-0 right-0 flex items-center pr-3 text-muted-foreground/60 hover:text-foreground"
+                class="absolute inset-y-0 right-0 flex items-center pr-3 text-muted-foreground/60 hover:text-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-primary rounded m-1"
+                aria-label={showPassword ? "Hide password" : "Show password"}
                 on:click={() => (showPassword = !showPassword)}
-                tabindex="-1"
               >
                 {#if showPassword}
                   <svg

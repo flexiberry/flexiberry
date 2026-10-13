@@ -1,0 +1,8 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Community Discussions & Questions
+    url: https://github.com/flexiberry/flexiberry/discussions
+    about: Ask questions, discuss patterns, and share feedback with the community.
+  - name: Discord Community
+    url: https://discord.flexiberry.dev
+    about: Chat in real-time with fellow contributors and users.

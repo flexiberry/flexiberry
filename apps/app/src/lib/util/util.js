@@ -6,12 +6,10 @@
  */
 export function moveItem(folders, indexArray, item) {
   let currentLevel = folders;
-  let index = 0;
   for (let i = 0; i < indexArray.length - 1; i++) {
     currentLevel = currentLevel[indexArray[i]].subfolders;
   }
 
-  console.log(index, indexArray[indexArray.length - 1]);
   if (!currentLevel[indexArray[indexArray.length - 1]].subfolders)
     currentLevel[indexArray[indexArray.length - 1]].subfolders = [];
   currentLevel[indexArray[indexArray.length - 1]].subfolders.push(item);
@@ -40,12 +38,8 @@ export function removeItem(folders, indexArray, item) {
  */
 export function moveItemInHierarchy(folders, path, draggedItemPath) {
   let fl_path = findFolderPath(folders, path);
-  console.log(fl_path);
-  // moveItem(folders, fl_path, draggedItemPath);
-
   let fl_path2 = findFolderPath(folders, draggedItemPath);
 
-  console.log(fl_path2);
   folders = moveItem(folders, fl_path, draggedItemPath);
 
   return removeItem(folders, fl_path2, draggedItemPath);

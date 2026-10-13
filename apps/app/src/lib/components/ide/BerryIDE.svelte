@@ -557,35 +557,14 @@
   }
 
   function playHoverSound() {
-    try {
-      const audioCtx = new (window.AudioContext ||
-        (window as any).webkitAudioContext)();
-      const osc = audioCtx.createOscillator();
-      const gain = audioCtx.createGain();
-
-      osc.connect(gain);
-      gain.connect(audioCtx.destination);
-
-      osc.type = "sine";
-      osc.frequency.setValueAtTime(1300, audioCtx.currentTime);
-
-      gain.gain.setValueAtTime(0.012, audioCtx.currentTime);
-      gain.gain.exponentialRampToValueAtTime(
-        0.001,
-        audioCtx.currentTime + 0.035,
-      );
-
-      osc.start();
-      osc.stop(audioCtx.currentTime + 0.035);
-    } catch (e) {
-      // Ignored if blocked
-    }
+    // Disabled to prevent Web Audio memory leak and unwanted hover audio feedback
   }
 
   function playBeepSound(frequency = 700, duration = 0.08) {
     try {
-      const audioCtx = new (window.AudioContext ||
-        (window as any).webkitAudioContext)();
+      const AudioCtxClass = window.AudioContext || (window as any).webkitAudioContext;
+      if (!AudioCtxClass) return;
+      const audioCtx = new AudioCtxClass();
       const osc = audioCtx.createOscillator();
       const gain = audioCtx.createGain();
 
@@ -600,6 +579,12 @@
         0.001,
         audioCtx.currentTime + duration,
       );
+
+      osc.onended = () => {
+        try {
+          audioCtx.close();
+        } catch {}
+      };
 
       osc.start();
       osc.stop(audioCtx.currentTime + duration);
@@ -894,7 +879,7 @@
       <!-- Floating Left Control Sidebar -->
       {#if $berryBlocks.length > 0}
         <div
-          class="fixed left-3 lg:left-auto lg:right-[calc(50vw+464px)] top-1/2 -translate-y-1/2 z-30 flex flex-col items-end gap-2 p-1.5 bg-card/90 dark:bg-[#141b2b]/90 backdrop-blur border border-border/40 dark:border-border/80 rounded-3xl shadow-lg transition-all duration-300"
+          class="hidden lg:flex fixed left-3 lg:left-auto lg:right-[calc(50vw+464px)] top-1/2 -translate-y-1/2 z-30 flex-col items-end gap-2 p-1.5 bg-card/90 backdrop-blur border border-border/40 rounded-3xl shadow-lg transition-all duration-300"
           aria-label="Notebook Controls"
         >
           <!-- Global actions -->
@@ -1074,7 +1059,7 @@
       <!-- Floating Right Run Sidebar / Dashboard -->
       {#if $berryBlocks.length > 0 && $executions.length > 0}
         <div
-          class="fixed right-3 lg:right-auto lg:left-[calc(50vw+464px)] top-1/2 -translate-y-1/2 z-30 w-28 flex flex-col gap-2 p-2 bg-card/95 dark:bg-[#141b2b]/95 backdrop-blur border border-border/40 dark:border-border/80 rounded-2xl shadow-xl transition-all duration-300"
+          class="hidden lg:flex fixed right-3 lg:right-auto lg:left-[calc(50vw+464px)] top-1/2 -translate-y-1/2 z-30 w-28 flex-col gap-2 p-2 bg-card/95 backdrop-blur border border-border/40 rounded-2xl shadow-xl transition-all duration-300"
           aria-label="Execution Controller"
         >
           <!-- Executions Grid -->
@@ -1119,7 +1104,7 @@
 
                   <!-- Hover Popover Status Card -->
                   <div
-                    class="absolute right-[125%] top-1/2 -translate-y-1/2 w-52 p-3 bg-card dark:bg-[#141b2b] border border-border/80 dark:border-border rounded-xl shadow-2xl z-50 pointer-events-none transition-all duration-200 origin-right flex flex-col gap-1.5 text-xs text-foreground font-sans text-left {hoveredId ===
+                    class="absolute right-[125%] top-1/2 -translate-y-1/2 w-52 p-3 bg-card border border-border/80 rounded-xl shadow-2xl z-50 pointer-events-none transition-all duration-200 origin-right flex flex-col gap-1.5 text-xs text-foreground font-sans text-left {hoveredId ===
                       exec.id || exec.forceShowPopover
                       ? 'opacity-100 scale-100'
                       : 'opacity-0 scale-95'}"

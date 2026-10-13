@@ -164,14 +164,18 @@
     {#if creatingNew}
       <!-- Inline create form — stops dropdown from closing on click inside -->
       <div
+        role="presentation"
         class="px-3 py-2.5 flex flex-col gap-2"
         on:mousedown|stopPropagation
         on:click|stopPropagation
+        on:keydown|stopPropagation
       >
         <!-- Emoji picker -->
         <div class="flex gap-1 flex-wrap">
           {#each EMOJIS as e}
             <button
+              type="button"
+              aria-label={`Select emoji ${e}`}
               class="text-sm p-1 rounded-md transition-colors hover:bg-muted {newEmoji ===
               e
                 ? 'bg-primary/10 ring-1 ring-primary/40'
@@ -187,6 +191,7 @@
             bind:this={inputEl}
             bind:value={newName}
             placeholder="Workspace name..."
+            aria-label="Workspace name"
             class="h-8 text-sm px-2 flex-1 min-w-0 rounded-md border border-input bg-background focus:outline-none focus:ring-1 focus:ring-primary"
             on:keydown={(e) => {
               if (e.key === "Enter") handleCreate();
@@ -200,6 +205,7 @@
         <!-- Action row -->
         <div class="flex items-center justify-end gap-1.5">
           <button
+            type="button"
             class="h-7 px-2.5 text-xs rounded-md text-muted-foreground hover:bg-muted transition-colors"
             on:click|stopPropagation={() => {
               creatingNew = false;

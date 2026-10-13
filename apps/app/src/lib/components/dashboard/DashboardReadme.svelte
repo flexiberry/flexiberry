@@ -106,6 +106,7 @@
           size="sm"
           class="h-8 px-2.5 text-xs gap-1.5 text-muted-foreground hover:text-foreground hover:bg-muted/60"
           on:click={handleCopy}
+          aria-label="Copy raw markdown content"
           title="Copy raw markdown content"
         >
           {#if copied}
@@ -122,6 +123,7 @@
           size="sm"
           class="h-8 px-3 text-xs gap-1.5 font-medium border-border/70 hover:bg-muted/60 transition-colors"
           on:click={handleEdit}
+          aria-label="Open in full editor"
           title="Open in full editor"
         >
           <Pencil class="w-3.5 h-3.5 text-primary" />

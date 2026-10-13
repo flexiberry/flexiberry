@@ -224,7 +224,7 @@
   <div class="pt-4 border-t border-border/20 flex flex-col gap-2 bg-transparent">
     <!-- Spotlight Command Input Capsule -->
     <div
-      class="flex items-center bg-card dark:bg-[#141b2b]/95 border border-border/60 dark:border-border/80 shadow-lg rounded-full px-3 py-1.5 w-full h-11 transition-all duration-300"
+      class="flex items-center bg-card border border-border/60 shadow-lg rounded-full px-3 py-1.5 w-full h-11 transition-all duration-300"
     >
       <!-- Brand Icon -->
       <div class="w-7 h-7 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center text-primary shadow-sm shrink-0 mr-2.5">
@@ -237,12 +237,14 @@
         bind:value={query}
         on:keydown={(e) => e.key === "Enter" && sendMessage()}
         placeholder="Describe changes or paste cURL..."
+        aria-label="Describe changes or paste cURL"
         class="bg-transparent border-none outline-none focus:outline-none focus:ring-0 w-full h-full text-xs font-semibold text-foreground placeholder:text-muted-foreground/45 flex-grow"
       />
 
       <!-- Send Action Button -->
       <button
         type="button"
+        aria-label="Send message"
         class="w-7 h-7 rounded-full bg-primary/10 text-primary hover:bg-primary/25 flex items-center justify-center transition-all shadow-sm active:scale-90 shrink-0 ml-1.5 cursor-pointer border border-primary/25"
         on:click={sendMessage}
       >
