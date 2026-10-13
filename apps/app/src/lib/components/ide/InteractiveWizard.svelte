@@ -327,13 +327,19 @@
             bind:this={inputRef}
             bind:value={inputValue}
             on:keydown={handleKeydown}
+            aria-label={activeStep.message || 'Wizard input'}
             class="bg-transparent border-none outline-none text-foreground w-full placeholder:text-muted-foreground/40 font-mono text-sm"
             placeholder={activeStep.placeholder || ''}
             autocomplete="off"
             spellcheck="false"
           />
           {#if activeStep.suggestions && activeStep.suggestions.length > 0}
-            <div class="flex flex-col gap-1 mt-3 w-full max-w-md border border-border/40 rounded-lg bg-card/50 overflow-hidden shadow-md divide-y divide-border/20" on:click|stopPropagation>
+            <div
+              role="presentation"
+              class="flex flex-col gap-1 mt-3 w-full max-w-md border border-border/40 rounded-lg bg-card/50 overflow-hidden shadow-md divide-y divide-border/20"
+              on:click|stopPropagation
+              on:keydown|stopPropagation
+            >
               <div class="px-3 py-1.5 bg-muted/40 text-[10px] font-black text-muted-foreground/60 uppercase tracking-wider flex justify-between items-center">
                 <span>Suggestions</span>
                 <span class="text-[9px] lowercase italic text-muted-foreground/40 font-medium">use ↑/↓ arrow keys, enter to pick</span>

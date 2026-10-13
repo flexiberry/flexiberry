@@ -231,6 +231,15 @@
   $: avatarInitial = ($user?.isAnonymous ? "G" : (displayName?.[0] || "D")).toUpperCase();
 </script>
 
+<svelte:window
+  on:keydown={(e) => {
+    if (showImportModal && e.key === "Escape") {
+      showImportModal = false;
+      importedData = null;
+    }
+  }}
+/>
+
 <div class="h-full w-full bg-background text-foreground flex flex-col font-sans overflow-hidden relative">
   <!-- Animated Background Orbs (matches +page.svelte dashboard) -->
   <div class="absolute inset-0 z-0 pointer-events-none overflow-hidden bg-background">
@@ -244,6 +253,8 @@
     <!-- Top Nav Header -->
     <div class="max-w-[70rem] mx-auto w-full px-8 pt-6">
       <button 
+        type="button"
+        aria-label="Back to Dashboard"
         class="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-muted-foreground hover:text-foreground bg-card border border-border/80 px-3.5 py-2 rounded-xl transition-all duration-200 shadow-sm hover:scale-[0.98]"
         on:click={goBack}
       >
@@ -383,7 +394,13 @@
 
 <!-- Custom Restore Strategy Confirmation Modal -->
 {#if showImportModal && importedData}
-  <div class="fixed inset-0 z-50 bg-background/80 backdrop-blur-sm flex items-center justify-center p-4">
+  <div
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="confirm-restore-title"
+    tabindex="-1"
+    class="fixed inset-0 z-50 bg-background/80 backdrop-blur-sm flex items-center justify-center p-4"
+  >
     <div class="bg-card border border-border shadow-2xl rounded-2xl p-6 max-w-md w-full relative z-10 transition-all duration-300">
       
       <!-- Warning Header -->
@@ -392,7 +409,7 @@
           <AlertTriangle size={20} />
         </div>
         <div>
-          <h3 class="text-base font-bold text-foreground">Confirm Restore Strategy</h3>
+          <h2 id="confirm-restore-title" class="text-base font-bold text-foreground">Confirm Restore Strategy</h2>
           <p class="text-xs text-muted-foreground mt-0.5">
             A valid backup file containing {importedData.workspaces.length} workspaces and {importedData.files.length} files was parsed.
           </p>
@@ -443,12 +460,14 @@
       <!-- Action buttons -->
       <div class="flex items-center justify-end gap-2.5">
         <button 
+          type="button"
           class="px-4 h-9 text-xs font-semibold text-muted-foreground hover:bg-accent rounded-lg transition-colors border border-border/80"
           on:click={() => { showImportModal = false; importedData = null; }}
         >
           Cancel
         </button>
         <button 
+          type="button"
           class="px-4.5 h-9 text-xs font-bold uppercase tracking-wider rounded-lg text-primary-foreground transition-all shadow-sm {importStrategy === 'merge' ? 'bg-primary hover:bg-primary/95' : 'bg-destructive hover:bg-destructive/95'}"
           on:click={executeImport}
         >

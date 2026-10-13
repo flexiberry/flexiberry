@@ -560,7 +560,7 @@
   :global(.md-prose code)   { font-family:ui-monospace,Menlo,monospace;font-size:.8rem;background:hsl(var(--muted)/.6);padding:.1rem .35rem;border-radius:4px;color:hsl(var(--primary)); }
   :global(.md-prose pre)    { background:hsl(var(--card));border:1px solid hsl(var(--border)/.5);border-radius:8px;padding:1rem 1.2rem;overflow-x:auto;margin:1rem 0; }
   :global(.md-prose pre code) { background:transparent;padding:0;color:hsl(var(--foreground));font-size:.82rem; }
-  :global(.md-prose blockquote) { border-left:3px solid hsl(var(--primary)/.5);margin-left:0;padding-left:1rem;color:hsl(var(--muted-foreground));font-style:italic; }
+  :global(.md-prose blockquote) { background:hsl(var(--muted)/.35);border-radius:6px;margin:1rem 0;padding:.75rem 1rem;color:hsl(var(--muted-foreground));font-style:italic; }
   :global(.md-prose ul),:global(.md-prose ol) { padding-left:1.5rem;margin-bottom:.9rem;color:hsl(var(--muted-foreground)); }
   :global(.md-prose li)   { margin-bottom:.3rem; }
   :global(.md-prose table) { width:100%;border-collapse:collapse;font-size:.82rem;margin:1rem 0; }

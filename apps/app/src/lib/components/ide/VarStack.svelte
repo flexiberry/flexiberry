@@ -6,6 +6,7 @@
     Ast, 
     NodeType, 
     type VarDeclarationNode,
+    type KeyValuePairNode,
     type ProgramNode,
     BerryFormatter
   } from "@flexiberry/berrycore";
@@ -46,13 +47,16 @@
       : node.title || "unnamed";
   }
 
+  function getKeyValuePairs(entries: VarDeclarationNode["entries"]): KeyValuePairNode[] {
+    return entries.filter((e): e is KeyValuePairNode => 'key' in e);
+  }
+
   // ─── Update Logic ────────────────────────────────────────────────
   async function updateValue(varNode: VarDeclarationNode, key: string, newValue: string) {
     if (!fullProgram) return;
 
     // 1. Find the entry and update it
-    // Note: We use the existing node reference in fullProgram
-    const entry = varNode.entries.find(e => e.key === key);
+    const entry = varNode.entries.find((e): e is KeyValuePairNode => 'key' in e && e.key === key);
     if (!entry) return;
     
     // Only update if value actually changed
@@ -105,8 +109,9 @@
         {@const varId = getVarId(v)}
         <div class="group border border-border/40 rounded-xl bg-muted/5 hover:bg-muted/10 transition-all duration-300 overflow-hidden">
           <!-- Var Card Header -->
-          <div 
-            class="p-3 flex items-center justify-between gap-3 cursor-pointer"
+          <button 
+            type="button"
+            class="w-full text-left p-3 flex items-center justify-between gap-3 cursor-pointer focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-primary/40 rounded-xl"
             on:click={() => toggleExpand(varId)}
           >
             <div class="flex items-center gap-3 overflow-hidden">
@@ -143,13 +148,13 @@
                 <ChevronDown class="w-4 h-4" />
               {/if}
             </div>
-          </div>
+          </button>
 
           <!-- Expanded Entries Area -->
           {#if expandedVar === varId}
             <div transition:slide={{ duration: 300 }} class="border-t border-border/30 bg-background/40 p-3 pt-4">
               <div class="space-y-3">
-                {#each v.entries as entry}
+                {#each getKeyValuePairs(v.entries) as entry}
                   <div class="flex flex-col gap-1.5 group/entry relative">
                     <div class="flex items-center justify-between">
                       <div class="flex items-center gap-2">

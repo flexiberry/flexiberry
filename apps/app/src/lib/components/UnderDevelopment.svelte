@@ -114,7 +114,7 @@
         <img
           src={berry}
           alt="Flexiberry Logo"
-          class="w-8 h-8 object-contain relative z-10 animate-bounce-slow"
+          class="w-8 h-8 object-contain relative z-10 transition-transform duration-300 group-hover:scale-105"
         />
       </div>
       <div class="text-left">
@@ -292,7 +292,6 @@
             placeholder="Access code"
             class="flex-1 bg-transparent border-0 outline-none text-xs text-foreground px-2 py-1 placeholder:text-muted-foreground/60 focus:ring-0 focus:outline-none"
             required
-            autoFocus
           />
           <Button
             type="submit"
@@ -340,15 +339,6 @@
       transform: rotate(360deg);
     }
   }
-  @keyframes bounce-slow {
-    0%,
-    100% {
-      transform: translateY(0);
-    }
-    50% {
-      transform: translateY(-4px);
-    }
-  }
   @keyframes fade-in {
     from {
       opacity: 0;
@@ -380,17 +370,14 @@
     }
   }
 
-  .animate-spin-slow {
+  :global(.animate-spin-slow) {
     animation: spin-slow 8s linear infinite;
-  }
-  .animate-bounce-slow {
-    animation: bounce-slow 3s ease-in-out infinite;
   }
   .animate-fade-in {
     animation: fade-in 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
   }
   .animate-scale-up {
-    animation: scale-up 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+    animation: scale-up 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
   }
   .animate-slide-down {
     animation: slide-down 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;

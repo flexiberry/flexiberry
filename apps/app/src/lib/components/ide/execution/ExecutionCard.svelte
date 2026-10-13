@@ -64,7 +64,18 @@
     if (!isDragging) return;
     isDragging = false;
     const header = e.currentTarget as HTMLElement;
-    header.releasePointerCapture(e.pointerId);
+    try {
+      header.releasePointerCapture(e.pointerId);
+    } catch {}
+  }
+
+  function handlePointerCancel(e: PointerEvent) {
+    if (!isDragging) return;
+    isDragging = false;
+    const header = e.currentTarget as HTMLElement;
+    try {
+      header.releasePointerCapture(e.pointerId);
+    } catch {}
   }
 
   $: if (exec.isFullscreen) {
@@ -198,7 +209,7 @@
 </script>
 
 <Card
-  class="pointer-events-auto flex flex-col bg-card/95 dark:bg-[#141b2b]/95 border-border/50 dark:border-border/80 shadow-2xl rounded-2xl overflow-hidden
+  class="pointer-events-auto flex flex-col bg-card/95 border-border/50 shadow-2xl rounded-2xl overflow-hidden
     {isDragging ? '' : 'transition-all duration-300'}
     {exec.isFullscreen
       ? 'fixed inset-10 z-[70] w-auto h-auto max-h-none max-w-none'
@@ -209,7 +220,10 @@
     on:pointerdown={handlePointerDown}
     on:pointermove={handlePointerMove}
     on:pointerup={handlePointerUp}
+    on:pointercancel={handlePointerCancel}
+    on:lostpointercapture={handlePointerCancel}
     class="px-4 py-3 bg-muted/40 border-b border-border/50 flex flex-row items-center justify-between gap-3 shrink-0 space-y-0 cursor-grab active:cursor-grabbing select-none"
+    style="touch-action: none;"
   >
     <div class="flex items-center gap-2 overflow-hidden flex-grow min-w-0">
       {#if exec.status === "running"}

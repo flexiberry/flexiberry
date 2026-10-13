@@ -75,11 +75,18 @@
       {#each files.filter((f) => f.name
           .toLowerCase()
           .includes(searchQuery.toLowerCase())) as file}
-        <button
+        <div
+          role="row"
+          tabindex="0"
           on:click={() =>
             goto(buildFilePath($activeWorkspaceId, file.name, file.folderId ?? currentFolderId))
           }
-          class="w-full text-left grid grid-cols-[1fr_120px] sm:grid-cols-[1fr_200px_150px_60px] gap-4 p-3.5 px-6 items-center hover:bg-muted/40 transition-colors cursor-pointer group"
+          on:keydown={(e) => {
+            if (e.key === "Enter" && e.target === e.currentTarget) {
+              goto(buildFilePath($activeWorkspaceId, file.name, file.folderId ?? currentFolderId));
+            }
+          }}
+          class="w-full text-left grid grid-cols-[1fr_120px] sm:grid-cols-[1fr_200px_150px_60px] gap-4 p-3.5 px-6 items-center hover:bg-muted/40 transition-colors cursor-pointer group focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-primary/40 rounded-lg"
         >
           <div class="flex items-center gap-3 overflow-hidden">
             <FileText
@@ -89,6 +96,7 @@
               <input
                 bind:this={fileInputEl}
                 bind:value={editingFileName}
+                aria-label={`Edit file name for ${file.name}`}
                 on:keydown={(e) => {
                   if (e.key === "Enter") saveFileName(file);
                   if (e.key === "Escape") isEditingFileId = null;
@@ -99,8 +107,16 @@
               />
             {:else}
               <span
-                class="font-medium text-[13px] truncate group-hover:text-primary transition-colors"
+                role="button"
+                tabindex="-1"
+                class="font-medium text-[13px] truncate group-hover:text-primary transition-colors cursor-pointer select-text"
                 on:dblclick={(e) => startEditingFile(e, file)}
+                on:keydown={(e) => {
+                  if (e.key === "F2") {
+                    e.stopPropagation();
+                    startEditingFile(e, file);
+                  }
+                }}
                 title="Double click to rename">{file.name}</span
               >
             {/if}
@@ -110,13 +126,10 @@
             class="hidden sm:flex items-center gap-2 text-[13px] text-muted-foreground truncate"
           >
             <div
-              class="w-5 h-5 rounded-full bg-gradient-to-tr from-sky-400 to-indigo-500 overflow-hidden shrink-0 shadow-sm border border-border"
+              class="w-5 h-5 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center text-[9px] font-bold text-primary shrink-0 shadow-sm select-none"
+              aria-hidden="true"
             >
-              <img
-                src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${file.name}`}
-                alt="avatar"
-                class="w-full h-full object-cover bg-white"
-              />
+              TF
             </div>
             <span class="truncate">Team Flexi</span>
           </div>
@@ -132,6 +145,7 @@
               variant="ghost"
               size="icon"
               class="h-7 w-7 text-muted-foreground opacity-50 group-hover:opacity-100 hover:text-foreground hover:bg-muted"
+              aria-label={`Rename ${file.name}`}
               on:click={(e) => startEditingFile(e, file)}
             >
               <Pencil class="w-3.5 h-3.5" />
@@ -140,12 +154,13 @@
               variant="ghost"
               size="icon"
               class="h-7 w-7 text-muted-foreground opacity-50 group-hover:opacity-100 hover:text-destructive hover:bg-destructive/10"
+              aria-label={`Delete ${file.name}`}
               on:click={(e) => handleDeleteFile(e, file.id)}
             >
               <Trash2 class="w-4 h-4" />
             </Button>
           </div>
-        </button>
+        </div>
       {/each}
     </div>
   </div>

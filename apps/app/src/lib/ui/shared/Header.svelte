@@ -94,6 +94,7 @@
         on:click={() => goto("/")}
         variant="ghost"
         size="icon"
+        aria-label="Go to home"
         class="w-9 h-9 rounded-lg text-muted-foreground hover:text-foreground"
       >
         <Home class="w-[18px] h-[18px]" strokeWidth={1.5} />
@@ -131,6 +132,7 @@
         <Button
           variant="ghost"
           size="icon"
+          aria-label="Documentation"
           class="w-9 h-9 rounded-lg text-muted-foreground hover:text-foreground"
         >
           <BookOpen class="w-[16px] h-[16px]" strokeWidth={1.5} />
@@ -183,6 +185,7 @@
             bind:value={$themeIntensity}
             class="w-16 h-1 bg-muted-foreground/30 rounded-lg appearance-none cursor-pointer accent-primary focus:outline-none theme-slider"
             title="Adjust background intensity"
+            aria-label="Adjust background intensity"
           />
         </div>
       </div>
@@ -218,6 +221,9 @@
         <div
           use:builder.action
           {...builder}
+          role="button"
+          tabindex="0"
+          aria-label="User account menu"
           class="flex items-center gap-3 pl-2 pr-4 h-12 bg-card border border-border rounded-full shadow-sm hover:bg-muted/50 transition-colors cursor-pointer select-none outline-none"
         >
           {#if $user?.photoURL}
