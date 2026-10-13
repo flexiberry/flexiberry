@@ -91,7 +91,7 @@ Var @PROD Production Config
 ### 4.3 System Process Environment Variables (`$env.` & Automatic Fallback)
 Berry automatically falls back to system process environment variables (`process.env` in Node.js/CLI) for any unresolved variable placeholders.
 
-You can also explicitly reference system environment variables using the `{{$env.KEY}}` or `{{KEY}}` namespace syntax:
+You can also explicitly reference system environment variables using the <code v-pre>{{$env.KEY}}</code> or <code v-pre>{{KEY}}</code> namespace syntax:
 ```berry
 Var AppSecrets
 - databaseSecret: {{$env.DB_PASSWORD}}
@@ -131,7 +131,7 @@ Body <Type> `<content>`
 ### 5.1 Properties
 - **`<METHOD>`:** `GET` | `POST` | `PUT` | `PATCH` | `DELETE`
 - **`#<ApiName>`:** Unique identifier preceded by a `#` symbol.
-- **`Url`:** The target URL. Supports placeholder interpolation using `{{variableName}}`.
+- **`Url`:** The target URL. Supports placeholder interpolation using <code v-pre>{{variableName}}</code>.
 - **`Header`:** Sub-block containing request headers as key-value pairs. Supports placeholder interpolation.
 - **`Body <Type>`:** Declares the body type (typically `JSON`, `XML`, or `FORM`) followed by a backtick-wrapped multiline string. Supports placeholder interpolation.
 
@@ -220,15 +220,15 @@ When extracting values in a `Capture` block or validating them in a `Check` bloc
 
 ### 7.3 Captured Variable Scope & Referencing
 When you capture a variable (e.g. `- id: $.body.id`):
-1. **Short Reference:** The variable is declared directly in the task scope as `id`, allowing you to reference it as `{{id}}` in subsequent steps or use it in the current step's checks as `id != null`.
+1. **Short Reference:** The variable is declared directly in the task scope as `id`, allowing you to reference it as <code v-pre>{{id}}</code> in subsequent steps or use it in the current step's checks as `id != null`.
 2. **Step Reference:** The variable is also declared as `Step.<index>.<key>` (e.g. `Step.1.id`) where `<index>` is the 1-based index of the step that captured it. This ensures you can access values uniquely across multiple steps even if they capture matching variable keys (e.g. `id == Step.1.id`).
 
 ### 7.4 Variable Scopes & Hierarchy
-When resolving expressions and placeholders (`{{varName}}`), the engine searches in the following order:
+When resolving expressions and placeholders (<code v-pre>{{varName}}</code>), the engine searches in the following order:
 1. **Step Environment (`stepEnv`)**: Resolves step parameters and response properties (like `$.status` and `$.body`).
 2. **Task Environment (`taskEnv`)**: Resolves step outputs captured from previous steps using the syntax `Step.<Step-Index>.<Captured-Key>` (e.g. `Step.1.token`), as well as short-name variables.
 3. **Global Environment (`globalEnv`)**: Resolves variables defined in global `Var` blocks (matching active `targetEnv` pointers if configured).
-4. **System Process Environment (`process.env`)**: Automatically resolves any remaining unresolved variable names or explicit `{{$env.KEY}}` or `{{KEY}}` references from the operating system / runtime process environment variables.
+4. **System Process Environment (`process.env`)**: Automatically resolves any remaining unresolved variable names or explicit <code v-pre>{{$env.KEY}}</code> or <code v-pre>{{KEY}}</code> references from the operating system / runtime process environment variables.
 
 ### 7.5 Assertions (`Check`) Syntax
 The check block executes a list of assertions. All assertions must evaluate to `true` for the step to pass.

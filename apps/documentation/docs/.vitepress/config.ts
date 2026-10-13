@@ -47,6 +47,7 @@ export default defineConfig({
       { text: "Quick Start", link: "/quick-start" },
       { text: "Writing Berry", link: "/guide/writing-berry" },
       { text: "CLI Tutorial", link: "/guide/cli-tutorial" },
+      { text: "Integrations", link: "/integrations/spring-boot" },
       { text: "CLI", link: "/cli" },
       { text: ".berry Language", link: "/berry-language" },
     ],
@@ -58,6 +59,12 @@ export default defineConfig({
           { text: "Writing Berry", link: "/guide/writing-berry" },
           { text: "CLI Tutorial", link: "/guide/cli-tutorial" },
           { text: "CI / CD Integration", link: "/ci-cd" },
+        ],
+      },
+      {
+        text: "Integrations",
+        items: [
+          { text: "Spring Boot", link: "/integrations/spring-boot" },
         ],
       },
       {

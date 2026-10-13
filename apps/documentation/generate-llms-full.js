@@ -14,7 +14,8 @@ const filesToAggregate = [
   "guide/cli-tutorial.md",
   "cli.md",
   "berry-language.md",
-  "ci-cd.md"
+  "ci-cd.md",
+  "integrations/spring-boot.md"
 ];
 
 let aggregatedContent = `# FlexiBerry Comprehensive Documentation (Aggregated)

@@ -1,0 +1,49 @@
+## ------------------------------------------------------------------
+## CONTROLLER: OrderController
+## Auto-generated from Spring Boot controller
+## Total Endpoints: 3
+## ------------------------------------------------------------------
+
+Api POST #createOrder Create order (OrderController.createOrder)
+Url http://localhost:8080/api/v1/orders
+Header
+- Content-Type: 'application/json'
+- Accept: 'application/json'
+Body JSON `
+{
+  "customerId" : "sample_string",
+  "amount" : 99.95,
+  "currency" : "sample_string"
+}
+`
+
+Api DELETE #cancelOrder Cancel order (OrderController.cancelOrder)
+Url http://localhost:8080/api/v1/orders/{{orderId}}
+Header
+- Accept: 'application/json'
+
+Api GET #getOrder Get order (OrderController.getOrder)
+Url http://localhost:8080/api/v1/orders/{{orderId}}
+Header
+- Accept: 'application/json'
+
+Task Order Lifecycle Workflow
+    Step Call Api createOrder
+        Capture
+        - createdId: response.body.id
+        - createStatus: response.status
+        Check
+        - createStatus == 201 OR createStatus == 200
+        - createdId != null
+    Step Call Api getOrder
+        Params
+        - orderId: createdId
+        Check
+        - $.status == 200
+        - response.body.id == createdId
+    Step Call Api cancelOrder
+        Params
+        - orderId: createdId
+        Check
+        - $.status == 204 OR $.status == 200
+

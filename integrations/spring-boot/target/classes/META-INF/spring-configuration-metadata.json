@@ -1,0 +1,74 @@
+{
+  "groups": [
+    {
+      "name": "flexiberry",
+      "type": "io.flexiberry.springboot.FlexiberryProperties",
+      "sourceType": "io.flexiberry.springboot.FlexiberryProperties"
+    }
+  ],
+  "properties": [
+    {
+      "name": "flexiberry.base-packages",
+      "type": "java.util.List<java.lang.String>",
+      "description": "Restrict scanning to controllers in specified package prefixes",
+      "sourceType": "io.flexiberry.springboot.FlexiberryProperties"
+    },
+    {
+      "name": "flexiberry.base-url",
+      "type": "java.lang.String",
+      "description": "Base URL prefixed to endpoints (e.g. http:\/\/localhost:8080)",
+      "sourceType": "io.flexiberry.springboot.FlexiberryProperties",
+      "defaultValue": "http:\/\/localhost:8080"
+    },
+    {
+      "name": "flexiberry.enabled",
+      "type": "java.lang.Boolean",
+      "description": "Enable or disable Flexiberry spec generator",
+      "sourceType": "io.flexiberry.springboot.FlexiberryProperties",
+      "defaultValue": true
+    },
+    {
+      "name": "flexiberry.export-endpoint-enabled",
+      "type": "java.lang.Boolean",
+      "description": "Expose the HTTP endpoint \/flexiberry\/export.berry",
+      "sourceType": "io.flexiberry.springboot.FlexiberryProperties",
+      "defaultValue": true
+    },
+    {
+      "name": "flexiberry.file-name",
+      "type": "java.lang.String",
+      "description": "Default file name for the emitted .berry spec",
+      "sourceType": "io.flexiberry.springboot.FlexiberryProperties",
+      "defaultValue": "application.berry"
+    },
+    {
+      "name": "flexiberry.generate-on-startup",
+      "type": "java.lang.Boolean",
+      "description": "Automatically write .berry spec on application startup",
+      "sourceType": "io.flexiberry.springboot.FlexiberryProperties",
+      "defaultValue": false
+    },
+    {
+      "name": "flexiberry.infer-workflows",
+      "type": "java.lang.Boolean",
+      "description": "Automatically infer sequential CRUD lifecycle tasks (Task ... Step Call Api ...)",
+      "sourceType": "io.flexiberry.springboot.FlexiberryProperties",
+      "defaultValue": true
+    },
+    {
+      "name": "flexiberry.output-dir",
+      "type": "java.lang.String",
+      "description": "Target directory to write generated .berry files",
+      "sourceType": "io.flexiberry.springboot.FlexiberryProperties",
+      "defaultValue": "src\/test\/resources\/flexiberry"
+    },
+    {
+      "name": "flexiberry.split-by-controller",
+      "type": "java.lang.Boolean",
+      "description": "If true, generates a separate .berry file for each controller and links\/imports them into the main entry file using the 'Link' keyword.",
+      "sourceType": "io.flexiberry.springboot.FlexiberryProperties",
+      "defaultValue": false
+    }
+  ],
+  "hints": []
+}

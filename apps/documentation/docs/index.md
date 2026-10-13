@@ -50,11 +50,19 @@ Welcome to the Flexiberry Documentation!
   <a href="/configuration" class="fb-link">App Configuration →</a>
 </div>
 
-<!-- (Optional) Placeholder for 4th Card -->
+<!-- .berry Language Card -->
 <div class="fb-card">
-  <h3>.berry Language Documentation</h3>
-  <p>Learn how to use the .berry language to write testcases.</p>
+  <h3>📝 .berry Language</h3>
+  <p>Learn how to use the .berry language syntax to write sequential API testcases and assertions.</p>
   <a href="/berry-language" class="fb-link">.berry Language →</a>
 </div>
 
+<!-- Native Framework Integrations Card -->
+<div class="fb-card">
+  <h3>🌱 Spring Boot Integration</h3>
+  <p>Generate type-safe .berry workflow specs and CRUD tests directly from backend controllers and DTOs.</p>
+  <a href="/integrations/spring-boot" class="fb-link">Spring Boot Integration →</a>
 </div>
+
+</div>
+

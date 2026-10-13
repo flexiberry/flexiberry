@@ -1,0 +1,11 @@
+{
+  "name": "@flexiberry/spring-boot-starter",
+  "version": "0.1.0",
+  "description": "Spring Boot starter for generating type-safe Flexiberry (.berry) workflow specs directly from controllers",
+  "private": true,
+  "scripts": {
+    "build": "mvn clean compile -DskipTests",
+    "test": "mvn test",
+    "package": "mvn clean package -DskipTests"
+  }
+}

@@ -40,7 +40,7 @@ Header
 - Accept: 'application/json'
 ```
 > [!NOTE]
-> `{{petId}}` acts as a placeholder that will be dynamically resolved or interpolated when the API is invoked.
+> <code v-pre>{{petId}}</code> acts as a placeholder that will be dynamically resolved or interpolated when the API is invoked.
 
 ### 1.2 POST Request with JSON Body
 For request bodies, Berry supports multiline values enclosed in backticks (`` ` ``):
@@ -115,7 +115,7 @@ Var @PROD Production Config
   flexiberry run my-workflow.berry -e DEV
   ```
 
-### 3.3 System Environment Variables (`process.env` & `{{$env.KEY}}`)
+### 3.3 System Environment Variables (`process.env` & <code v-pre>{{$env.KEY}}</code>)
 Berry automatically resolves any undeclared variable placeholder from your system environment variables (`process.env`):
 ```berry
 # Automatically falls back to process.env.DATABASE_SECRET
@@ -123,7 +123,7 @@ Var Database
 - secretKey: {{DATABASE_SECRET}}
 ```
 
-You can also explicitly reference system environment variables using the `{{$env.KEY}}` namespace:
+You can also explicitly reference system environment variables using the <code v-pre>{{$env.KEY}}</code> namespace:
 ```berry
 Var Auth
 - bearerToken: {{$env.MY_SECRET_TOKEN}}

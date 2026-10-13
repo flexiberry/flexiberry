@@ -21,6 +21,8 @@
     "build:extension": "pnpm --filter @flexiberry/berrycore build && pnpm --filter @flexiberry/language-server build && pnpm --filter vscode-berry-extension build",
     "package:extension": "pnpm run build:extension && pnpm --filter vscode-berry-extension package",
     "dev:all": "node scripts/run-all.js",
+    "build:springboot": "pnpm --filter @flexiberry/spring-boot-starter build",
+    "test:springboot": "pnpm --filter @flexiberry/spring-boot-starter test",
     "build:app": "pnpm --filter @flexiberry/app build",
     "build:doc": "pnpm --filter documentation build",
     "build:website": "pnpm --filter website build",

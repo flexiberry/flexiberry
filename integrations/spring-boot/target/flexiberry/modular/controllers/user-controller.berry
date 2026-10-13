@@ -1,0 +1,71 @@
+## ------------------------------------------------------------------
+## CONTROLLER: UserController
+## Auto-generated from Spring Boot controller
+## Total Endpoints: 5
+## ------------------------------------------------------------------
+
+Api GET #listUsers List users (UserController.listUsers)
+Url http://localhost:8080/api/v1/users?page={{page}}
+Header
+- Accept: 'application/json'
+
+Api POST #create Create (UserController.create)
+Url http://localhost:8080/api/v1/users
+Header
+- Content-Type: 'application/json'
+- Accept: 'application/json'
+Body JSON `
+{
+  "username" : "sample_string",
+  "email" : "sample_string",
+  "role" : "sample_string"
+}
+`
+
+Api DELETE #delete Delete (UserController.delete)
+Url http://localhost:8080/api/v1/users/{{id}}
+Header
+- Accept: 'application/json'
+
+Api GET #getById Get by id (UserController.getById)
+Url http://localhost:8080/api/v1/users/{{id}}
+Header
+- Accept: 'application/json'
+
+Api PUT #update Update (UserController.update)
+Url http://localhost:8080/api/v1/users/{{id}}
+Header
+- Content-Type: 'application/json'
+- Accept: 'application/json'
+Body JSON `
+{
+  "email" : "sample_string",
+  "active" : true
+}
+`
+
+Task User Lifecycle Workflow
+    Step Call Api create
+        Capture
+        - createdId: response.body.id
+        - createStatus: response.status
+        Check
+        - createStatus == 201 OR createStatus == 200
+        - createdId != null
+    Step Call Api getById
+        Params
+        - id: createdId
+        Check
+        - $.status == 200
+        - response.body.id == createdId
+    Step Call Api update
+        Params
+        - id: createdId
+        Check
+        - $.status == 200
+    Step Call Api delete
+        Params
+        - id: createdId
+        Check
+        - $.status == 204 OR $.status == 200
+

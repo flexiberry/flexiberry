@@ -1,0 +1,9 @@
+io/flexiberry/springboot/FlexiberryStarterTest.class
+io/flexiberry/springboot/sample/UserController.class
+io/flexiberry/springboot/sample/OrderController$OrderResponse.class
+io/flexiberry/springboot/sample/UserController$UpdateUserDto.class
+io/flexiberry/springboot/sample/OrderController.class
+io/flexiberry/springboot/sample/TestApplication.class
+io/flexiberry/springboot/sample/UserController$UserResponse.class
+io/flexiberry/springboot/sample/UserController$CreateUserDto.class
+io/flexiberry/springboot/sample/OrderController$CreateOrderDto.class
