@@ -12,8 +12,9 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplicat
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
+import org.springframework.context.annotation.Configuration;
 
-@AutoConfiguration
+@Configuration(proxyBeanMethods = false)
 @ConditionalOnWebApplication
 @EnableConfigurationProperties(FlexiberryProperties.class)
 @ConditionalOnProperty(name = "flexiberry.enabled", havingValue = "true", matchIfMissing = true)

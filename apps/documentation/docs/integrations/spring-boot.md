@@ -19,7 +19,7 @@ The **Flexiberry Spring Boot Starter** (`flexiberry-spring-boot-starter`) solves
 
 ## 📦 Installation
 
-Add the `flexiberry-spring-boot-starter` dependency to your Spring Boot project (compatible with Spring Boot 3.x and Java 17+):
+Add the `flexiberry-spring-boot-starter` dependency to your Spring Boot project (natively compatible across **Spring Boot 2.x, 3.x, and 4.x** / Spring Framework 4, 5, 6, and 7):
 
 ### Maven (`pom.xml`)
 

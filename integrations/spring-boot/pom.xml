@@ -91,4 +91,33 @@
             </plugin>
         </plugins>
     </build>
+
+    <profiles>
+        <!-- Spring Boot 3 (Default, 3.3.x) -->
+        <profile>
+            <id>spring-boot-3</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <properties>
+                <spring-boot.version>3.3.4</spring-boot.version>
+            </properties>
+        </profile>
+
+        <!-- Spring Boot 2 (2.7.x / Spring Framework 5.3) -->
+        <profile>
+            <id>spring-boot-2</id>
+            <properties>
+                <spring-boot.version>2.7.18</spring-boot.version>
+            </properties>
+        </profile>
+
+        <!-- Spring Boot 4 / 3.4+ Milestone (Spring Framework 6/7) -->
+        <profile>
+            <id>spring-boot-4</id>
+            <properties>
+                <spring-boot.version>3.4.0</spring-boot.version>
+            </properties>
+        </profile>
+    </profiles>
 </project>

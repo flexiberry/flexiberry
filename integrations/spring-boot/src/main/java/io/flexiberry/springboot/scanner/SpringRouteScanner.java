@@ -161,14 +161,41 @@ public class SpringRouteScanner {
         );
     }
 
+    @SuppressWarnings("unchecked")
     private Set<String> extractPatterns(RequestMappingInfo info) {
-        if (info.getPathPatternsCondition() != null) {
-            return info.getPathPatternsCondition().getPatternValues();
-        } else if (info.getPatternsCondition() != null) {
-            return info.getPatternsCondition().getPatterns();
+        // 1. Try Spring 5.3+ / Spring 6 / Spring Boot 3 & 4 PathPatternsCondition
+        try {
+            Method getPathPatterns = info.getClass().getMethod("getPathPatternsCondition");
+            Object condition = getPathPatterns.invoke(info);
+            if (condition != null) {
+                Method getPatternValues = condition.getClass().getMethod("getPatternValues");
+                Set<String> values = (Set<String>) getPatternValues.invoke(condition);
+                if (values != null && !values.isEmpty()) {
+                    return values;
+                }
+            }
+        } catch (Throwable ignored) {
+            // Not available on Spring 3 / 4 / early Spring Boot 2
         }
+
+        // 2. Fallback to PatternsCondition (Spring 3, 4, 5 / Spring Boot 2)
+        try {
+            Method getPatternsMethod = info.getClass().getMethod("getPatternsCondition");
+            Object condition = getPatternsMethod.invoke(info);
+            if (condition != null) {
+                Method getPatterns = condition.getClass().getMethod("getPatterns");
+                Set<String> patterns = (Set<String>) getPatterns.invoke(condition);
+                if (patterns != null && !patterns.isEmpty()) {
+                    return patterns;
+                }
+            }
+        } catch (Throwable ignored) {
+            // Invocation error
+        }
+
         return Collections.emptySet();
     }
+
 
     private String humanize(String identifier) {
         StringBuilder sb = new StringBuilder();

@@ -77,16 +77,26 @@ public class DtoPayloadGenerator {
         if (visited.contains(clazz)) return null;
         visited.add(clazz);
 
-        // Handle Java Records (Record components)
-        if (clazz.isRecord()) {
+        // Handle Java Records (reflective check for Java 8 / 11 compatibility)
+        if (isRecordClass(clazz)) {
             Map<String, Object> recordMap = new LinkedHashMap<>();
-            RecordComponent[] components = clazz.getRecordComponents();
-            for (RecordComponent comp : components) {
-                String name = comp.getName();
-                Object val = instantiateSample(comp.getGenericType(), depth + 1);
-                recordMap.put(name, val != null ? val : "sample_" + name);
+            try {
+                Method getComponentsMethod = Class.class.getMethod("getRecordComponents");
+                Object[] components = (Object[]) getComponentsMethod.invoke(clazz);
+                if (components != null) {
+                    for (Object comp : components) {
+                        Method getNameMethod = comp.getClass().getMethod("getName");
+                        Method getGenericTypeMethod = comp.getClass().getMethod("getGenericType");
+                        String name = (String) getNameMethod.invoke(comp);
+                        Type compType = (Type) getGenericTypeMethod.invoke(comp);
+                        Object val = instantiateSample(compType, depth + 1);
+                        recordMap.put(name, val != null ? val : "sample_" + name);
+                    }
+                    return recordMap;
+                }
+            } catch (Throwable ignored) {
+                // Fallback to standard POJO field introspection
             }
-            return recordMap;
         }
 
         // Standard POJOs
@@ -106,4 +116,14 @@ public class DtoPayloadGenerator {
 
         return map.isEmpty() ? null : map;
     }
+
+    private boolean isRecordClass(Class<?> clazz) {
+        try {
+            Method isRecordMethod = Class.class.getMethod("isRecord");
+            return (Boolean) isRecordMethod.invoke(clazz);
+        } catch (Throwable t) {
+            return false;
+        }
+    }
 }
+
