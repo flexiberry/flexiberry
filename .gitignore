@@ -9,4 +9,5 @@ sample
 
 # Build output
 target/
+integrations/spring-boot/target
 
