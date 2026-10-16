@@ -32,6 +32,13 @@ public class BerryWriter {
         return this;
     }
 
+    public BerryWriter appendRaw(String raw) {
+        if (raw != null) {
+            sb.append(raw);
+        }
+        return this;
+    }
+
     public BerryWriter link(String path) {
         sb.append("Link ").append(path.trim()).append("\n");
         return this;

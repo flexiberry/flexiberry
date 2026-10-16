@@ -40,6 +40,54 @@ testImplementation 'io.flexiberry:flexiberry-spring-boot-starter:0.1.0-SNAPSHOT'
 
 ---
 
+## 🛠️ Building & Using Locally via Local Maven
+
+If you are developing locally or testing the starter in other local Spring Boot applications:
+
+### 1. Build & Install to Local Maven Cache (`~/.m2/repository`)
+
+From the `integrations/spring-boot` directory:
+
+```bash
+# Build, test, and install artifact to ~/.m2/repository
+mvn clean install
+
+# Or skip tests during build if preferred
+mvn clean install -DskipTests
+```
+
+This compiles, packages, and installs `io.flexiberry:flexiberry-spring-boot-starter:0.1.0-SNAPSHOT` into your local machine's Maven repository cache at `~/.m2/repository/io/flexiberry/flexiberry-spring-boot-starter/0.1.0-SNAPSHOT/`.
+
+### 2. Consume in Your Local Spring Boot App
+
+#### Maven (`pom.xml`)
+Add the dependency directly to your application's `pom.xml`:
+
+```xml
+<dependency>
+    <groupId>io.flexiberry</groupId>
+    <artifactId>flexiberry-spring-boot-starter</artifactId>
+    <version>0.1.0-SNAPSHOT</version>
+    <scope>test</scope> <!-- Or runtime if using the live /flexiberry/export.berry endpoint -->
+</dependency>
+```
+
+#### Gradle (`build.gradle`)
+Ensure `mavenLocal()` is included under `repositories`:
+
+```groovy
+repositories {
+    mavenLocal()
+    mavenCentral()
+}
+
+dependencies {
+    testImplementation 'io.flexiberry:flexiberry-spring-boot-starter:0.1.0-SNAPSHOT'
+}
+```
+
+---
+
 ## ⚙️ Configuration
 
 Configure the starter in `application.yml` or `application.properties`:
@@ -52,19 +100,26 @@ flexiberry:
   # Base URL prefixed to endpoints (default: http://localhost:8080)
   base-url: "http://localhost:8080"
 
+  # Whether to use a Berry variable for baseUrl (e.g. {{baseUrl}}/path) (default: true)
+  use-base-url-variable: true
+
+  # Variable name to use for the base URL in generated .berry files (default: baseUrl)
+  base-url-variable-name: "baseUrl"
+
   # Target directory where generated .berry files are written
   output-dir: "src/test/resources/flexiberry"
 
   # Default generated filename
   file-name: "application.berry"
 
-  # Split into separate files per controller and import via Link (default: false)
-  split-by-controller: false
+  # Split into separate files per controller and import via Link (default: true)
+  split-by-controller: true
 
   # Automatically write .berry spec on application startup (default: false)
   generate-on-startup: false
 
-  # Automatically infer sequential multi-API CRUD workflows (default: true)
+  # Automatically infer sequential multi-API CRUD workflows/tasks (default: true)
+  # If false, skips generating Task blocks
   infer-workflows: true
 
   # Expose live export endpoint at /flexiberry/export.berry (default: true)
@@ -79,24 +134,24 @@ flexiberry:
 
 ## 📁 Modular Multi-File Generation (`split-by-controller`)
 
-By default (`split-by-controller: false`), all discovered controllers, APIs, and workflows are written into a single consolidated file (e.g. `application.berry`).
+By default (`split-by-controller: true`), modular file separation is enabled: each discovered controller has its own `.berry` file, and the root `application.berry` links them together while organizing executable workflows.
 
-When your application grows and has many controllers, you can enable modular file separation:
+If you prefer a single consolidated `.berry` file with all APIs in one place, you can disable this option:
 
 ```yaml
 flexiberry:
-  split-by-controller: true
+  split-by-controller: false
   output-dir: "src/test/resources/flexiberry"
   file-name: "application.berry"
 ```
 
 When `split-by-controller: true` is configured, the generator:
-1. Emits an isolated `.berry` file for each controller inside a `controllers/` subfolder (e.g. `user-controller.berry`, `order-controller.berry`).
-2. Generates the main entry file (`application.berry`) that imports each controller module using Berry's native `Link` statement:
+1. Emits an isolated `.berry` file for each controller inside a `controllers/` subfolder (e.g. `user-controller.berry`, `order-controller.berry`), complete with its own APIs and lifecycle Task.
+2. Generates the main entry file (`application.berry`) that imports each controller module via `Link` and synthesizes executable `Task` suites for each controller directly within the main file:
 
 ```
 src/test/resources/flexiberry/
-├── application.berry           # Root entry file importing controller modules
+├── application.berry           # Root entry file importing modules & hosting controller Tasks
 └── controllers/
     ├── user-controller.berry   # UserController APIs & CRUD workflow
     └── order-controller.berry  # OrderController APIs & CRUD workflow
@@ -109,8 +164,55 @@ src/test/resources/flexiberry/
 ## Auto-generated from Spring Boot application controllers
 ## ------------------------------------------------------------------
 
+Var AppConfig
+    - baseUrl: 'http://localhost:8080'
+
 Link ./controllers/user-controller.berry
 Link ./controllers/order-controller.berry
+
+## ------------------------------------------------------------------
+## INFERRED SEQUENTIAL MULTI-API TASKS
+## ------------------------------------------------------------------
+
+Task User Lifecycle Workflow
+    Step Call Api create
+        Capture
+        - createdId: response.body.id
+        - createStatus: response.status
+        Check
+        - createStatus == 201 OR createStatus == 200
+        - createdId != null
+    Step Call Api getById
+        Params
+        - id: createdId
+        Check
+        - $.status == 200
+        - response.body.id == createdId
+    Step Call Api delete
+        Params
+        - id: createdId
+        Check
+        - $.status == 204 OR $.status == 200
+
+Task Order Lifecycle Workflow
+    Step Call Api createOrder
+        Capture
+        - createdId: response.body.id
+        - createStatus: response.status
+        Check
+        - createStatus == 201 OR createStatus == 200
+        - createdId != null
+    Step Call Api getOrder
+        Params
+        - orderId: createdId
+        Check
+        - $.status == 200
+        - response.body.id == createdId
+    Step Call Api cancelOrder
+        Params
+        - orderId: createdId
+        Check
+        - $.status == 204 OR $.status == 200
 ```
 
 When you execute `flexiberry run application.berry`, Berry's compiler recursively resolves the `Link` statements and combines all modules into an unified execution context.
@@ -240,8 +342,11 @@ The integration directly outputs the following specification:
 ## Auto-generated from Spring Boot application controllers
 ## ------------------------------------------------------------------
 
+Var AppConfig
+    - baseUrl: 'http://localhost:8080'
+
 Api POST #create Create (UserController.create)
-Url http://localhost:8080/api/v1/users
+Url {{baseUrl}}/api/v1/users
 Header
 - Content-Type: 'application/json'
 - Accept: 'application/json'
@@ -254,12 +359,12 @@ Body JSON `
 `
 
 Api GET #getById Get by id (UserController.getById)
-Url http://localhost:8080/api/v1/users/{{id}}
+Url {{baseUrl}}/api/v1/users/{{id}}
 Header
 - Accept: 'application/json'
 
 Api PUT #update Update (UserController.update)
-Url http://localhost:8080/api/v1/users/{{id}}
+Url {{baseUrl}}/api/v1/users/{{id}}
 Header
 - Content-Type: 'application/json'
 - Accept: 'application/json'
@@ -271,7 +376,7 @@ Body JSON `
 `
 
 Api DELETE #delete Delete (UserController.delete)
-Url http://localhost:8080/api/v1/users/{{id}}
+Url {{baseUrl}}/api/v1/users/{{id}}
 Header
 - Accept: 'application/json'
 

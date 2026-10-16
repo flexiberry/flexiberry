@@ -38,6 +38,70 @@ testImplementation 'io.flexiberry:flexiberry-spring-boot-starter:0.1.0-SNAPSHOT'
 
 ---
 
+## 🛠️ Building & Using Locally via Local Maven
+
+If you are developing locally or testing the starter in your local Spring Boot applications:
+
+### 1. Build & Install to Local Maven Cache (`~/.m2/repository`)
+
+Run the following command from the `integrations/spring-boot` directory:
+
+```bash
+# Build, run tests, and install to local ~/.m2/repository
+mvn clean install
+
+# Or skip tests during build if preferred
+mvn clean install -DskipTests
+```
+
+This compiles, packages the JAR, and installs `io.flexiberry:flexiberry-spring-boot-starter:0.1.0-SNAPSHOT` into your local machine's Maven repository at:
+`~/.m2/repository/io/flexiberry/flexiberry-spring-boot-starter/0.1.0-SNAPSHOT/`
+
+### 2. Consume in Your Local Spring Boot App
+
+#### Maven (`pom.xml`)
+Add the dependency directly to your application's `pom.xml`:
+
+```xml
+<dependency>
+    <groupId>io.flexiberry</groupId>
+    <artifactId>flexiberry-spring-boot-starter</artifactId>
+    <version>0.1.0-SNAPSHOT</version>
+    <scope>test</scope> <!-- Or runtime if using the live /flexiberry/export.berry endpoint -->
+</dependency>
+```
+
+Maven automatically resolves SNAPSHOT artifacts from your local `~/.m2/repository`. If your project enforces remote repositories, ensure local snapshots are enabled:
+
+```xml
+<repositories>
+    <repository>
+        <id>local-m2</id>
+        <url>file://${user.home}/.m2/repository</url>
+        <snapshots>
+            <enabled>true</enabled>
+            <updatePolicy>always</updatePolicy>
+        </snapshots>
+    </repository>
+</repositories>
+```
+
+#### Gradle (`build.gradle`)
+Ensure `mavenLocal()` is included under `repositories`:
+
+```groovy
+repositories {
+    mavenLocal()
+    mavenCentral()
+}
+
+dependencies {
+    testImplementation 'io.flexiberry:flexiberry-spring-boot-starter:0.1.0-SNAPSHOT'
+}
+```
+
+---
+
 ## ⚙️ Configuration
 
 Configure generation options in `application.yml` or `application.properties`:
@@ -46,10 +110,14 @@ Configure generation options in `application.yml` or `application.properties`:
 flexiberry:
   enabled: true
   base-url: "http://localhost:8080"
+  use-base-url-variable: true
+  base-url-variable-name: "baseUrl"
   output-dir: "src/test/resources/flexiberry"
   file-name: "application.berry"
+  split-by-controller: true
   generate-on-startup: false
-  infer-workflows: true
+  # Generate lifecycle tasks for each controller (default: true)
+  infer-workflows: true # or generate-tasks: true
   export-endpoint-enabled: true
   base-packages:
     - "com.example.demo.controller"
@@ -100,8 +168,11 @@ public class UserController {
 
 The starter produces:
 ```berry
+Var AppConfig
+    - baseUrl: 'http://localhost:8080'
+
 Api POST #create Create (UserController.create)
-Url http://localhost:8080/api/v1/users
+Url {{baseUrl}}/api/v1/users
 Header
 - Content-Type: 'application/json'
 - Accept: 'application/json'
@@ -113,12 +184,12 @@ Body JSON `
 `
 
 Api GET #getById Get by id (UserController.getById)
-Url http://localhost:8080/api/v1/users/{{id}}
+Url {{baseUrl}}/api/v1/users/{{id}}
 Header
 - Accept: 'application/json'
 
 Api DELETE #delete Delete (UserController.delete)
-Url http://localhost:8080/api/v1/users/{{id}}
+Url {{baseUrl}}/api/v1/users/{{id}}
 Header
 - Accept: 'application/json'
 

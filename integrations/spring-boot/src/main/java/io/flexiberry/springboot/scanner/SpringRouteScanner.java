@@ -10,6 +10,8 @@ import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandl
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Scans Spring MVC RequestMappingHandlerMapping to extract type-safe route endpoints.
@@ -114,10 +116,37 @@ public class SpringRouteScanner {
             }
         }
 
+        // Extract any path variables directly from rawPath (e.g. /{id} or /{orderId})
+        // This guarantees path variables are detected even if class bytecode lacks -parameters debug symbols
+        Matcher pvMatcher = Pattern.compile("\\{([a-zA-Z0-9_]+)\\}").matcher(rawPath);
+        while (pvMatcher.find()) {
+            String pvName = pvMatcher.group(1);
+            if (!pathVars.contains(pvName)) {
+                pathVars.add(pvName);
+            }
+        }
+
         // Normalize URL to {{param}}
         String berryPath = rawPath.replaceAll("\\{([a-zA-Z0-9_]+)\\}", "{{$1}}");
-        String fullUrl = properties.getBaseUrl().replaceAll("/+$", "") +
-                         (berryPath.startsWith("/") ? berryPath : "/" + berryPath);
+        String normalizedEndpoint = berryPath.startsWith("/") ? berryPath : "/" + berryPath;
+
+        String prefix;
+        if (properties.isUseBaseUrlVariable()) {
+            String rawBase = properties.getBaseUrl() != null ? properties.getBaseUrl().trim() : "";
+            if (rawBase.startsWith("{{") && rawBase.endsWith("}}")) {
+                prefix = rawBase;
+            } else {
+                String varName = properties.getBaseUrlVariableName();
+                if (varName == null || varName.isBlank()) {
+                    varName = "baseUrl";
+                }
+                prefix = "{{" + varName.trim() + "}}";
+            }
+        } else {
+            prefix = properties.getBaseUrl() != null ? properties.getBaseUrl().replaceAll("/+$", "") : "";
+        }
+
+        String fullUrl = prefix + normalizedEndpoint;
 
         // Add query parameters to URL if any
         if (!queryParams.isEmpty()) {

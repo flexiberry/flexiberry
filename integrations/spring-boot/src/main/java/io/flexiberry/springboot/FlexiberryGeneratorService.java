@@ -50,7 +50,7 @@ public class FlexiberryGeneratorService {
             for (String controllerName : grouped.keySet()) {
                 linkPaths.add("./controllers/" + toKebabCase(controllerName) + ".berry");
             }
-            return generateRootBerryDsl(linkPaths);
+            return generateRootBerryDsl(linkPaths, grouped);
         }
 
         List<DiscoveredEndpoint> endpoints = scanner.scanEndpoints();
@@ -64,6 +64,10 @@ public class FlexiberryGeneratorService {
         writer.comment("Total Discovered Endpoints: " + endpoints.size());
         writer.comment("------------------------------------------------------------------");
         writer.blankLine();
+
+        if (properties.isUseBaseUrlVariable()) {
+            writeBaseUrlVariable(writer);
+        }
 
         // Write each discovered API block
         for (DiscoveredEndpoint ep : endpoints) {
@@ -79,11 +83,14 @@ public class FlexiberryGeneratorService {
 
         // Infer sequential multi-API workflow tasks
         if (properties.isInferWorkflows()) {
-            writer.comment("------------------------------------------------------------------");
-            writer.comment("INFERRED SEQUENTIAL MULTI-API TASKS");
-            writer.comment("------------------------------------------------------------------");
-            writer.blankLine();
-            workflowInferrer.inferWorkflows(endpoints, writer);
+            BerryWriter taskWriter = new BerryWriter(4);
+            if (workflowInferrer.inferWorkflows(endpoints, taskWriter)) {
+                writer.comment("------------------------------------------------------------------");
+                writer.comment("INFERRED SEQUENTIAL MULTI-API TASKS");
+                writer.comment("------------------------------------------------------------------");
+                writer.blankLine();
+                writer.appendRaw(taskWriter.build());
+            }
         }
 
         return writer.build();
@@ -101,6 +108,10 @@ public class FlexiberryGeneratorService {
         writer.comment("Total Endpoints: " + endpoints.size());
         writer.comment("------------------------------------------------------------------");
         writer.blankLine();
+
+        if (properties.isUseBaseUrlVariable()) {
+            writeBaseUrlVariable(writer);
+        }
 
         for (DiscoveredEndpoint ep : endpoints) {
             writer.api(
@@ -121,9 +132,14 @@ public class FlexiberryGeneratorService {
     }
 
     /**
-     * Generate the root .berry DSL that imports each controller file via 'Link'.
+     * Generate the root .berry DSL that imports each controller file via 'Link'
+     * and optionally includes lifecycle Tasks for each controller.
      */
     public String generateRootBerryDsl(List<String> linkPaths) {
+        return generateRootBerryDsl(linkPaths, getEndpointsByController());
+    }
+
+    public String generateRootBerryDsl(List<String> linkPaths, Map<String, List<DiscoveredEndpoint>> groupedEndpoints) {
         BerryWriter writer = new BerryWriter(4);
 
         writer.comment("------------------------------------------------------------------");
@@ -134,11 +150,55 @@ public class FlexiberryGeneratorService {
         writer.comment("------------------------------------------------------------------");
         writer.blankLine();
 
+        if (properties.isUseBaseUrlVariable()) {
+            writeBaseUrlVariable(writer);
+        }
+
         for (String path : linkPaths) {
             writer.link(path);
         }
 
+        if (properties.isInferWorkflows() && groupedEndpoints != null && !groupedEndpoints.isEmpty()) {
+            BerryWriter taskWriter = new BerryWriter(4);
+            boolean anyTask = false;
+            for (Map.Entry<String, List<DiscoveredEndpoint>> entry : groupedEndpoints.entrySet()) {
+                if (workflowInferrer.inferControllerLifecycle(entry.getKey(), entry.getValue(), taskWriter)) {
+                    anyTask = true;
+                }
+            }
+
+            if (anyTask) {
+                writer.blankLine();
+                writer.comment("------------------------------------------------------------------");
+                writer.comment("INFERRED SEQUENTIAL MULTI-API TASKS");
+                writer.comment("------------------------------------------------------------------");
+                writer.blankLine();
+                writer.appendRaw(taskWriter.build());
+            }
+        }
+
         return writer.build();
+    }
+
+    private void writeBaseUrlVariable(BerryWriter writer) {
+        String varName = properties.getBaseUrlVariableName();
+        if (varName == null || varName.isBlank()) {
+            varName = "baseUrl";
+        }
+        String baseValue = properties.getBaseUrl();
+        if (baseValue == null || baseValue.isBlank()) {
+            baseValue = "http://localhost:8080";
+        } else {
+            baseValue = baseValue.replaceAll("/+$", "");
+        }
+
+        if (baseValue.startsWith("{{") && baseValue.endsWith("}}")) {
+            baseValue = baseValue.substring(2, baseValue.length() - 2).trim();
+        }
+
+        Map<String, Object> entries = new LinkedHashMap<>();
+        entries.put(varName.trim(), baseValue);
+        writer.var("AppConfig", null, entries);
     }
 
     /**
@@ -182,8 +242,8 @@ public class FlexiberryGeneratorService {
             linkPaths.add("./controllers/" + fileName);
         }
 
-        // Write root file with Link statements
-        String rootDsl = generateRootBerryDsl(linkPaths);
+        // Write root file with Link statements and tasks
+        String rootDsl = generateRootBerryDsl(linkPaths, grouped);
         Files.writeString(mainPath, rootDsl, StandardCharsets.UTF_8);
         writtenFiles.add(0, mainPath);
 

@@ -14,6 +14,17 @@ public class FlexiberryProperties {
     /** Base URL prefixed to endpoints (e.g. http://localhost:8080) */
     private String baseUrl = "http://localhost:8080";
 
+    /**
+     * Whether to use a Berry variable for the base URL (e.g. {{baseUrl}}/endpoint)
+     * and declare it in a Var block, rather than inlining the absolute base URL directly.
+     */
+    private boolean useBaseUrlVariable = true;
+
+    /**
+     * Name of the variable to use for the base URL in generated .berry files (default: baseUrl).
+     */
+    private String baseUrlVariableName = "baseUrl";
+
     /** Target directory to write generated .berry files */
     private String outputDir = "src/test/resources/flexiberry";
 
@@ -36,13 +47,19 @@ public class FlexiberryProperties {
      * If true, generates a separate .berry file for each controller and links/imports
      * them into the main entry file using the 'Link' keyword.
      */
-    private boolean splitByController = false;
+    private boolean splitByController = true;
 
     public boolean isEnabled() { return enabled; }
     public void setEnabled(boolean enabled) { this.enabled = enabled; }
 
     public String getBaseUrl() { return baseUrl; }
     public void setBaseUrl(String baseUrl) { this.baseUrl = baseUrl; }
+
+    public boolean isUseBaseUrlVariable() { return useBaseUrlVariable; }
+    public void setUseBaseUrlVariable(boolean useBaseUrlVariable) { this.useBaseUrlVariable = useBaseUrlVariable; }
+
+    public String getBaseUrlVariableName() { return baseUrlVariableName; }
+    public void setBaseUrlVariableName(String baseUrlVariableName) { this.baseUrlVariableName = baseUrlVariableName; }
 
     public String getOutputDir() { return outputDir; }
     public void setOutputDir(String outputDir) { this.outputDir = outputDir; }
@@ -55,6 +72,9 @@ public class FlexiberryProperties {
 
     public boolean isInferWorkflows() { return inferWorkflows; }
     public void setInferWorkflows(boolean inferWorkflows) { this.inferWorkflows = inferWorkflows; }
+
+    public boolean isGenerateTasks() { return inferWorkflows; }
+    public void setGenerateTasks(boolean generateTasks) { this.inferWorkflows = generateTasks; }
 
     public boolean isExportEndpointEnabled() { return exportEndpointEnabled; }
     public void setExportEndpointEnabled(boolean exportEndpointEnabled) { this.exportEndpointEnabled = exportEndpointEnabled; }
